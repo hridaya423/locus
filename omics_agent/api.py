@@ -1,4 +1,5 @@
 import json
+import os
 import queue
 import threading
 from dataclasses import asdict
@@ -90,4 +91,5 @@ def main() -> None:
 
     # Load the embedding model and vectors before serving, so the first search does not pay for it.
     index.semantic_search("warm up", ["GEO"], "", 1)
-    uvicorn.run(app, port=8000)
+    # OMICS_API_PORT lets the API move off 8000 when that port is taken; the web app's OMICS_API_URL must match.
+    uvicorn.run(app, port=int(os.environ.get("OMICS_API_PORT") or 8000))

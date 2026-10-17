@@ -68,6 +68,13 @@ cd web && npm ci && npm run dev     # http://localhost:3000
 
 The web app calls `/api` on its own origin, and Next.js forwards it to port 8000, so the app also works through a tunnel such as ngrok.
 
+If port 8000 is taken, set `OMICS_API_PORT` in `.env` and point the web app at it with `OMICS_API_URL`. To open the dev server from another machine by its IP address, list that address in `EXTRA_DEV_ORIGINS`:
+
+```sh
+OMICS_API_PORT=8010 uv run omics-api
+cd web && OMICS_API_URL=http://localhost:8010 EXTRA_DEV_ORIGINS=152.78.149.61 npm run dev
+```
+
 ### MCP server
 
 ```sh
