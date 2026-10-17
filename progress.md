@@ -202,6 +202,24 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 
 ### Moments
 (one line each: source · page · dataset · moment)
+Door audit baseline (seed 1, 30 datasets, 38 pages, 23:05): 5.97 outbound links per page, 20.03 values that open nothing per page.
+- door audit · /d/E-MTAB-12165 · E-MTAB-12165 · Record › Organism opens nothing (on 34 of 38 pages, e.g. “Homo sapiens”)
+- door audit · /d/df4f1358-4a19-44f5-b136-bc7274c29789 · df4f1358-4a19-44f5-b136-bc7274c29789 · Record › Published opens nothing (on 17 of 38 pages, e.g. “2021-12-09”)
+- door audit · /d/E-MTAB-12165 · E-MTAB-12165 · nav › www.ebi.ac.uk links out to www.ebi.ac.uk (on 16 of 38 pages, e.g. “ArrayExpress record”)
+- door audit · /d/PRJNA1089337 · PRJNA1089337 · Files › ftp.sra.ebi.ac.uk links out to ftp.sra.ebi.ac.uk (on 14 of 38 pages, e.g. “SRR28383130_1.fastq.gz”)
+- door audit · /d/df4f1358-4a19-44f5-b136-bc7274c29789 · df4f1358-4a19-44f5-b136-bc7274c29789 · Record › Data type opens nothing (on 14 of 38 pages, e.g. “Single-cell: Slide-seqV2”)
+- door audit · /d/df4f1358-4a19-44f5-b136-bc7274c29789 · df4f1358-4a19-44f5-b136-bc7274c29789 · Paper › europepmc.org links out to europepmc.org (on 12 of 38 pages, e.g. “High-resolution Slide-seqV2 spatial transcriptomics enables ”)
+- door audit · /d/EGAD00000000085 · EGAD00000000085 · nav › www.omicsdi.org links out to www.omicsdi.org (on 12 of 38 pages, e.g. “EGA record”)
+- door audit · /d/PRJNA1089337 · PRJNA1089337 · Record › Status opens nothing (on 12 of 38 pages, e.g. “PUBLIC”)
+- door audit · /d/PRJNA1089337 · PRJNA1089337 · Record › Last updated opens nothing (on 12 of 38 pages, e.g. “2024-03-30”)
+- door audit · /d/GSE69830 · GSE69830 · Record › Submitted opens nothing (on 12 of 38 pages, e.g. “Jun 12 2015”)
+- door audit · /d/LDS-1346 · LDS-1346 · Record › Keywords opens nothing (on 11 of 38 pages, e.g. “Small molecule metabolic process”)
+- door audit · /d/PRJNA1089337/SRR28383130 · PRJNA1089337 · Record › Instrument opens nothing (on 11 of 38 pages, e.g. “Illumina NovaSeq 6000”)
+- door audit · /d/df4f1358-4a19-44f5-b136-bc7274c29789 · df4f1358-4a19-44f5-b136-bc7274c29789 · Record › Samples opens nothing (on 11 of 38 pages, e.g. “1”)
+- door audit · /d/GSE69830 · GSE69830 · Record › Experiment type opens nothing (on 8 of 38 pages, e.g. “Expression profiling by high throughput sequencing”)
+- door audit · /d/E-MTAB-12165 · E-MTAB-12165 · Record › Released opens nothing (on 8 of 38 pages, e.g. “2023-08-22”)
+- door audit · /d/GSE69830 · GSE69830 · nav › www.ncbi.nlm.nih.gov links out to www.ncbi.nlm.nih.gov (on 8 of 38 pages, e.g. “GEO record”)
+- harness · /d/GSE179525 · GSE179525 · Samples design charts fail: /design returns 500 (design.py IndexError); also GSE149204. Sent to builder A.
 
 ### Ladder, found tonight
 - Dictate the question (mic in the search box), asked by the user at 23:05.

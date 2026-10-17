@@ -15,7 +15,7 @@ const DB = new URL("../data/omics.db", import.meta.url).pathname;
 mkdirSync(OUT, { recursive: true });
 
 // One dataset per repository first, then the rest from the repositories locus reads in full, so every kind of page is seen.
-const sql = (q) => execFileSync("sqlite3", ["-readonly", DB, q], { encoding: "utf8" }).trim().split("\n").filter(Boolean);
+const sql = (q) => execFileSync("sqlite3", [DB, q], { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 const shuffle = `ORDER BY ((rowid + ${SEED}) * 2654435761) % 1000003`;
 const sources = sql("SELECT DISTINCT source FROM datasets");
 const picked = sources.flatMap((s) => sql(`SELECT accession FROM datasets WHERE source='${s}' ${shuffle} LIMIT 1`));
@@ -65,7 +65,7 @@ const pages = [];
 for (const acc of picked) {
   for (let url = `${WEB}/d/${encodeURIComponent(acc)}`; url; ) {
     await page.goto(url);
-    const ready = await page.until(PAGE_READY, 60000);
+    const ready = (await page.until(PAGE_READY, 60000)) && !(await page.eval("/did not send/.test(document.body.innerText)"));
     await new Promise((r) => setTimeout(r, 1200));
     const doors = ready ? await page.eval(COLLECT) : [];
     const sample = url.endsWith(encodeURIComponent(acc)) ? await page.eval(`document.querySelector('a[href^="/d/${encodeURIComponent(acc)}/"]')?.getAttribute('href') ?? null`) : null;

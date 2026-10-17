@@ -44,7 +44,7 @@ async function open(url, name) {
   await page.width(1280);
   const t0 = Date.now();
   await page.goto(url);
-  const ready = await page.until(PAGE_READY, 60000);
+  const ready = (await page.until(PAGE_READY, 60000)) && !(await page.eval("/did not send/.test(document.body.innerText)"));
   const ms = Date.now() - t0;
   const outbound = await page.eval(`[...document.querySelectorAll('a[href]')].filter(a => a.host && a.host !== location.host && !a.href.startsWith('mailto:')).length`);
   const overflow = await both(name, true);
