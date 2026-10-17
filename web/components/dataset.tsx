@@ -76,7 +76,7 @@ export function DatasetPage({ accession }: { accession: string }) {
           <Header accession={accession} rec={rec} hit={context?.hit} />
           {error ? (
             <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
-              {source ? repositoryName(source) : "The repository"} did not send the record.
+              {error === "502" ? `${source ? repositoryName(source) : "The repository"} did not send the record.` : "locus could not read this record; its server failed."}
               <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
             </p>
           ) : !rec ? (

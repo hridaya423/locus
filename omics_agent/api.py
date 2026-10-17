@@ -5,6 +5,7 @@ import threading
 from dataclasses import asdict
 from typing import Annotated
 
+import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,7 +88,11 @@ def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za
 @app.get("/record/{accession}")
 def dataset_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """Everything the repository's own page shows for one dataset: texts, facts, people, papers, links, samples and files."""
-    if not (found := record.record(accession)):
+    try:
+        found = record.record(accession)
+    except httpx.HTTPError as error:
+        raise HTTPException(502, f"The repository did not answer: {error}") from error
+    if not found:
         raise HTTPException(404, f"{accession} is not in the index.")
     return found
 
@@ -99,6 +104,8 @@ def sample_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,3
         found = record.sample(accession, sample)
     except LookupError as error:
         raise HTTPException(404, str(error))
+    except httpx.HTTPError as error:
+        raise HTTPException(502, f"The repository did not answer: {error}") from error
     if not found:
         raise HTTPException(404, f"locus has no sample pages for {accession}.")
     return found

@@ -85,7 +85,7 @@ export function SamplePage({ dataset, accession }: { dataset: string; accession:
         </p>
       ) : error ? (
         <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
-          The repository did not send the sample record.
+          {error === "502" ? "The repository did not send the sample record." : "locus could not read this sample; its server failed."}
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
         </p>
       ) : (

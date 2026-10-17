@@ -624,17 +624,24 @@ def _pmid_for_doi(doi: str) -> str | None:
 
 
 def bundles(hits: list[dict]) -> list[list[dict]]:
-    """Group hits that come from the same paper, across repositories."""
+    """Group hits that are one study in several repositories: the same paper, or the same title (ArrayExpress and ENA
+    list one submission under two accessions, often with no paper)."""
     dois = {p[4:] for h in hits for p in h["papers"] if p.startswith("doi:")}
     with ThreadPoolExecutor() as pool:
         doi_to_pmid = dict(zip(dois, pool.map(_pmid_for_doi, dois)))
-    by_paper: dict[str, list[dict]] = {}
+    by_key: dict[str, list[dict]] = {}
     for h in hits:
-        keys = {f"pmid:{doi_to_pmid[p[4:]]}" if doi_to_pmid.get(p[4:]) else p for p in h["papers"]}
+        keys = {f"pmid:{doi_to_pmid[p[4:]]}" if doi_to_pmid.get(p[4:]) else p for p in h["papers"] if p != "pmid:1"}
+        if len(title := re.sub(r"[^a-z0-9]", "", h["title"].lower())) >= 25:
+            keys.add(f"title:{title}")
         for key in keys:
-            by_paper.setdefault(key, []).append(h)
-    groups = [g for g in by_paper.values() if len({h["source"] for h in g}) > 1]
-    return [g for i, g in enumerate(groups) if g not in groups[:i]]
+            by_key.setdefault(key, []).append(h)
+    groups: list[list[dict]] = []
+    for g in (g for g in by_key.values() if len({h["source"] for h in g}) > 1):
+        touching = [o for o in groups if any(h in o for h in g)]
+        merged = [h for o in touching for h in o] + [h for h in g if not any(h in o for o in touching)]
+        groups = [o for o in groups if o not in touching] + [merged]
+    return groups
 
 
 def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> dict:
