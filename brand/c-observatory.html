@@ -1,0 +1,94 @@
+<!doctype html><html><head><meta charset="utf-8"><title>locus — C · Dark observatory</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--void:#07080A;--deep:#0E1014;--line:#1E222A;--dim:#6B7280;--star:#E8ECF2;--sig:#FF5A24;--ctl:#7FB8A4}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Inter Tight',sans-serif;color:var(--star)}
+.m{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+.board{background:var(--void);border-radius:14px;padding:12px;display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.c{background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:22px;position:relative;overflow:hidden}
+.lbl{display:flex;justify-content:space-between;color:var(--dim);margin-bottom:18px}
+.hero{grid-column:span 12;height:440px;padding:0;background:var(--void)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero .in{position:relative;height:100%;padding:26px;display:flex;flex-direction:column;justify-content:space-between}
+.wm{font-weight:300;font-size:92px;letter-spacing:.32em;line-height:1;margin-right:-.32em}
+.lock{display:flex;align-items:center;gap:28px}
+.s4{grid-column:span 4}.s5{grid-column:span 5}.s7{grid-column:span 7}.s8{grid-column:span 8}.s6{grid-column:span 6}
+.glow{filter:drop-shadow(0 0 10px rgba(255,90,36,.55))}
+.sw{height:96px;border-radius:8px;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;border:1px solid var(--line)}
+.res{border:1px solid var(--line);border-radius:10px;padding:16px;background:linear-gradient(180deg,#12151b,#0d0f13)}
+.res+.res{margin-top:8px}
+.ratio{display:flex;gap:3px;height:4px;margin:12px 0 8px}
+.ratio i{display:block;border-radius:2px}
+.q{display:flex;align-items:center;gap:12px;border:1px solid #2a2f39;border-radius:999px;padding:12px 18px;font-size:14px;color:#c9ced8;background:#0b0d11}
+.q span{margin-left:auto;color:var(--dim)}
+@media(max-width:640px){.s4,.s5,.s7,.s8,.s6{grid-column:span 12}.wm{font-size:46px}.lock svg{width:60px;height:60px}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="mk" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".35"/><circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="32" cy="32" r="6" fill="#FF5A24"/></symbol>
+</defs></svg>
+<div class="board">
+ <section class="c hero"><canvas id="sky"></canvas>
+  <div class="in">
+   <div class="lbl m" style="margin:0"><span>locus / identity</span><span>C · observatory · rev 01</span></div>
+   <div class="lock"><svg width="96" height="96" class="glow"><use href="#mk"/></svg><span class="wm">LOCUS</span></div>
+   <div style="display:flex;justify-content:space-between;align-items:flex-end">
+    <p style="font-size:22px;font-weight:300;line-height:1.3;max-width:24ch">343,076 public studies.<br><span style="color:var(--sig)">One</span> is the one you need.</p>
+    <span class="m" style="color:var(--dim)">each point · one study</span></div>
+  </div></section>
+
+ <section class="c s4"><div class="lbl m"><span>01 mark</span><span>orbit · lens · star</span></div>
+  <div style="display:grid;place-items:center;height:170px;background:radial-gradient(circle at 50% 50%,#161a21,transparent 70%)"><svg width="130" height="130" class="glow"><use href="#mk"/></svg></div>
+  <p style="font-size:13px;color:#a6adba;line-height:1.5;margin-top:10px">The outer orbit is the whole archive. The inner ring is your question. The ember is the match.</p></section>
+
+ <section class="c s4"><div class="lbl m"><span>02 small sizes</span><span>orbit drops below 32px</span></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:22px;height:170px">
+   <div style="width:72px;height:72px;border-radius:18px;background:#000;border:1px solid var(--line);display:grid;place-items:center"><svg width="50" height="50" class="glow"><use href="#mk"/></svg></div>
+   <div style="width:44px;height:44px;border-radius:11px;background:#000;border:1px solid var(--line);display:grid;place-items:center"><svg width="28" height="28" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="none" stroke="#E8ECF2" stroke-width="5"/><circle cx="32" cy="32" r="8" fill="#FF5A24"/></svg></div>
+   <div style="width:22px;height:22px;border-radius:5px;background:#000;display:grid;place-items:center"><svg width="12" height="12" viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#FF5A24"/></svg></div>
+  </div>
+  <p class="m" style="color:var(--dim);margin-top:10px">app · avatar · favicon</p></section>
+
+ <section class="c s4"><div class="lbl m"><span>03 colour</span><span>light is data</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+   <div class="sw" style="background:var(--void)"><b style="font-weight:500">Void</b><span class="m" style="color:var(--dim)">#07080A</span></div>
+   <div class="sw" style="background:var(--star);color:#07080A"><b style="font-weight:500">Starlight</b><span class="m">#E8ECF2</span></div>
+   <div class="sw" style="background:var(--sig);color:#07080A;box-shadow:0 0 30px rgba(255,90,36,.35)"><b style="font-weight:500">Ember</b><span class="m">case · match</span></div>
+   <div class="sw" style="background:var(--ctl);color:#07080A"><b style="font-weight:500">Aurora</b><span class="m">control</span></div>
+  </div></section>
+
+ <section class="c s7"><div class="lbl m"><span>04 in product</span><span>results</span></div>
+  <div class="q"><svg width="18" height="18"><use href="#mk"/></svg>lung fibrosis, single-cell + proteomics, healthy controls<span class="m">↵</span></div>
+  <div style="margin-top:14px">
+   <div class="res"><div style="display:flex;justify-content:space-between"><span class="m" style="color:var(--star)">GSE328392 <span style="color:var(--dim)">· GEO</span></span><span class="m" style="color:var(--sig)">● usable as is</span></div>
+    <div style="font-size:16px;font-weight:400;margin-top:8px">Idiopathic pulmonary fibrosis lung, single-cell</div>
+    <div class="ratio"><i style="flex:102;background:var(--sig);box-shadow:0 0 8px rgba(255,90,36,.6)"></i><i style="flex:90;background:var(--ctl)"></i></div>
+    <div class="m" style="display:flex;justify-content:space-between"><span style="color:var(--sig)">IPF 102</span><span style="color:var(--ctl)">control 90</span></div></div>
+   <div class="res" style="opacity:.6"><div style="display:flex;justify-content:space-between"><span class="m">GSE326573 <span style="color:var(--dim)">· GEO</span></span><span class="m" style="color:var(--dim)">○ close match</span></div>
+    <div class="ratio"><i style="flex:19;background:var(--sig)"></i><i style="flex:20;background:var(--ctl)"></i></div>
+    <div class="m" style="display:flex;justify-content:space-between"><span style="color:var(--sig)">IPF 19</span><span style="color:var(--ctl)">control 20</span></div></div>
+  </div></section>
+
+ <section class="c s5"><div class="lbl m"><span>05 type</span><span>Inter Tight 300 · JetBrains Mono</span></div>
+  <div style="font-weight:300;font-size:58px;letter-spacing:-.03em;line-height:1">Aa <span style="color:var(--sig)">102</span><span style="color:var(--dim)">/</span><span style="color:var(--ctl)">90</span></div>
+  <p style="font-weight:300;font-size:15px;line-height:1.5;color:#a6adba;margin-top:14px">Light weights read like instruments in a dark room. Mono for anything counted.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+   <div><div style="font-size:22px;font-weight:300">298,702</div><div class="m" style="color:var(--dim)">GEO</div></div>
+   <div><div style="font-size:22px;font-weight:300">42,131</div><div class="m" style="color:var(--dim)">PRIDE</div></div>
+   <div><div style="font-size:22px;font-weight:300">2,243</div><div class="m" style="color:var(--dim)">CELLxGENE</div></div>
+  </div></section>
+</div>
+<script>
+document.fonts.ready.then(()=>{
+const c=document.getElementById('sky'),x=c.getContext('2d'),d=devicePixelRatio||1;
+const W=c.clientWidth,H=c.clientHeight;c.width=W*d;c.height=H*d;x.scale(d,d);
+let r=11;const rnd=()=>(r=(r*9301+49297)%233280)/233280;
+for(let i=0;i<1400;i++){const px=rnd()*W,py=rnd()*H,z=rnd();x.fillStyle=`rgba(232,236,242,${(z*z*.7+.05).toFixed(3)})`;x.beginPath();x.arc(px,py,z*1.2+.2,0,7);x.fill()}
+const X=W*.74,Y=H*.42;x.strokeStyle='rgba(232,236,242,.12)';x.lineWidth=1;
+[60,120,200].forEach(R=>{x.beginPath();x.arc(X,Y,R,0,7);x.stroke()});
+const g=x.createRadialGradient(X,Y,0,X,Y,40);g.addColorStop(0,'rgba(255,90,36,.9)');g.addColorStop(.15,'rgba(255,90,36,.35)');g.addColorStop(1,'rgba(255,90,36,0)');
+x.fillStyle=g;x.beginPath();x.arc(X,Y,40,0,7);x.fill();x.fillStyle='#FFD9C9';x.beginPath();x.arc(X,Y,2.6,0,7);x.fill();
+x.font='500 10.5px JetBrains Mono';x.fillStyle='rgba(232,236,242,.8)';x.fillText('GSE328392',X+14,Y-12);
+});
+</script>
+</body></html>

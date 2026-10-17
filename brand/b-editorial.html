@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"><title>locus — B · Editorial journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1A1714;--paper:#F4EFE6;--card:#FBF8F2;--rule:#D8CFBF;--mute:#7D7366;--ver:#C2401C;--sage:#4F6B5A}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,sans-serif;color:var(--ink)}
+.s{font-family:'Instrument Serif',serif;font-weight:400}
+.m{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em}
+.board{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.c{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:26px}
+.cap{display:flex;gap:10px;align-items:baseline;border-top:1px solid var(--ink);padding-top:8px;margin-bottom:22px}
+.cap b{font-family:'IBM Plex Mono';font-size:10.5px;font-weight:500}
+.cap span{font-size:12.5px;color:var(--mute)}
+.wm{display:inline-flex;align-items:baseline;font-family:'Instrument Serif';line-height:.8;letter-spacing:-.02em}
+.wm svg{align-self:baseline;margin:0 .01em}
+.cover{grid-column:span 7;background:var(--paper);padding:30px 34px;min-height:560px;display:flex;flex-direction:column}
+.mast{display:flex;justify-content:space-between;border-bottom:1px solid var(--ink);padding-bottom:10px}
+.cover h1{font-size:62px;line-height:.98;letter-spacing:-.015em;margin-top:auto}
+.cover h1 i{color:var(--ver)}
+.fig{margin:26px 0 18px;height:150px;position:relative}
+.side{grid-column:span 5;display:grid;gap:14px;grid-template-rows:auto 1fr}
+.s4{grid-column:span 4}.s8{grid-column:span 8}.s6{grid-column:span 6}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule)}
+.sw div{height:110px;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;font-size:12px}
+.sw b{font-family:'Instrument Serif';font-weight:400;font-size:22px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:9px 0;border-bottom:1px solid var(--rule);text-align:left;font-weight:400}
+th{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--mute);border-bottom:1px solid var(--ink)}
+td.n{font-family:'IBM Plex Mono';text-align:right}
+.dc{float:left;font-size:58px;line-height:.8;margin:6px 8px 0 0;color:var(--ver)}
+@media(max-width:700px){.cover,.side,.s4,.s8,.s6{grid-column:span 12}.cover h1{font-size:42px}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="o" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15.5" fill="none" stroke="currentColor" stroke-width="3.4"/><circle cx="20" cy="20" r="5.2" fill="#C2401C"/></symbol>
+</defs></svg>
+<div class="board">
+ <section class="c cover">
+  <div class="mast"><span class="wm" style="font-size:40px">l<svg width=".52em" height=".52em" viewBox="0 0 40 40"><use href="#o"/></svg>cus</span>
+   <span class="m" style="align-self:flex-end;color:var(--mute)">Identity · B · Editorial · Vol. 1</span></div>
+  <div class="fig" id="fig"></div>
+  <div class="cap"><b>Fig. 1</b><span>343,076 public studies, one question. The ringed point is the dataset you asked for.</span></div>
+  <h1 class="s">Every public dataset,<br><i>one</i> plain question.</h1>
+ </section>
+
+ <div class="side">
+  <section class="c"><div class="cap"><b>01</b><span>The wordmark</span></div>
+   <div style="display:grid;place-items:center;padding:18px 0 8px"><span class="wm" style="font-size:118px">l<svg width=".52em" height=".52em" viewBox="0 0 40 40"><use href="#o"/></svg>cus</span></div>
+   <p style="font-size:13.5px;line-height:1.55;color:#3d3832;margin-top:14px">A <i class="s" style="font-size:17px">locus</i> is a fixed place on a chromosome. The <i class="s" style="font-size:17px">o</i> becomes a reticle: the ring is the search, the vermilion point is what it found.</p></section>
+  <section class="c" style="display:flex;gap:18px;align-items:center;justify-content:space-between">
+   <div style="width:70px;height:70px;border-radius:16px;background:var(--ink);color:var(--paper);display:grid;place-items:center"><svg width="44" height="44" viewBox="0 0 40 40"><use href="#o"/></svg></div>
+   <div style="width:70px;height:70px;border-radius:16px;background:var(--paper);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center"><span class="wm" style="font-size:40px">l<svg width=".52em" height=".52em" viewBox="0 0 40 40"><use href="#o"/></svg></span></div>
+   <div style="width:32px;height:32px;border-radius:8px;background:var(--ver);display:grid;place-items:center;color:var(--paper)"><svg width="20" height="20" viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="currentColor" stroke-width="5"/></svg></div>
+   <span class="m" style="color:var(--mute);max-width:9ch">app, mono, favicon</span></section>
+ </div>
+
+ <section class="c s6"><div class="cap"><b>02</b><span>Palette, named for the lab</span></div>
+  <div class="sw">
+   <div style="background:var(--ink);color:var(--paper)"><b>Ink</b><span class="m">#1A1714</span></div>
+   <div style="background:var(--paper)"><b>Paper</b><span class="m">#F4EFE6</span></div>
+   <div style="background:var(--ver);color:var(--paper)"><b>Vermilion</b><span class="m">case · found</span></div>
+   <div style="background:var(--sage);color:var(--paper)"><b>Sage</b><span class="m">control</span></div>
+  </div></section>
+
+ <section class="c s6"><div class="cap"><b>03</b><span>Type: Instrument Serif, Inter, IBM Plex Mono</span></div>
+  <p class="s" style="font-size:44px;line-height:1">Single-cell and proteomics data from patients <i>and</i> healthy controls.</p>
+  <p class="m" style="margin-top:14px;color:var(--mute)">Serif states the question · Sans explains · Mono cites the record</p></section>
+
+ <section class="c s8"><div class="cap"><b>04</b><span>Results set like a table in a paper</span></div>
+  <p class="s" style="font-size:24px;margin-bottom:14px">“I work on lung fibrosis in humans and need single-cell and proteomics data from patients and healthy controls.”</p>
+  <table><tr><th>Accession</th><th>Repository</th><th>Fit</th><th style="text-align:right">Case</th><th style="text-align:right">Control</th></tr>
+  <tr><td class="m" style="font-size:12.5px">GSE328392</td><td>GEO</td><td><span style="color:var(--ver)">●</span> usable as is</td><td class="n" style="color:var(--ver)">102</td><td class="n" style="color:var(--sage)">90</td></tr>
+  <tr><td class="m" style="font-size:12.5px">GSE326573</td><td>GEO</td><td style="color:var(--mute)">○ close match</td><td class="n" style="color:var(--ver)">19</td><td class="n" style="color:var(--sage)">20</td></tr></table>
+  <p style="font-size:12px;color:var(--mute);margin-top:10px">Counts are taken from sample records, not from the model. Table 1.</p></section>
+
+ <section class="c s4" style="background:var(--ink);color:var(--paper);border-color:var(--ink)"><div class="cap" style="border-color:var(--paper)"><b>05</b><span style="color:#b2a898">Voice</span></div>
+  <p class="s" style="font-size:30px;line-height:1.1">Quiet, exact, and cited. We show the quote or we show nothing.</p>
+  <p class="m" style="margin-top:18px;color:#b2a898">GEO 298,702 · PRIDE 42,131 · CELLxGENE 2,243</p></section>
+</div>
+<script>
+const f=document.getElementById('fig'),W=f.clientWidth,H=150;let s=`<svg width="${W}" height="${H}">`;
+let r=7;const rnd=()=>(r=(r*9301+49297)%233280)/233280;
+for(let i=0;i<260;i++){const x=rnd()*W,y=H/2+(rnd()-.5)*(rnd()*H*.9);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.4" fill="#1A1714" opacity="${(.25+rnd()*.5).toFixed(2)}"/>`}
+const X=W*.68,Y=H*.38;s+=`<line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="#1A1714" stroke-width=".6"/><circle cx="${X}" cy="${Y}" r="14" fill="none" stroke="#1A1714" stroke-width="1.4"/><circle cx="${X}" cy="${Y}" r="4.5" fill="#C2401C"/><text x="${X+22}" y="${Y+4}" font-family="IBM Plex Mono" font-size="10.5" fill="#1A1714">GSE328392</text></svg>`;
+f.innerHTML=s;
+</script>
+</body></html>
