@@ -84,3 +84,19 @@ If time runs short, deliver in this order: 2 → 3 → 4 → PNGs → 5 → 6. A
 - 2026-10-17 23:49 BST: `uv run pytest` 8 passed (contrast selection, cap and refusals, `.count` writing, tx2gene, top genes). API on 8020: POST /process/GSE273888 → `{"stage": "done"}` (cached), GET returns the result, files endpoint 200 for a `.count` file and 404 for an unknown name. `npm run build` and `npm run lint` pass.
 - 2026-10-18 00:03 BST: the web search through the Next.js dev proxy died with `ERR_INCOMPLETE_CHUNKED_ENCODING` about 40 s after submit: on the local model the triage stage sends nothing for minutes and the proxy closes the idle stream (not seen with Claude, whose stages take seconds). Fix: `/search` now writes a `{"stage": "working"}` heartbeat line every 10 s of silence, and the web client skips it.
 - 2026-10-18 00:04 BST: **incident.** `pkill -f "[o]mics-api"`, meant for the API on 8020, also killed the other session's API on 8010 (same command line). Restarted it at once from `/home/jlw/omics-agent` with its own `.env` (`OMICS_API_PORT=8010`), log in `/tmp/api8010-restarted-by-pipeline-session.log`; 8010 answered 200 within 30 s. Nothing in that checkout was edited. vLLM on 8000 and the web app on 3000 were not touched.
+- 2026-10-18 00:09 BST: web flow rehearsed headlessly (Playwright, Chromium) on port 3020 against the API on 8020: the same question, results after 4 min (plan and labels cached), GSE273888 opened, **Process** clicked, panel rendered with PCA, volcano, MA, top genes and 19 download links. Screenshots: `docs/evidence/process/GSE273888/web-results-panel.png` (page) and `web-results-panel-crop.png` (panel). `npm run build` and `npm run lint` pass.
+
+### Acceptance criteria at hand-over (2026-10-18 00:10 BST)
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | env `omics-rnaseq`: salmon and R package versions | pass: salmon 2.8.0; DESeq2 1.50.2, tximport 1.38.2, apeglm 1.32.0 |
+| 2 | `uv run omics process GSE273888` exit 0, < 45 min | pass: exit 0, 172 s wall from a clean output directory (index build 6 min 41 s excluded) |
+| 3 | PCA separates conditions; top genes plausible | pass: PC1 means −2.85 vs +2.85, all six samples on the right side; DDIT4 and SCD (mTORC1-dependent via ATF4 and SREBP) fall after rapamycin |
+| 4 | `uv run pytest` with contrast and `.count` tests | pass: 8 tests |
+| 5 | POST then GET /process/GSE273888 on 8020 reaches done | pass (cached result; the API also ran the job from the web flow) |
+| 6 | `npm run build` passes; panel screenshot saved | pass |
+| 7 | README section, evidence folder, demo script, status log | pass |
+| 8 | committed and pushed to `origin/juri-processing-pipeline`, clean tree | pass (see the final commit) |
+
+Known limits: one run per sample (the first ENA run), human and mouse only, mouse index not yet built, the triage stage of the search is not cached so a repeated question can rank differently; the web search on the local model takes 4–8 minutes.

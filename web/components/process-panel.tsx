@@ -132,7 +132,7 @@ function Genes({ accession, file, title, x, y, xLabel, yLabel, zero }: {
         <Scatter name="other" data={rest} {...dot("var(--muted-foreground)")} fillOpacity={0.35} />
         <Scatter name="padj < 0.05" data={hits} {...dot("var(--signal)")} />
       </ScatterChart>
-      <span className="text-[11px] text-muted-foreground">{xLabel} vs {yLabel}; orange: padj &lt; 0.05</span>
+      <span className="max-w-[300px] text-[11px] leading-snug text-muted-foreground">{xLabel} vs {yLabel}; orange: padj &lt; 0.05</span>
     </Panel>
   );
 }
