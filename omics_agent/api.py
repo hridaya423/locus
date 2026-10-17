@@ -105,6 +105,14 @@ def first_look(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = 
     return volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
 
 
+@app.get("/first-look/{accession}/paper")
+def first_look_paper(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+                     control: Annotated[list[str] | None, Query()] = None) -> dict:
+    """The genes the dataset's paper names, and where each lands in the same comparison."""
+    look = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
+    return volcano.paper_genes(accession, look) if look.get("available") else {"available": False, "reason": look.get("reason")}
+
+
 @app.get("/record/{accession}")
 def dataset_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """Everything the repository's own page shows for one dataset: texts, facts, people, papers, links, samples and files."""

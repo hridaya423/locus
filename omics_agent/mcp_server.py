@@ -110,13 +110,17 @@ def get_table(accession: str) -> dict:
 def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25) -> dict:
     """A first differential-expression look at a GEO RNA-seq series from its fetched counts: genes up and down between
     two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
-    the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes and the
-    top genes each way with log2 fold change, -log10 p and BH q. A screen, not DESeq2."""
+    the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes, the
+    top genes each way with log2 fold change, -log10 p and BH q, and paper_check: the genes the dataset's paper names
+    (Europe PMC full text or text-mined mentions) and where each lands here. A screen, not DESeq2."""
     result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     if not result.get("available"):
         return result
+    check = volcano.paper_genes(accession, result)
     genes = result.pop("genes")
     result.pop("groups")
+    result["paper_check"] = {k: v for k, v in check.items() if k != "genes"} | {"genes": [
+        {k: g[k] for k in ("gene", "log2fc", "q", "significant", "says", "agrees", "where", "sentence")} for g in check.get("genes", [])[:top]]}
     columns = ["gene", "log2_fold_change", "minus_log10_p", "q"]
     result["top_up"] = [dict(zip(columns, g)) for g in genes if g[1] > 0][:top]
     result["top_down"] = [dict(zip(columns, g)) for g in genes if g[1] < 0][:top]

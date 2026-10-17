@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
-import { firstLook, tableDownload, tableSummary, type FirstLook, type Gene, type TableSummary } from "@/lib/api";
+import { firstLook, paperCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type TableSummary } from "@/lib/api";
 
 type Pick = { factor: string; case: string[]; control: string[] };
 
@@ -22,7 +22,7 @@ function ticks(lo: number, hi: number, n = 5) {
   return out;
 }
 
-function Volcano({ look }: { look: FirstLook }) {
+function Volcano({ look, ringed }: { look: FirstLook; ringed: Set<string> }) {
   const [hover, setHover] = useState<Gene | null>(null);
   const svg = useRef<SVGSVGElement>(null);
   const { x, y, xs, ys, quiet, up, down, labelled, cut } = useMemo(() => {
@@ -84,13 +84,14 @@ function Volcano({ look }: { look: FirstLook }) {
           const right = x(g[1]) > W - 90 || (x(g[1]) < 90 ? false : g[1] < 0);
           return <text key={`l${g[0]}`} x={x(g[1]) + (right ? -5 : 5)} y={y(g[2]) + 3} textAnchor={right ? "end" : "start"} className="fill-foreground text-[10px] font-medium">{g[0]}</text>;
         })}
+        {look.genes.filter((g) => ringed.has(g[0])).map((g) => <circle key={`r${g[0]}`} cx={x(g[1])} cy={y(g[2])} r={4} className="fill-none stroke-foreground" strokeWidth={0.9} />)}
         {hover && <circle cx={x(hover[1])} cy={y(hover[2])} r={4.5} className="fill-none stroke-foreground" strokeWidth={1.25} />}
         <text x={(PAD.l + W - PAD.r) / 2} y={H - 4} textAnchor="middle" className="fill-muted-foreground text-[10.5px]">log2 fold change, {look.case.join(", ")} vs {look.control.join(", ")}</text>
         <text transform={`translate(11 ${(PAD.t + H - PAD.b) / 2}) rotate(-90)`} textAnchor="middle" className="fill-muted-foreground text-[10.5px]">−log10 p</text>
       </svg>
       <figcaption className="min-h-5 font-mono text-[12px] tabular text-muted-foreground">
         {hover ? (
-          <><span className="font-medium text-foreground">{hover[0]}</span> log2FC {hover[1].toFixed(2)} · p {(10 ** -hover[2]).toExponential(1)} · q {hover[3].toExponential(1)}</>
+          <><span className="font-medium text-foreground">{hover[0]}</span> log2FC {hover[1].toFixed(2)} · p {(10 ** -hover[2]).toExponential(1)} · q {hover[3].toExponential(1)}{ringed.has(hover[0]) && " · named in the paper"}</>
         ) : (
           "Point at a dot to see its gene."
         )}
@@ -129,6 +130,38 @@ function TopList({ title, genes, tone }: { title: string; genes: Gene[]; tone: "
   );
 }
 
+function PaperLine({ check, ringOn, onRing }: { check: PaperCheck; ringOn: boolean; onRing: () => void }) {
+  if (!check.available) return <p className="text-[12.5px] text-muted-foreground">Paper check: {check.reason ?? "not available"}.</p>;
+  if (!check.named) return <p className="text-[12.5px] text-muted-foreground">The paper names none of the tested genes.</p>;
+  return (
+    <details className="group/p grid gap-2">
+      <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px] [&::-webkit-details-marker]:hidden">
+        <span>
+          The paper names <span className="font-medium">{check.named}</span> of the tested genes; <span className="font-medium">{check.significant}</span> are among the coloured genes here
+          {check.agree + check.disagree > 0 && <>, {check.agree} in the direction its text states{check.disagree > 0 && `, ${check.disagree} opposite`}</>}.
+        </span>
+        <button type="button" aria-pressed={ringOn} onClick={(e) => { e.preventDefault(); onRing(); }} className={cn("text-[12.5px]", MUTED_LINK)}>
+          {ringOn ? "Hide rings" : "Ring them on the plot"}
+        </button>
+        <span className={cn("text-[12.5px]", MUTED_LINK)}>Show the genes</span>
+      </summary>
+      <div className="grid gap-2 pt-2">
+        <p className="flex flex-wrap gap-x-3 gap-y-1 text-[12.5px]">
+          {check.genes.map((g) => (
+            <span key={g.gene} title={g.sentence ? `${g.where}: “${g.sentence}”` : `Named in the paper (${g.where})`}
+              className={cn("font-medium", !g.significant ? "text-muted-foreground" : g.log2fc > 0 ? "text-signal" : "text-control")}>
+              {g.gene}
+            </span>
+          ))}
+        </p>
+        <p className="text-[12px] text-muted-foreground">
+          Read from {check.read}: <a href={check.url} className={MUTED_LINK}>{check.title}</a> <span className="italic">{check.journal}</span> {check.year}. Coloured as on the plot.
+        </p>
+      </div>
+    </details>
+  );
+}
+
 function Select({ label, value, options, onChange }: { label: string; value: string; options: [string, string][]; onChange: (v: string) => void }) {
   return (
     <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}
@@ -144,6 +177,8 @@ export function FirstLookSection({ accession }: { accession: string }) {
   const [pick, setPick] = useState<Pick | null>(null);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [check, setCheck] = useState<PaperCheck | null>(null);
+  const [ringOn, setRingOn] = useState(true);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -160,6 +195,14 @@ export function FirstLookSection({ accession }: { accession: string }) {
     );
     return () => ctrl.abort();
   }, [accession, summary, pick]);
+
+  useEffect(() => {
+    if (!look?.available) return;
+    const ctrl = new AbortController();
+    paperCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setCheck, () => {});
+    return () => ctrl.abort();
+  }, [accession, look]);
+  const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;
   if (summary && !summary.available) return null;
@@ -201,8 +244,9 @@ export function FirstLookSection({ accession }: { accession: string }) {
             <span className="text-signal">{look.up.toLocaleString()} higher</span> · <span className="text-control">{look.down.toLocaleString()} lower</span> in {look.n_case} {look.case.join(", ")} than {look.n_control} {look.control.join(", ")}
             <span className="text-muted-foreground"> · {look.tested.toLocaleString()} genes tested · q &lt; {look.q}, |log2FC| ≥ {look.lfc}</span>
           </p>
+          {check && <PaperLine check={check} ringOn={ringOn} onRing={() => setRingOn((v) => !v)} />}
           <div className={cn("grid gap-8 transition-opacity duration-200", busy && "opacity-50")}>
-            <Volcano look={look} />
+            <Volcano look={look} ringed={ringed} />
             <div className="grid content-start gap-6 sm:grid-cols-2 sm:gap-10">
               <TopList title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" />
               <TopList title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" />

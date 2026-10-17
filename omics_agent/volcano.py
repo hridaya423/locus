@@ -4,11 +4,23 @@ Method, stated wherever the result is shown: library-size CPM, genes with CPM >=
 smaller group, Welch's t-test on log2(CPM + 1), Benjamini-Hochberg FDR. It is a screen, not DESeq2 or limma-voom."""
 
 import re
+from pathlib import Path
+from xml.etree import ElementTree
 
+import httpx
 import numpy as np
 from scipy import stats
 
 from . import record, table
+
+FULLTEXT = Path.home() / ".cache" / "omics-agent" / "fulltext"
+EUROPE_PMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
+UP = re.compile(r"\b(?:increas|elevat|up-?regulat|higher|induc|enrich|overexpress|gain)", re.I)
+DOWN = re.compile(r"\b(?:decreas|reduc|down-?regulat|lower|loss|lost|depleted|suppress|diminish)", re.I)
+# Gene symbols that are also ordinary words or common abbreviations in papers.
+NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "WAS", "CAD", "AIM", "IMPACT", "ACE", "CLOCK", "MET", "ARC",
+             "BAD", "CAST", "COPD", "IPF", "MAP", "MARCH", "SEPT", "PC", "TNF", "AGO", "ATM", "BID", "CAP", "CAR", "COIL", "DO", "GC", "HR", "IMP",
+             "MAL", "NHS", "PAH", "PIN", "POLE", "RAN", "RET", "SDS", "STAR", "TEC", "TH", "TOP", "WARS", "FAT", "SRY", "CPM", "DNA", "RNA", "PCR"}
 
 CONTROL = re.compile(r"control|healthy|normal|\bwt\b|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
 METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
@@ -87,6 +99,65 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     }
 
 
+def _fulltext(paper: str) -> tuple[ElementTree.Element | None, dict]:
+    query = f"EXT_ID:{paper[5:]} AND SRC:MED" if paper.startswith("pmid:") else f'DOI:"{paper[4:]}"'
+    found = httpx.get(f"{EUROPE_PMC}/search", params={"query": query, "format": "json", "resultType": "core"}, timeout=30).json()["resultList"]["result"]
+    if not found:
+        return None, {"paper": paper, "reason": "not found in Europe PMC"}
+    hit = found[0]
+    head = {"paper": paper, "pmcid": hit.get("pmcid"), "title": hit.get("title", ""), "journal": (hit.get("journalInfo") or {}).get("journal", {}).get("title", ""),
+            "year": hit.get("pubYear", "")}
+    if not hit.get("pmcid") or hit.get("isOpenAccess") != "Y":
+        return None, head | {"reason": "the paper has no open-access full text"}
+    path = FULLTEXT / f"{hit['pmcid']}.xml"
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(httpx.get(f"{EUROPE_PMC}/{hit['pmcid']}/fullTextXML", timeout=60).raise_for_status().content)
+    return ElementTree.fromstring(path.read_bytes()), head | {"url": f"https://europepmc.org/article/PMC/{hit['pmcid']}"}
+
+
+def paper_genes(accession: str, look: dict) -> dict:
+    """The genes the dataset's paper names in its results (open-access full text, methods left out), where each lands on
+    this comparison, and whether the sentence naming it states the same direction."""
+    rec = record.record(accession)
+    papers = [p["id"] for p in rec["papers"] if p.get("id")] if rec else []
+    if not papers:
+        return {"available": False, "reason": "no paper is linked to this dataset"}
+    root, head = _fulltext(papers[0])
+    if root is not None:
+        body = root.find("body")
+        methods = {id(p) for sec in (body.iter("sec") if body is not None else []) if re.search(r"method|materials", sec.findtext("title") or "", re.I) for p in sec.iter()}
+        texts = [(" ".join("".join(el.itertext()).split()), "figure legend" if el.tag == "caption" else "text") for el in (body.iter() if body is not None else []) if el.tag in ("p", "caption") and id(el) not in methods]
+        head |= {"read": "open-access full text, methods left out"}
+    elif head.get("pmcid") or papers[0].startswith("pmid:"):
+        ids = f"PMC:{head['pmcid']}" if head.get("pmcid") else f"MED:{papers[0][5:]}"
+        found = httpx.get(f"https://www.ebi.ac.uk/europepmc/annotations_api/annotationsByArticleIds", params={"articleIds": ids, "type": "Gene_Proteins", "format": "JSON"}, timeout=30).json()
+        mentions = found[0]["annotations"] if found else []
+        texts = [(" ".join(f"{m.get('prefix', '')} {m['exact']} {m.get('postfix', '')}".split()), re.sub(r"\s*\(http.*", "", m.get("section") or "figure or table"))
+                 for m in mentions if not re.search(r"method", m.get("section") or "", re.I)]
+        if not texts:
+            return {"available": False} | head
+        head = {k: v for k, v in head.items() if k != "reason"} | {"read": "Europe PMC text-mined gene mentions (no open-access full text)",
+                                                                    "url": f"https://europepmc.org/article/MED/{papers[0][5:]}" if papers[0].startswith("pmid:") else ""}
+    else:
+        return {"available": False} | head
+    here = {g[0]: g for g in look["genes"]}
+    named: dict[str, dict] = {}
+    for text, where in texts:
+        for sentence in re.split(r"(?<=[.;])\s+(?=[A-Z(])", text):
+            for symbol in dict.fromkeys(re.findall(r"(?<![\w-])[A-Z][A-Z0-9]{2,}(?![\w-])", sentence)):
+                if symbol in here and symbol not in NOT_GENES and symbol not in named:
+                    up, down = bool(UP.search(sentence)), bool(DOWN.search(sentence))
+                    says = "higher" if up and not down else "lower" if down and not up else None
+                    g = here[symbol]
+                    significant = g[3] < look["q"] and abs(g[1]) >= look["lfc"]
+                    agrees = None if says is None or not significant else (says == "higher") == (g[1] > 0)
+                    named[symbol] = {"gene": symbol, "sentence": sentence if sentence != symbol else None, "where": where, "says": says, "log2fc": g[1], "q": g[3], "significant": significant, "agrees": agrees}
+    genes = sorted(named.values(), key=lambda n: n["q"])
+    return {"available": True, **head, "genes": genes, "named": len(genes), "significant": sum(n["significant"] for n in genes),
+            "agree": sum(n["agrees"] is True for n in genes), "disagree": sum(n["agrees"] is False for n in genes)}
+
+
 if __name__ == "__main__":
     g = groups("GSE124685")
     assert g["default"] == {"factor": "disease state", "case": ["IPF"], "control": ["healthy donor"]}, g["default"]
@@ -95,4 +166,7 @@ if __name__ == "__main__":
     top = {g[0]: g for g in r["genes"][:2000]}
     for gene in ("MMP7", "SPP1", "COL1A1"):
         assert gene in top and top[gene][1] > 1, (gene, top.get(gene))
+    check = paper_genes("GSE124685", r)
+    assert check["available"] and check["named"] >= 5, {k: v for k, v in check.items() if k != "genes"}
+    print("paper check:", {k: v for k, v in check.items() if k != "genes"})
     print("volcano self-check passed:", r["tested"], "genes tested,", r["up"], "up,", r["down"], "down; top", [g[0] for g in r["genes"][:8]])

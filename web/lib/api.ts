@@ -187,3 +187,16 @@ export async function firstLook(accession: string, pick: { factor: string; case:
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
+
+export type PaperGene = { gene: string; sentence: string | null; where: string; says: "higher" | "lower" | null; log2fc: number; q: number; significant: boolean; agrees: boolean | null };
+export type PaperCheck = { available: boolean; reason?: string; paper?: string; title?: string; journal?: string; year?: string; url?: string; read?: string;
+  genes: PaperGene[]; named: number; significant: number; agree: number; disagree: number };
+
+export async function paperCheck(accession: string, pick: { factor: string; case: string[]; control: string[] }, signal?: AbortSignal): Promise<PaperCheck> {
+  const q = new URLSearchParams({ factor: pick.factor });
+  pick.case.forEach((c) => q.append("case", c));
+  pick.control.forEach((c) => q.append("control", c));
+  const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}/paper?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
