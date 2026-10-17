@@ -60,7 +60,9 @@ function LibraryRows({ dataset, rows }: { dataset: string; rows: LibraryRow[] })
 
 function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
   const samples = assay.samples ?? [];
-  const labels = Object.entries(assay.labels ?? {});
+  const stated = Object.entries(assay.stated ?? {});
+  const strategy = Object.entries(assay.strategy ?? {});
+  const list = (pairs: [string, number][]) => pairs.map(([label, n]) => `${label} (${n})`).join(", ");
   return (
     <li className="border-b border-rule">
       <details className="group/a" open={assay.mislabelled > 0}>
@@ -75,14 +77,15 @@ function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
             <ChevronDown aria-hidden className="size-3.5 transition-transform duration-200 group-open/a:rotate-180" />
           </span>
           {assay.mislabelled > 0 && (
-            <span className="col-span-2 text-[12.5px] text-warn">Labelled {labels.map(([label, n]) => `${label} (${n})`).join(", ")} by the authors</span>
+            <span className="col-span-2 text-[12.5px] text-warn">The authors&apos; processing notes call {assay.mislabelled === samples.length ? "these" : `${assay.mislabelled} of these`} {list(stated)}</span>
           )}
         </summary>
         <div className="grid gap-3 pb-4">
           {assay.evidence.map((e) => <Quote key={e.text} dataset={dataset} evidence={e} />)}
-          {labels.length > 0 && assay.mislabelled === 0 && (
+          {(stated.length > 0 || strategy.length > 0) && (
             <p className="text-[12.5px] text-muted-foreground">
-              Library type in the record: {labels.map(([label, n]) => `${label} (${n})`).join(", ")}
+              {stated.length > 0 && assay.mislabelled === 0 && <>Authors&apos; library strategy: {list(stated)}. </>}
+              {strategy.length > 0 && <>GEO library strategy: {list(strategy)}.</>}
             </p>
           )}
           {assay.library_rows && <LibraryRows dataset={dataset} rows={assay.library_rows} />}
@@ -109,7 +112,7 @@ export function useAssays(accession: string, enabled: boolean): AssayState {
   return state;
 }
 
-export const assayNames = (data?: Assays) => data?.assays.filter((a) => a.evidence.length || a.samples?.length).map((a) => a.assay.replace(/ \(.*\)$/, "")) ?? [];
+export const assayNames = (data?: Assays) => data?.assays.filter((a) => a.samples?.length).map((a) => a.assay.replace(/ \(.*\)$/, "")) ?? [];
 
 export function AssayList({ accession, state }: { accession: string; state: AssayState }) {
   const data = state.data;
@@ -119,7 +122,7 @@ export function AssayList({ accession, state }: { accession: string; state: Assa
       {state.failed ? (
         <p className="text-[13px] text-muted-foreground">The methods could not be read.</p>
       ) : !data ? (
-        <p className="text-[13px] text-muted-foreground">{state.slow ? "Still reading the methods; a large series takes up to a minute the first time." : "Reading the methods…"}</p>
+        <p className="text-[13px] text-muted-foreground">{state.slow ? "Still reading the methods; a series with thousands of samples can take up to three minutes the first time." : "Reading the methods…"}</p>
       ) : data.assays.length === 0 ? (
         <p className="text-[13px] text-muted-foreground">No method is named in the record{data.read_from.length ? ` (${data.read_from.join(", ")})` : ""}.</p>
       ) : (

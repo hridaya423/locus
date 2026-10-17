@@ -20,7 +20,7 @@ RULES = [
     ("Ribo-seq (elongating ribosomes)", "inferred", r"\bcycloheximide\b|\bCHX\b"),
     ("Polysome profiling", "named", r"polysome[- ](?:profil|seq|fraction)|polysomal (?:RNA|fraction)"),
     ("Single-cell RNA-seq, droplet", "named", r"\b10[xX] (?:Genomics )?Chromium\b|\bChromium (?:Single Cell|Controller|Next GEM|X|iX|Connect)\b|\b10[xX] Genomics\b.{0,80}\b(?:single[- ]cell|scRNA|snRNA|GEMs?|[35]['′’])|\bSingle Cell [35]['′’] |\bDrop-?seq\b|\binDrops?\b|\bBD Rhapsody\b"),
-    ("Single-cell RNA-seq, plate", "named", r"\bSmart-?seq ?[23]?\b|\bSMART-Seq\b|\bCEL-?seq2?\b|\bMARS-?seq\b|\bFluidigm C1\b|\bC1 (?:IFC|Single-Cell|system)"),
+    ("Single-cell RNA-seq, plate", "named", r"\bSmart-?seq ?[23]\b|\bSMART-?Seq2\b|\bSMART-Seq\b(?=.{0,80}single[- ]cell)|\bCEL-?seq2?\b|\bMARS-?seq\b|\bFluidigm C1\b|\bC1 (?:IFC|Single-Cell|system)"),
     ("Single-cell RNA-seq, combinatorial", "named", r"\bsci-RNA-seq\b|\bSPLiT-seq\b|\bParse Biosciences\b|\bEvercode\b"),
     ("Single-nucleus RNA-seq", "named", r"\bsnRNA-?seq\b|\bsingle[- ]nucle(?:us|i) RNA"),
     ("Immune repertoire (V(D)J)", "named", r"\bV\(D\)J\b|(?-i:\bVDJ\b)|\b(?:TCR|BCR) (?:repertoire|sequencing|libraries|library)"),
@@ -29,10 +29,11 @@ RULES = [
     ("RNA-seq", "named", r"\bRNA-?seq\b|\bmRNA-?seq\b|\bTruSeq\b.{0,30}\bRNA\b|\bpoly\(?A\)?\+? (?:RNA )?(?:selection|enrich|captur)|\bNEBNext\b.{0,30}\bRNA\b"),
     ("Long-read RNA (isoform-resolved)", "named", r"\bOxford Nanopore\b|\bMinION\b|\bPromethION\b|\bPacBio\b|\bIso-?Seq\b|\bdirect RNA sequencing\b"),
     ("ATAC-seq", "named", r"\bATAC-?seq\b|\bscATAC\b|\bMultiome\b"),
-    ("ChIP-seq", "named", r"\bChIP-?seq\b|chromatin immunoprecipitation"),
+    ("ChIP-chip (tiling array)", "named", r"\bChIP-?chip\b|binding/occupancy profiling by genome tiling array"),
+    ("ChIP-seq", "named", r"\bChIP-?seq\b|chromatin immunoprecipitation(?!.{0,60}\b(?:chip|array|microarray)\b)"),
     ("CUT&RUN / CUT&Tag", "named", r"\bCUT ?& ?(?:RUN|Tag)\b|\bCUT and (?:RUN|Tag)\b"),
     ("Hi-C", "named", r"\bHi-?C\b|\bMicro-C\b"),
-    ("DNA methylation", "named", r"\bbisulfite\b|\bWGBS\b|\bRRBS\b|\bEM-seq\b|\bEPIC (?:array|BeadChip)\b|\bHumanMethylation\d+"),
+    ("DNA methylation", "named", r"\bbisul(?:f|ph)ite\b|\bWGBS\b|\bRRBS\b|\bEM-seq\b|\bEPIC (?:array|BeadChip)\b|\bHumanMethylation\d+"),
     ("CLIP-seq (RNA-protein binding)", "named", r"\b(?:e|i|PAR-|HITS-)CLIP\b|\bCLIP-seq\b"),
     ("16S rRNA amplicon", "named", r"\b16S (?:rRNA|rDNA|ribosomal)|\bV3-?V4\b|\bV4 (?:hyper)?variable"),
     ("Shotgun metagenomics", "named", r"shotgun metagenom|metagenomic (?:shotgun )?sequencing"),
@@ -53,7 +54,10 @@ RULES = [
     ("Targeted metabolomics", "named", r"(?<!un)(?<!non-)(?<!non)\btargeted metabolom"),
     ("Lipidomics", "named", r"\blipidom"),
     ("Targeted MS (PRM/SRM/MRM)", "named", r"(?-i:\bPRM\b|\bSRM\b|\bMRM\b)|parallel reaction monitoring|selected reaction monitoring|multiple reaction monitoring"),
-    ("Expression microarray", "named", r"expression profiling by array"),
+    ("Expression microarray", "named", r"expression profiling by array|transcription profiling by array"),
+    ("Array CGH", "named", r"comparative genomic hybridi[sz]ation by array|\barray CGH\b|\baCGH\b"),
+    ("Small RNA-seq", "named", r"\bmiRNA[- ]seq|\bmicroRNA sequencing|small RNA (?:sequencing|librar|-seq)|\bsRNA-seq"),
+    ("Top-down proteomics", "named", r"top-?down proteom"),
     ("Nascent transcription (PRO-seq/GRO-seq)", "named", r"\bPRO-?seq\b|\bGRO-?seq\b|\bPRO-?cap\b|\bTT-?seq\b"),
     ("Cross-linking MS", "named", r"cross-?linking mass spec|\bXL-?MS\b|\bDSSO\b"),
 ]
@@ -64,13 +68,34 @@ COMPILED = [(assay, how, re.compile(p, 0 if assay in CASE_SENSITIVE else re.I)) 
 RIBOSOME_PROFILING = re.compile(r"ribosome profiling|ribo-?seq|footprint|\bRPFs?\b|monosome|ribosome[- ]protected", re.I)
 SINGLE_CELL = {"Single-cell RNA-seq, droplet", "Single-cell RNA-seq, plate", "Single-cell RNA-seq, combinatorial", "Single-nucleus RNA-seq", "Spatial transcriptomics"}
 
-# Words in a sample's own title or description that say which library it is, when one protocol text describes several.
-LIBRARY_WORDS = [(assay, re.compile(rf"(?<![A-Za-z0-9])(?:{words})(?![A-Za-z0-9])", re.I)) for assay, words in (
-    ("Small RNA-seq", r"s(?:mall ?)?RNA(?:-?seq)?|miRNA(?:-?seq)?|ncRNA(?:-?seq)?"),
-    ("RNA-seq", r"RNA-?seq|mRNA(?:-?seq)?|total ?RNA|poly-?A\+?"),
-    ("TIS-seq (initiating ribosomes)", r"harr|harringtonine|HAR|HHT|LTM|lactimidomycin|retapamulin|Ret|TIS|GTI|QTI|TI-?seq"),
-    ("Ribo-seq (elongating ribosomes)", r"ribo|riboseq|ribo-?seq|RPFs?|footprints?|FP|ribosome profiling|monosomes?"),
-)]
+BACKGROUND = re.compile(r"\bto date\b|\bpreviously\b|\bprevious (?:stud|work|method)|\bhas (?:involved|been)\b|\bhave been\b|\btraditional(?:ly)?\b|\bconventional(?:ly)?\b|\btypically\b|\bcommonly\b|\bexisting\b|\bin contrast to\b", re.I)
+TIS, RIBO, RNA, SMALL = "TIS-seq (initiating ribosomes)", "Ribo-seq (elongating ribosomes)", "RNA-seq", "Small RNA-seq"
+WORD = lambda words: re.compile(rf"(?<![A-Za-z])(?:{words})(?![A-Za-z])", re.I)
+TIS_WORDS = WORD(r"harr|harringtonine|HAR|HHT|LTM|lactimidomycin|retapamulin|Ret|TIS|GTI|QTI|TI-?seq")
+FOOT_WORDS = WORD(r"ribo|riboseq|ribo-?seq|RPFs?|RFP|fp|footprints?|monosomes?|StRP|80S|ribosome profiling")
+CHX_WORDS = WORD(r"CHX|cycloheximide")
+SMALL_WORDS = WORD(r"s(?:mall ?)?RNA(?:-?seq)?|miRNA(?:-?seq)?|ncRNA(?:-?seq)?")
+RNA_WORDS = WORD(r"RNA|mRNA|TotRNA|total ?RNA|RNA-?seq|RNAseq|mRNA-?seq|poly-?A\+?")
+OTHER_ASSAY = {"ATAC": "ATAC-seq", "CHIP": "ChIP-seq", "CLIP": "CLIP-seq (RNA-protein binding)", "CUT": "CUT&RUN / CUT&Tag", "CUTRUN": "CUT&RUN / CUT&Tag",
+               "HIC": "Hi-C", "WGBS": "DNA methylation", "BISULFITE": "DNA methylation", "DNASEQ": "DNA sequencing", "WGS": "DNA sequencing", "WES": "DNA sequencing"}
+OTHER_WORDS = WORD(r"ATAC|ChIP|CLIP|CUT&RUN|CUTRUN|Hi-?C|WGBS|bisulfite|DNA-?seq|WGS|WES")
+
+
+def _library_word(text: str) -> tuple[str, str] | None:
+    """The library a short label names: the earliest family word wins; a footprint library with an initiation word is TIS."""
+    if m := OTHER_WORDS.search(text):
+        return OTHER_ASSAY.get(m.group(0).upper().replace("-", "").split("&")[0], "Other assay"), m.group(0)
+    rna = min((m for rx in (SMALL_WORDS, RNA_WORDS) if (m := rx.search(text))), key=lambda m: m.start(), default=None)
+    foot = min((m for rx in (TIS_WORDS, FOOT_WORDS) if (m := rx.search(text))), key=lambda m: m.start(), default=None)
+    if not foot and not rna and (chx := CHX_WORDS.search(text)):
+        foot = chx
+    if foot and (not rna or foot.start() < rna.start()):
+        tis = TIS_WORDS.search(text)
+        return (TIS, tis.group(0)) if tis else (RIBO, foot.group(0))
+    if rna:
+        return (SMALL, rna.group(0)) if SMALL_WORDS.search(text) else (RNA, rna.group(0))
+    return None
+
 
 SENTENCE = re.compile(r"(?<=[.;!?])\s+(?=[A-Za-z0-9(\[])")
 
@@ -91,7 +116,12 @@ def _match(sentence: str, study_text: str) -> list[tuple[str, str, str]]:
         if m := rx.search(sentence):
             if assay.startswith(("TIS", "Ribo-seq")) and how == "inferred" and not RIBOSOME_PROFILING.search(study_text):
                 continue
-            if assay == "Phosphoproteomics" and how == "inferred" and not re.search(r"phospho", study_text, re.I):
+            if assay == "Phosphoproteomics" and how == "inferred" and not re.search(r"phospho(?:peptide|proteom|site|rylat)", study_text, re.I):
+                continue
+            if assay.startswith("Targeted MS") and not re.search(r"mass spectrometr|\bMS\b|\bLC\b|transition|peptide|Skyline", sentence):
+                continue
+            if assay.startswith(("Data-independent", "Data-dependent", "Isobaric", "Label-free", "SILAC")) and (
+                    BACKGROUND.search(sentence) or not re.search(r"acquired|operat|\bmode\b|\brun\b|analy[sz]ed|measured|performed|recorded|collected|labell?ed|quantif", sentence, re.I)):
                 continue
             if assay.endswith("droplet") and re.search(r"Visium|Xenium|hexavalent|chromium (?:\(VI\)|contamin|reduc|metal)", sentence, re.I):
                 continue
@@ -117,38 +147,34 @@ def _texts(rec: dict) -> list[tuple[str, list[str], str]]:
     return out
 
 
-def _libraries(rec: dict, assays: list[str], study: str) -> dict[str, dict]:
-    """For a GEO study with ribosome footprints: which samples are which library. A sample's own title, description and
-    characteristics decide; its own protocol decides only when no other sample shares that protocol text; otherwise the
-    library is undetermined."""
+def _libraries(rec: dict, study: str) -> dict[str, dict]:
+    """Which GEO sample is which library: its title decides; then its characteristics and description; then its own
+    protocol, if not shared by the whole study; then the authors' 'library strategy:' line; else undetermined."""
     parsed = []
     for block in (samples.CACHE / f"{rec['accession']}.txt").read_text().split("^SAMPLE = ")[1:]:
         fields: dict[str, list[str]] = {}
         for line in block.splitlines()[1:]:
             key, _, value = line.partition(" = ")
             fields.setdefault(re.sub(r"^!Sample_|_ch\d$", "", key), []).append(value)
-        words = " ".join(fields.get("title", []) + fields.get("description", []) + fields.get("characteristics", []))
-        protocol = " ".join(fields.get("treatment_protocol", []) + fields.get("extract_protocol", []))
         stated = next((m.group(1).strip() for v in fields.get("data_processing", []) if (m := re.match(r"library strategy:\s*(.+)", v, re.I))), None)
-        parsed.append((block.split("\n", 1)[0].strip(), words, protocol, stated, (fields.get("library_strategy") or ["not stated"])[0], (fields.get("title") or [""])[0]))
-    def decisive(protocol: str) -> list[tuple[str, str]]:
-        kinds = [(a, t) for a, _, t in _match(protocol, study) if a.startswith(("TIS-seq", "Ribo-seq"))]
-        mixed = len({a for a, _ in kinds}) > 1 and any(h == "named" for a, h, _ in _match(protocol, study) if a.startswith(("TIS-seq", "Ribo-seq")))
-        everyone = all(x[2] == protocol for x in parsed) and len(parsed) > 1
-        return [] if mixed or everyone else kinds
-
+        parsed.append({"gsm": block.split("\n", 1)[0].strip(), "title": (fields.get("title") or [""])[0], "stated": stated,
+                       "strategy": (fields.get("library_strategy") or ["not stated"])[0],
+                       "words": " ".join(fields.get("description", []) + fields.get("characteristics", [])),
+                       "protocol": " ".join(fields.get("treatment_protocol", []) + fields.get("extract_protocol", []))})
+    everyone = len({p["protocol"] for p in parsed}) == 1 and len(parsed) > 1
     own: dict[str, dict] = {}
-    for gsm, words, protocol, stated, strategy, title in parsed:
-        hit = next(((a, m.group(0)) for a, rx in LIBRARY_WORDS if (m := rx.search(words))), None)
-        if hit:
-            kind, why = hit[0], f"title or characteristics: {hit[1]}"
-        elif protocol and (by := decisive(protocol)):
-            kind, why = by[0][0], f"own protocol: {by[0][1]}"
-        elif m := re.search(r"(?<![A-Za-z0-9])RNA(?![A-Za-z0-9])", title):
-            kind, why = "RNA-seq", f"title: {m.group(0)}"
-        else:
-            kind, why = None, "undetermined: no library word in its title and its protocol is shared"
-        own[gsm] = {"assay": kind, "why": why, "stated": stated, "strategy": strategy, "title": title}
+    for p in parsed:
+        kind, why = None, "undetermined: no library word in its title or characteristics, and its protocol is shared"
+        if hit := _library_word(p["title"]):
+            kind, why = hit[0], f"title: {hit[1]}"
+        elif hit := _library_word(p["words"]):
+            kind, why = hit[0], f"characteristics: {hit[1]}"
+        elif p["protocol"] and not everyone and len(calls := {a for a, h, _ in _match(p["protocol"], study) if a in (TIS, RIBO)}) == 1:
+            kind = calls.pop()
+            why = f"own protocol: {next(t for a, _, t in _match(p['protocol'], study) if a == kind)}"
+        elif p["stated"] and (hit := _library_word(p["stated"])):
+            kind, why = hit[0], f"authors' library strategy: {p['stated']}"
+        own[p["gsm"]] = {"assay": kind, "why": why, "stated": p["stated"], "strategy": p["strategy"], "title": p["title"]}
     return own
 
 
@@ -183,37 +209,26 @@ def classify(accession: str) -> dict | None:
     if SINGLE_CELL & set(found):
         found.pop("RNA-seq", None)
     libraries = {}
-    ribo_family = [a for a in found if a.startswith(("TIS-seq", "Ribo-seq"))]
-    if rec["source"] == "GEO" and ribo_family:
-        libraries = _libraries(rec, ribo_family, study)
-        for assay, entry in found.items():
-            members = [g for g, s in libraries.items() if s["assay"] == assay]
-            if members:
-                entry["samples"] = members
-                entry["labels"] = dict(Counter(libraries[g]["stated"] or libraries[g]["strategy"] for g in members))
-                entry["library_rows"] = [{"sample": g, "title": libraries[g]["title"], "why": libraries[g]["why"]} for g in members]
-                own = [e for e in entry["evidence"] if not e["samples"] or set(e["samples"]) & set(members)]
-                entry["evidence"] = [e for e in own if not e["samples"] or set(e["samples"]) <= set(members) or len(e["samples"]) == len(libraries)] or own
-                entry["mislabelled"] = sum(1 for g in members if libraries[g]["stated"] and _names_other(libraries[g]["stated"], assay))
-        rna = [g for g, s in libraries.items() if s["assay"] == "RNA-seq"]
-        if rna:
-            evidence = [{"text": sentence, "term": m.group(0), "field": field, "samples": sample_list}
-                        for field, sample_list, text in texts for sentence in _sentences(text) if (m := RNA_SEQ.search(sentence))][:3]
-            found.setdefault("RNA-seq", {"assay": "RNA-seq", "how": "named", "terms": [e["term"] for e in evidence[:1]], "evidence": evidence})
-            found["RNA-seq"]["samples"] = rna
-            found["RNA-seq"]["labels"] = dict(Counter(libraries[g]["stated"] or libraries[g]["strategy"] for g in rna))
-            found["RNA-seq"]["library_rows"] = [{"sample": g, "title": libraries[g]["title"], "why": libraries[g]["why"]} for g in rna]
-        for kind in ("Small RNA-seq",):
+    unassigned = []
+    if rec["source"] == "GEO" and any(a in (TIS, RIBO) for a in found):
+        libraries = _libraries(rec, study)
+        kinds = list(dict.fromkeys(s["assay"] for s in libraries.values() if s["assay"]))
+        for kind in kinds:
             members = [g for g, s in libraries.items() if s["assay"] == kind]
-            if members:
-                found[kind] = {"assay": kind, "how": "named", "terms": [], "evidence": [], "samples": members,
-                               "labels": dict(Counter(libraries[g]["stated"] or libraries[g]["strategy"] for g in members)),
-                               "library_rows": [{"sample": g, "title": libraries[g]["title"], "why": libraries[g]["why"]} for g in members]}
+            entry = found.setdefault(kind, {"assay": kind, "how": "named", "terms": [], "evidence": []})
+            if kind == RNA and not entry["evidence"]:
+                entry["evidence"] = [{"text": sentence, "term": m.group(0), "field": field, "samples": sample_list, "how": "named"}
+                                     for field, sample_list, text in texts for sentence in _sentences(text) if (m := RNA_SEQ.search(sentence))][:2]
+            own = [e for e in entry["evidence"] if not e["samples"] or set(e["samples"]) & set(members)]
+            entry["evidence"] = [e for e in own if not e["samples"] or set(e["samples"]) <= set(members) or len(e["samples"]) == len(libraries)] or own
+            entry["samples"] = members
+            entry["stated"] = dict(Counter(libraries[g]["stated"] for g in members if libraries[g]["stated"]))
+            entry["strategy"] = dict(Counter(libraries[g]["strategy"] for g in members))
+            entry["library_rows"] = [{"sample": g, "title": libraries[g]["title"], "why": libraries[g]["why"]} for g in members]
+            entry["mislabelled"] = sum(1 for g in members if libraries[g]["stated"] and not libraries[g]["why"].startswith("authors")
+                                       and (named := _library_word(libraries[g]["stated"])) and named[0] != kind)
         unassigned = [{"sample": g, "title": s["title"], "why": s["why"]} for g, s in libraries.items() if s["assay"] is None]
-        if len(unassigned) < len(libraries):
-            found = {a: e for a, e in found.items() if not a.startswith(("TIS-seq", "Ribo-seq", "RNA-seq", "Small RNA")) or e.get("samples")}
-    else:
-        unassigned = []
+        found = {a: e for a, e in found.items() if a not in (TIS, RIBO, RNA, SMALL) or e.get("samples")}
     split = None
     if {"RNA-seq"} & set(found) and any(a.startswith(("Ribo-seq", "TIS-seq")) for a in found):
         paper = next((p["id"] for p in rec["papers"] if p.get("id") and p["id"] != "pmid:1"), None)
@@ -236,29 +251,43 @@ def classify(accession: str) -> dict | None:
     }
 
 
-def _names_other(label: str, assay: str) -> bool:
-    """Whether an author's library label names a different library type than the methods show."""
-    named = next((a for a, rx in LIBRARY_WORDS if rx.search(label)), None)
-    return named is not None and named != assay
-
-
 def library_types(accession: str) -> tuple[dict[str, str], str]:
-    """Each GEO sample's library type as the methods show it (only for studies with ribosome footprints), and the sentence
-    that shows initiating ribosomes, if any."""
+    """Each GEO sample's library type where its own title, characteristics or protocol shows it (studies with ribosome
+    footprints only), and the sentence that shows initiating ribosomes, if any."""
     result = classify(accession) or {"assays": []}
-    types = {g: a["assay"] for a in result["assays"] for g in a.get("samples", [])}
+    types = {r["sample"]: a["assay"] for a in result["assays"] for r in a.get("library_rows", []) if r["why"].startswith(("title", "characteristics", "own protocol"))}
     tis = next((a["evidence"][0]["text"] for a in result["assays"] if a["assay"].startswith("TIS-seq") and a["evidence"]), "")
     return types, tis
 
 
+def _title_invariant() -> tuple[int, list[str]]:
+    """Across every cached GEO series with footprint libraries: a title with only footprint words is never RNA-seq, and
+    a title with only RNA words is never Ribo-seq or TIS-seq."""
+    checked, wrong = 0, []
+    for path in samples.CACHE.glob("GSE*.txt"):
+        text = path.read_text(errors="replace")
+        if not RIBOSOME_PROFILING.search(text):
+            continue
+        for title in re.findall(r"^!Sample_title = (.*)$", text, re.M):
+            foot, rna = bool(FOOT_WORDS.search(title) or TIS_WORDS.search(title)), bool(RNA_WORDS.search(title) or SMALL_WORDS.search(title))
+            if foot == rna or OTHER_WORDS.search(title):
+                continue
+            checked += 1
+            kind = (_library_word(title) or ("",))[0]
+            if foot and kind not in (TIS, RIBO) or rna and kind not in (RNA, SMALL):
+                wrong.append(f"{path.stem}: {title} -> {kind}")
+    return checked, wrong
+
+
 if __name__ == "__main__":
+    checked, wrong = _title_invariant()
+    assert not wrong, wrong[:10]
     def assays(acc: str) -> dict[str, dict]:
         return {a["assay"]: a for a in classify(acc)["assays"]}
 
     def counts(acc: str) -> dict[str, int]:
         return {k: len(v.get("samples", [])) for k, v in assays(acc).items()}
 
-    RIBO, TIS, RNA, SMALL = "Ribo-seq (elongating ribosomes)", "TIS-seq (initiating ribosomes)", "RNA-seq", "Small RNA-seq"
     assert counts("GSE36892") == {RIBO: 8, RNA: 4}
     assert counts("GSE157490") == {TIS: 30, RIBO: 36, RNA: 48, SMALL: 13}, counts("GSE157490")
     assert counts("GSE286083") == {TIS: 4, RIBO: 4, RNA: 4}, counts("GSE286083")
@@ -279,4 +308,11 @@ if __name__ == "__main__":
     assert not assays("PRJNA528752"), "hexavalent chromium is not 10x Chromium"
     assert "Single-cell RNA-seq, droplet" not in assays("GSE300303") and "Phosphoproteomics" not in assays("PXD040914")
     assert "Expression microarray" in assays("GSE14346")
-    print("assay self-check passed")
+    for acc, expected in {"GSE154992": {RIBO: 9, RNA: 9}, "GSE125218": {RIBO: 16, TIS: 9, RNA: 8}, "GSE143311": {RIBO: 2, TIS: 2, RNA: 2},
+                          "GSE125038": {RIBO: 28, RNA: 28}, "GSE169632": {RIBO: 14, RNA: 28, "ATAC-seq": 8}}.items():
+        assert {k: v for k, v in counts(acc).items() if v} == expected, (acc, counts(acc))
+    assert assays("GSE154992")[RIBO]["mislabelled"] == 0, "the authors' own Ribo-Seq line agrees with the title"
+    assert "ChIP-seq" not in assays("GSE25958") and not any(a.startswith("Targeted") for a in assays("PRJNA1013390"))
+    assert "Data-dependent acquisition (DDA)" not in assays("PXD066697") and "Phosphoproteomics" not in assays("PXD012401")
+    assert "Single-cell RNA-seq, plate" not in assays("GSE276671")
+    print(f"assay self-check passed; title rule held on {checked} footprint-study titles")
