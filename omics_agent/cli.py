@@ -41,11 +41,14 @@ def process_main(argv: list[str]) -> None:
         "test": "testing: DESeq2 with apeglm, PCA, volcano and MA plots",
     }
 
+    announced: set[str] = set()
+
     def progress(stage: str, data: dict) -> None:
         if stage == "log":
             log(data)
-        elif stage in stages:
-            log(stages[stage] + (f" ({data['count']} samples)" if "count" in data and "done" not in data else ""))
+        elif stage in stages and stage not in announced:
+            announced.add(stage)
+            log(stages[stage] + (f" ({data['count']} samples)" if "count" in data else ""))
 
     try:
         result = process.run(args.accession, args.topic, args.reads, args.threads, progress=progress)

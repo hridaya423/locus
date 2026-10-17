@@ -94,3 +94,44 @@ export const SAMPLE_TYPE: Record<string, string> = {
   patient_tissue: "patient tissue", patient_biofluid: "patient fluid", primary_cells: "primary cells",
   cell_line: "cell line", animal_or_organoid_model: "model system", unknown: "",
 };
+
+// The laptop-tier processing job: subsampled reads -> salmon -> counts -> DESeq2 -> plots, run by the API in the background.
+export const PROCESS_STAGES = ["plan", "reference", "fetch", "quantify", "count", "test", "done"] as const;
+export type ProcessStage = (typeof PROCESS_STAGES)[number] | "error";
+export type ProcessSample = { gsm: string; title: string; srx: string; run: string; fastq: string[]; condition: string; reads?: number; mapped?: number; mapping_rate?: number; library_type?: string };
+export type TopGene = { gene_id: string; gene_name: string; base_mean: number; log2fc: number; padj: number };
+export type ProcessResult = {
+  accession: string; organism: string; contrast: { field: string; reference: string; target: string; levels: Record<string, string> };
+  samples: ProcessSample[]; skipped: { gsm: string; title: string; reason: string }[];
+  genes: number; genes_tested: number; significant: number; up: number; down: number;
+  pca: { variance: [number, number]; means: Record<string, { PC1: number; PC2: number }> };
+  top_genes: TopGene[]; files: { name: string; bytes: number }[]; seconds: number; reads_per_fastq: number;
+  reference: { source: string; release: string; url: string; index: string }; tools: Record<string, string>;
+};
+export type ProcessStatus = {
+  accession: string; stage: ProcessStage | null; log: string[]; stages: Record<string, { count?: number; done?: number }>;
+  result: ProcessResult | null; error: string | null;
+};
+export type PcaPoint = { sample: string; condition: string; PC1: number; PC2: number };
+export type VolcanoPoint = { gene: string; log2fc: number; neglog10p: number; padj: number; significant: boolean };
+export type MaPoint = { gene: string; log10_mean: number; log2fc: number; padj: number; significant: boolean };
+
+export async function startProcess(accession: string, topic: string): Promise<{ stage: ProcessStage; started: boolean }> {
+  const res = await fetch(`${API}/process/${accession}?topic=${encodeURIComponent(topic)}`, { method: "POST" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+export async function processStatus(accession: string, signal?: AbortSignal): Promise<ProcessStatus> {
+  const res = await fetch(`${API}/process/${accession}`, { signal, cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+export const processFile = (accession: string, name: string) => `${API}/process/${accession}/files/${name}`;
+
+export async function processJson<T>(accession: string, name: string, signal?: AbortSignal): Promise<T> {
+  const res = await fetch(processFile(accession, name), { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}

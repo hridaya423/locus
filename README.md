@@ -111,6 +111,31 @@ The pipeline gives a wrong result, not an error, when the pairs or conditions ar
 
 Get the zip from the result row in the web app, from `GET /samplesheet/{accession}?topic=...`, or from the `get_samplesheet` MCP tool. We checked the export on 10 GEO Ribo-seq studies. All 10 samplesheets pass the pipeline's input schema. The design is in [`docs/plans/2026-10-17-samplesheet-export-design.md`](docs/plans/2026-10-17-samplesheet-export-design.md).
 
+## Process a dataset
+
+For a GEO bulk RNA-seq series with counted case and control samples, locus can run the laptop-tier pipeline from `docs/data-processing-contract.md` on your own machine: the first 2,000,000 reads of each FASTQ are streamed from ENA, quantified with salmon against GENCODE transcripts, summed to gene counts with tximport, and tested with DESeq2 (`~ condition`, apeglm shrinkage, alpha 0.05). Reads are subsampled, so the result is a preview of the study, not a reanalysis; the manifest says so.
+
+It needs [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) and one environment (bioconda has builds for linux-64, linux-aarch64 and osx-arm64):
+
+```sh
+micromamba create -n omics-rnaseq -c conda-forge -c bioconda salmon bioconductor-deseq2 bioconductor-tximport bioconductor-apeglm r-ggplot2 r-jsonlite
+uv run omics process GSE273888 --topic "mTOR inhibitor, rapamycin"
+```
+
+`--topic` is the question the case/control labels answer (the search's terms); without it the study title is used. The first run for an organism downloads GENCODE transcripts (human release 46 or mouse M35) to `~/omics-ref/` and builds the salmon index, which takes about 7 minutes and 3.3 GB of memory on an 8-core ARM machine. After that a 6-sample study takes a few minutes. Outputs land in `data/process/<GSE>/`:
+
+| File | Contents |
+|---|---|
+| `<GSM>.count` | One per sample: `gene_id<TAB>count`, integer, HTSeq-style |
+| `counts.tsv`, `normalized_counts.tsv` | Genes × samples, raw and DESeq2-normalised |
+| `deseq2_results.tsv`, `top_genes.tsv` | Shrunken log2 fold changes, p-values and adjusted p-values for the chosen contrast |
+| `pca.png`, `volcano.png`, `ma.png` and the same as JSON | The three plots |
+| `manifest.json` | Tool versions, reference release, samples, runs, read cap, timings and the samples left out, with the reason |
+
+The contrast is one two-level comparison: the most frequent control value of the labelled field against the most frequent case value, up to 4 samples per side, at least 2. Samples with other values, other assays or no FASTQ in ENA are listed in the manifest with the reason. Only human and mouse have a pinned reference.
+
+The same run is available as a background job from the API (`POST /process/{accession}?topic=…`, then `GET /process/{accession}` until `stage` is `done`, and `GET /process/{accession}/files/{name}` for each output) and from the **Process** button on a GEO RNA-seq row in the web app, which shows the stages and then the plots, the top genes and the downloads. The worked example is in [`docs/evidence/process/GSE273888/`](docs/evidence/process/GSE273888/).
+
 ## How it works
 
 1. **Plan.** Claude Sonnet 5.5 turns the question into search terms with synonyms, an organism, the repositories, the assays wanted, the assays that must be matched, and notes on what each method can measure. The plan is cached per question, so the same question always runs the same search.
@@ -161,6 +186,7 @@ For controlled-access data (EGA, dbGaP), locus links to the access request. It d
 | `omics_agent/agent.py` | The search: plan, gather, triage, screen, count, grade, group. The CLI, API and MCP server share it. |
 | `omics_agent/samples.py` | GEO sample records, labels and counts |
 | `omics_agent/samplesheet.py` | The nf-core/riboseq export |
+| `omics_agent/process.py`, `deseq2.R` | The laptop-tier RNA-seq pipeline: ENA reads → salmon → counts → DESeq2 → plots |
 | `omics_agent/index.py`, `store.py` | The local index and hybrid search |
 | `omics_agent/harvest*.py`, `embed.py` | Index builders |
 | `omics_agent/api.py`, `cli.py`, `mcp_server.py` | The three interfaces |

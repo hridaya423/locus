@@ -163,7 +163,7 @@ def reference(organism: str, threads: int, log) -> dict:
         os.replace(f"{fasta}.part", fasta)
     if not tx2gene.exists():
         write_tx2gene(fasta, tx2gene)
-    if not (index / "versionInfo.json").exists():
+    if not (index / "info.json").exists():
         log(f"  building the salmon index in {index} (once per reference; takes a while)")
         building = base / "salmon-index.building"
         shutil.rmtree(building, ignore_errors=True)
@@ -201,7 +201,7 @@ def fetch(sample: dict, reads: int, out: Path, log) -> list[Path]:
             continue
         log(f"  {sample['gsm']}: first {reads:,} reads of {url.rsplit('/', 1)[-1]}")
         # curl gets SIGPIPE when head closes the pipe, which is expected; gzip's exit status is the pipeline's.
-        _run(f"curl -sSL --retry 3 {url!r} | gzip -dc | head -n {4 * reads} | gzip -1 > {str(path) + '.part'!r}", log, shell=True)
+        _run(f"curl -sL --retry 3 {url!r} | gzip -dc | head -n {4 * reads} | gzip -1 > {str(path) + '.part'!r}", log, shell=True)
         os.replace(f"{path}.part", path)
         paths.append(path)
     return paths
@@ -214,7 +214,7 @@ def quantify(sample: dict, fastqs: list[Path], index: str, threads: int, out: Pa
     quant = out / sample["gsm"]
     if not (quant / "quant.sf").exists():
         reads = ["-1", str(fastqs[0]), "-2", str(fastqs[1])] if len(fastqs) == 2 else ["-r", str(fastqs[0])]
-        _run(_tool("salmon", "quant", "-i", index, "-l", "A", *reads, "-p", str(threads), "--validateMappings", "-o", str(quant)), log)
+        _run(_tool("salmon", "quant", "-i", index, "-l", "A", *reads, "-p", str(threads), "-o", str(quant)), log)
     meta = json.loads((quant / "aux_info" / "meta_info.json").read_text())
     return {"quant": str(quant), "reads": meta.get("num_processed"), "mapped": meta.get("num_mapped"), "mapping_rate": meta.get("percent_mapped"),
             "library_type": meta.get("library_types", [""])[0]}

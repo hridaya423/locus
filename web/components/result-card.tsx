@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { EASE_OUT } from "@/lib/springs";
 import { SAMPLE_TYPE, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
 import { Methods, Partners, Ready } from "@/components/row-details";
+import { ProcessPanel } from "@/components/process-panel";
 
 const WARNING: Record<string, Partial<Record<Check, string>>> = {
   patient_material: { no: "not patient material", unclear: "sample source not confirmed" },
@@ -207,6 +208,9 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   const facts = hit.facts;
   const plan = hit.download_plan;
   const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
+  // Bulk RNA-seq GEO series with counted case and control samples can run the laptop-tier pipeline.
+  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total)?rnaseq$/.test(norm(a))) && (facts?.case ?? 0) >= 2 && (facts?.control ?? 0) >= 2;
+  const [processing, setProcessing] = useState(false);
 
   async function exportSamplesheet() {
     setSheet("writing");
@@ -327,6 +331,15 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     </button>
                   </div>
                 </details>
+                {rnaseq && !processing && (
+                  <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <button type="button" onClick={() => setProcessing(true)} className={cn(ACTION, "w-fit")}>
+                      Process
+                    </button>
+                    <span className="text-xs text-muted-foreground">subsampled reads → salmon → counts → DESeq2, on this machine</span>
+                  </span>
+                )}
+                {processing && <ProcessPanel accession={hit.accession} topic={topic} />}
                 {riboseq && (
                   <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <button type="button" onClick={exportSamplesheet} disabled={sheet === "writing"} className={cn(ACTION, "w-fit disabled:cursor-wait disabled:no-underline")}>
