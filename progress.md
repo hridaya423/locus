@@ -222,6 +222,30 @@ Door audit baseline (seed 1, 30 datasets, 38 pages, 23:05): 5.97 outbound links 
 - door audit · /d/GSE69830 · GSE69830 · nav › www.ncbi.nlm.nih.gov links out to www.ncbi.nlm.nih.gov (on 8 of 38 pages, e.g. “GEO record”)
 - harness · /d/GSE179525 · GSE179525 · Samples design charts fail: /design returns 500 (design.py IndexError); also GSE149204. Sent to builder A.
 
+Task audit (23:30, /tmp/locus-night/task-audit.md; GEO, Europe PMC and Scholar blocked the headless browser with human checks, so repository-side GEO seconds are estimates):
+- task-audit · /d/GSE30839 · GSE30839 · the page showed "The repository did not send the record." for several minutes while locus's own API (port 8010) was down; nothing on the page says locus failed, so I would have blamed the repository and left for GEO
+- task-audit · /d/GSE35469/GSM869037 · GSE35469 · the one sentence about splitting the lysate sits inside a closed "Extraction protocol" block on a sample page; the dataset page never mentions it and its header says DATA TYPE "RNA-seq" for a Ribo-seq study
+- task-audit · /d/GSE36892 · GSE36892 · the search card correctly warns "4 Ribo-seq libraries have no matching RNA-seq", but the GEO methods never say the lysate was split, so I still had to leave locus for the Nature 2012 paper to quote a sentence
+- task-audit · /d/GSE132703/GSM3889077 · GSE132703 · found "28-34 nt footprints" and rRNA filtering but no periodicity, read-length or CDS-fraction cutoff; the PMC paper has 0 hits for "periodicity", "quality" and "filtered", so I could not quote the authors' QC and nothing on locus says that it is absent
+- task-audit · /d/GSE132703 · GSE132703 · contributor and contact names are plain text and only the dataset's own paper is linked, so for "what else did this lab publish" I had to leave locus for an author search (Europe PMC REST gave 25 hits mixing papers, bioRxiv preprints and commentaries)
+- task-audit · / (search "Global analysis of LARP1 translation targets…") · GSE132703 · pasting the PNAS paper title returned the dataset at rank 1 after 30 s, but "Philippe 2020 PNAS LARP1 5' TOP Ribo-seq" returned one row without GSE132703, so I can only search by exact title
+- task-audit · / (search Ingolia 2011 paper title) · GSE30839 · the GEO series title differs from the paper title, and the dataset came at rank 4 of 7 after 28 s behind METTL5, Dis3l2 and m7G datasets
+- task-audit · /d/GSE30839 · GSE30839 · the search card says TIS-SEQ but the dataset page says "RNA-seq, Other" and library strategy "RNA-Seq" for all 18 samples; I had to open a sample page to read "120 s harringtonine" and decode "HRT" in the treatment column
+- task-audit · /d/GSE30839 · GSE30839 · treatment column for GSM765293 reads "120 s HRT then 60 s CYH" although its title says emetine, and GSM765294 shows "–", so I distrusted the table and went to the sample pages
+- task-audit · / (search "human immunopeptidomics") · PXD010450 · the row card shows the synonyms searched for but no per-result reason, no matched field and no confidence score; the quote under "Open dataset" is the abstract and the chips say "DDA?" and "label-free?" with question marks
+- task-audit · /d/PXD010450 · PXD010450 · W6/32 appears only in a closed "Sample processing protocol" block, 951 px down the page, and the sample count reads "not stated"; I opened the block on each of 3 datasets to confirm the antibody
+- task-audit · pride archive search · "human immunopeptidomics" · PRIDE itself returned 0 datasets for this phrase and 342 for "immunopeptidomics"; the researcher has to guess the shorter query, which locus does not require
+- task-audit · / (search "idiopathic pulmonary fibrosis … 10x or Smart-seq2") · GSE136831 · the card shows RNA-SEQ, not scRNA-seq or 10x, and the 10x v2 evidence appears only in a sample-page extraction protocol, so the technology question needs 2 extra clicks per dataset
+- task-audit · /d/GSE94555/GSM2478109 · GSE94555 · no technology is named on the sample page (only Nextera XT) and the dataset has 6 samples of sorted cells, so I could not say whether it is single-cell at all
+- task-audit · /d/GSE86618 · GSE86618 · "Fluidigm" and "C1" appear 0 times on the dataset page and 5 times on the sample page; the dataset page lists 540 samples under DATA TYPE "RNA-seq"
+- task-audit · /d/GSE213001 · GSE213001 · a gender chart exists (M 70, F 69) but the cross-tab is fixed to disease × age group, so "female IPF" needs a hand count over 139 rows in the free-text filter
+- task-audit · /d/GSE136831 · GSE136831 · "disease by Sex" gives IPF F 6 at once, but "biopsy" cannot be checked because tissue is "Whole Lung Dissociate" for all 78 samples
+- task-audit · / (search "Mitochondrial proteomics from organelle immunoprecipitation (mito-IP)") · PXD043863 · the top hit is an OCIAD1-FLAG co-IP interactome, and none of the top 6 is a mito-IP, so I had no dataset to take a protein table from
+- task-audit · / (expanded row) vs /d/PXD043863 · PXD043863 · the row card says "None uploaded; the raw files need processing" but the dataset page lists "Search txt.zip 12 MB", so I distrusted the card and opened the page
+- task-audit · /d/PXD043863 · PXD043863 · the only processed table is a 12 MB `txt.zip` with no preview; I would have to download it and unzip it outside locus to see the first rows
+- task-audit · /d/PXD043863 · PXD043863 · the paper link goes to Europe PMC only and no supplementary table is listed, so I left for PMC (5.4 s) to find mmc2.xlsx
+- task-audit · ncbi.nlm.nih.gov/geo · GSE35469 · GEO, Europe PMC and Google Scholar showed human-verification pages to my automated browser, so none of the repository-side GEO seconds in this audit are measured
+
 ### Ladder, found tonight
 - Dictate the question (mic in the search box), asked by the user at 23:05.
 - Rule (user, 23:20): changes to data/ (re-embedding, FTS rebuilds, DB writes) only after a checkpoint: `cp -c data/omics.db data/checkpoints/omics.db.<time>` (APFS clone, instant) plus a line here naming it.
