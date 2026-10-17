@@ -10,6 +10,7 @@ export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export async function browser() {
   const port = 9400 + Math.floor(Math.random() * 500);
   const proc = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "locus-chrome-"))}`, "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
+  process.on("exit", () => proc.kill());
   let targets;
   for (let i = 0; i < 100 && !targets; i++) {
     await sleep(100);
