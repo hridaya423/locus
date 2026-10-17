@@ -54,7 +54,7 @@ export function useSelection(rec: DatasetRecord, designed: boolean) {
   const kept = useMemo(() => (result ? result.rows.map((i) => rec.samples!.rows[i]) : rec.samples?.rows ?? []), [result, rec.samples]);
   return {
     design: state.design, failed: state.failed, filters, text, active, toggle, setText,
-    rows: active && !result ? [] : kept,
+    rows: kept,
     clear: () => {
       setFilters({});
       setText("");

@@ -5,7 +5,7 @@ import { Download, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import type { Selection } from "@/components/design";
-import { repositoryName, samplePath, type DatasetRecord } from "@/lib/api";
+import { samplePath, type DatasetRecord } from "@/lib/api";
 
 const ROWS_SHOWN = 12;
 const ROWS_MAX = 2000;
@@ -34,7 +34,7 @@ export function SampleTable({ dataset, samples, selection }: { dataset: string; 
         aria-label="Filter samples"
         className="h-9 w-full max-w-64 rounded-md border border-rule bg-card px-3 text-[16px] outline-none transition-colors duration-150 placeholder:text-muted-foreground focus:border-foreground sm:text-[13px]"
       />
-      <div aria-busy={pending} className={cn("overflow-x-auto rounded-lg border border-rule bg-card transition-opacity duration-150 motion-reduce:transition-none", pending && "opacity-60")}>
+      <div aria-busy={pending} className={cn("overflow-x-auto rounded-lg border border-rule bg-card transition-opacity duration-150 motion-reduce:transition-none", (pending || error) && "opacity-60")}>
         <table className="w-max min-w-full border-collapse text-[12.5px]">
           <thead>
             <tr className="border-b border-rule">
@@ -62,17 +62,12 @@ export function SampleTable({ dataset, samples, selection }: { dataset: string; 
           </tbody>
         </table>
       </div>
-      {error ? (
-        <p className="flex flex-wrap items-baseline gap-x-3 text-[13px]">
-          The filter did not load.
-          <button type="button" onClick={selection.retry} className={LINK}>Try again</button>
-        </p>
-      ) : active && !pending && rows.length === 0 ? (
+      {active && !pending && !error && rows.length === 0 && (
         <p className="flex flex-wrap items-baseline gap-x-3 text-[13px]">
           No sample has all of these.
           <button type="button" onClick={selection.clear} className={LINK}>Clear filters</button>
         </p>
-      ) : null}
+      )}
       {!active && rows.length > ROWS_SHOWN && (
         <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[13px]", MUTED_LINK)}>
           {all ? "Show fewer" : `Show all ${rows.length.toLocaleString()}`}
@@ -103,37 +98,52 @@ export function SelectionBar({ rec, selection }: { rec: DatasetRecord; selection
     const commands = document.getElementById("download-commands") as HTMLDetailsElement | null;
     if (commands) commands.open = true;
     commands?.scrollIntoView({ block: "center" });
+    commands?.querySelector("summary")?.focus();
   };
   const narrowed = !!result?.downloads?.commands;
+  const stale = pending || error;
   return (
-    <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-rule bg-background px-1 py-2 text-[13px]">
-      <span className="font-mono text-[12px] tabular text-muted-foreground" aria-live="polite">
-        {pending && !result && active ? `Reading the sample records from ${repositoryName(rec.source)}…` : result ? `${result.samples.toLocaleString()} of ${total} ${unit}` : `${total} ${unit}`}
-      </span>
-      {chosen.map(([factor, level], at) => (
-        <button key={`${factor}\n${level}`} data-chip type="button" aria-label={`Remove ${factor}: ${level}`} className="flex max-w-full items-center gap-1.5 rounded-[4px] border border-foreground px-1.5 py-px"
-          onClick={() => {
-            focusAfterRemoving(at);
-            selection.toggle(factor, level);
-          }}>
-          <span className="[overflow-wrap:anywhere]"><span className="text-muted-foreground">{factor}</span> {level}</span>
-          <X aria-hidden className="size-3 shrink-0" />
+    <div className="sticky top-0 z-10 -mx-1 grid gap-1.5 border-b border-rule bg-background px-1 py-2 text-[13px]">
+      <div className="flex items-center gap-x-3 whitespace-nowrap">
+        {error ? (
+          <span className="flex items-baseline gap-x-2">
+            The filter did not load.
+            <button type="button" onClick={selection.retry} className={LINK}>Try again</button>
+          </span>
+        ) : (
+          <span className={cn("font-mono text-[12px] tabular text-muted-foreground transition-opacity duration-150 motion-reduce:transition-none", pending && "opacity-60")} aria-live="polite">
+            {result ? `${result.samples.toLocaleString()} of ${total} ${unit}` : `${total} ${unit}`}
+          </span>
+        )}
+        {active && (
+          <button type="button" className={MUTED_LINK} onClick={() => {
+            document.querySelector<HTMLElement>("figure button[aria-pressed]")?.focus();
+            selection.clear();
+          }}>Clear</button>
+        )}
+        <button type="button" disabled={stale || none} onClick={() => saveCsv(`${rec.accession}-samples${active ? "-selected" : ""}.csv`, samples.columns, rows)} className={cn("flex items-center gap-1 disabled:pointer-events-none disabled:opacity-50", MUTED_LINK)}>
+          <Download aria-hidden className="size-3" />
+          <span className="max-sm:hidden">Sample sheet </span>(CSV)
         </button>
-      ))}
-      {active && (
-        <button type="button" className={MUTED_LINK} onClick={() => {
-          document.querySelector<HTMLElement>("figure button[aria-pressed]")?.focus();
-          selection.clear();
-        }}>Clear</button>
-      )}
-      <button type="button" disabled={pending || error || none} onClick={() => saveCsv(`${rec.accession}-samples${active ? "-selected" : ""}.csv`, samples.columns, rows)} className={cn("flex items-center gap-1 disabled:pointer-events-none disabled:opacity-50", MUTED_LINK)}>
-        <Download aria-hidden className="size-3" />
-        Sample sheet (CSV)
-      </button>
-      {rec.download_plan && !none && !(active && !result) && (
-        <button type="button" onClick={toCommands} className={MUTED_LINK} title={narrowed ? undefined : result?.downloads?.note ?? undefined}>
-          {narrowed ? `Commands for these ${result!.samples.toLocaleString()}` : active ? "Commands (whole dataset)" : "Commands to download"}
-        </button>
+        {rec.download_plan && active && !none && !stale && (
+          <button type="button" onClick={toCommands} className={MUTED_LINK} title={narrowed ? undefined : result?.downloads?.note ?? undefined}>
+            Commands<span className="max-sm:hidden">{narrowed ? ` for these ${result!.samples.toLocaleString()}` : " (whole dataset)"}</span>
+          </button>
+        )}
+      </div>
+      {chosen.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {chosen.map(([factor, level], at) => (
+            <button key={`${factor}\n${level}`} data-chip type="button" aria-label={`Remove ${factor}: ${level}`} className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[4px] border border-foreground px-1.5 py-px"
+              onClick={() => {
+                focusAfterRemoving(at);
+                selection.toggle(factor, level);
+              }}>
+              <span><span className="text-muted-foreground">{factor}</span> {level}</span>
+              <X aria-hidden className="size-3 shrink-0" />
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -134,6 +134,7 @@ def filter_samples(accession: str, filters: dict[str, list[str]], text: str = ""
     return {
         "accession": accession, "samples": found["samples"], "total": found["total"], "columns": sheet["columns"],
         "rows": [sheet["rows"][i] for i in found["rows"][:limit]], "truncated": len(found["rows"]) > limit,
+        "unstated": found["unstated"],
         "counts": found["counts"], "downloads": found["downloads"],
     }
 
