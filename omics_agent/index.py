@@ -4,7 +4,7 @@ from functools import cache
 
 import numpy as np
 
-from . import store
+from . import methods, store
 from .sources import Dataset, _cellxgene_datasets, cellxgene_facts
 
 MODEL = "NeuML/pubmedbert-base-embeddings"
@@ -91,11 +91,12 @@ def load(accessions: list[str]) -> list[Dataset]:
         accessions,
     )}
     cellxgene = {d["dataset_id"]: d for d in _cellxgene_datasets()} if any(rows[a][1] == "CELLxGENE" for a in rows) else {}
+    tagged = store.methods([a for a in rows if rows[a][1] == "PRIDE"])
     return [
         Dataset(
             accession=a, source=r[1], modality=r[2], title=r[3], organism=r[4], samples=r[5], url=r[6],
             text=f"{r[3]}\n{r[7]}", papers=json.loads(r[8]), published=r[9],
-            facts=cellxgene_facts(cellxgene[a]) if a in cellxgene else None,
+            facts=cellxgene_facts(cellxgene[a]) if a in cellxgene else methods.facts(tagged[a], r[4]) if a in tagged else None,
         )
         for a in accessions if (r := rows.get(a))
     ]

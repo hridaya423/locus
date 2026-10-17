@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -14,11 +15,28 @@ CELLXGENE = "https://api.cellxgene.cziscience.com/curation/v1/datasets"
 CACHE = Path.home() / ".cache" / "omics-agent" / "cellxgene.json"
 
 
+_ncbi_lock = threading.Lock()
+_ncbi_next = 0.0
+
+
+def _ncbi_pace() -> None:
+    """Space requests from every thread in this process so they stay under NCBI's limit together."""
+    global _ncbi_next
+    gap = 1 / 9 if os.environ.get("NCBI_API_KEY") else 1 / 3
+    with _ncbi_lock:
+        now = time.monotonic()
+        _ncbi_next = max(_ncbi_next, now) + gap
+        wait = _ncbi_next - gap - now
+    if wait > 0:
+        time.sleep(wait)
+
+
 def ncbi_get(url: str, params: dict) -> httpx.Response:
     """NCBI allows 3 requests a second, or 10 with NCBI_API_KEY; back off and retry when throttled."""
     if key := os.environ.get("NCBI_API_KEY"):
         params = {**params, "api_key": key}
     for attempt in range(4):
+        _ncbi_pace()
         response = httpx.get(url, params=params, timeout=60)
         if response.status_code != 429 and "API rate limit exceeded" not in response.text[:200]:
             response.raise_for_status()
@@ -251,3 +269,43 @@ def paper_methods(paper: str) -> dict:
             heading = " ".join((sub.findtext("title") or "").split())
             paragraphs += [{"section": heading, "text": " ".join("".join(p.itertext()).split())} for p in sub.findall("p")]
     return head | {"available": bool(paragraphs), "paragraphs": paragraphs} | ({} if paragraphs else {"reason": "full text has no methods section"})
+
+
+PRIDE_FILES = "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/{}/files"
+PRIDE_FILES_CACHE = Path.home() / ".cache" / "omics-agent" / "pride-files"
+# What a researcher can use without reprocessing, in the order it is shown.
+FILE_KINDS = (
+    ("protein table", re.compile(r"proteingroups|protein_groups|pg_matrix|proteins?[._-]|protein[ _-]?quant", re.I)),
+    ("sample design", re.compile(r"\.sdrf|experimental.?design", re.I)),
+    ("search output", re.compile(r"report|evidence|peptides?|psm|precursor|\.mztab|\.mzid|\.msf|\.xlsx?$|\.tsv$|\.csv$", re.I)),
+)
+SKIPPED_FILES = re.compile(r"parameters|mqpar|\.fasta|library|\.kit$|\.xml$|summary\.txt|msms", re.I)
+
+
+def pride_files(accession: str) -> dict:
+    """The author-processed files of a PRIDE project (protein tables, search output, sample design) and a summary of
+    its raw files, so a researcher can see whether reprocessing is needed. Cached on disk."""
+    path = PRIDE_FILES_CACHE / f"{accession}.json"
+    if not path.exists():
+        files, page = [], 0
+        while batch := httpx.get(PRIDE_FILES.format(accession), params={"pageSize": 1000, "page": page}, timeout=60).raise_for_status().json():
+            files += batch
+            if len(batch) < 1000:
+                break
+            page += 1
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(files))
+    files = json.loads(path.read_text())
+    raw = [f for f in files if f["fileCategory"]["value"] == "RAW"]
+    processed = []
+    for f in files:
+        name, category = f["fileName"], f["fileCategory"]["value"]
+        if category == "RAW" or SKIPPED_FILES.search(name):
+            continue
+        kind = "sample design" if category == "EXPERIMENTAL DESIGN" else next((k for k, pattern in FILE_KINDS if pattern.search(name)), None)
+        ftp = next((loc["value"] for loc in f.get("publicFileLocations", []) if loc["value"].startswith("ftp://")), None)
+        if kind and ftp:
+            processed.append({"name": name, "kind": kind, "bytes": f["fileSizeBytes"], "url": ftp.replace("ftp://", "https://", 1)})
+    order = [k for k, _ in FILE_KINDS]
+    processed.sort(key=lambda p: (order.index(p["kind"]), -p["bytes"]))
+    return {"processed": processed[:6], "more": max(0, len(processed) - 6), "raw": {"files": len(raw), "bytes": sum(f["fileSizeBytes"] for f in raw)}}

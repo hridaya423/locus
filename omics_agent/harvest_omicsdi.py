@@ -81,8 +81,8 @@ def harvest_repo(client: httpx.Client, repo: str) -> list[dict]:
     with ThreadPoolExecutor(max_workers=6) as pool:
         datasets = {d["id"]: d for batch in pool.map(page, range(pages)) for d in batch}
     print(f"{repo}: {count} listed, {len(datasets)} fetched", flush=True)
-    # E-GEOD-N is a copy of GEO series GSEN, which the GEO harvest already holds.
-    return [_row(repo, d) for d in datasets.values() if not d["id"].startswith("E-GEOD-")]
+    # E-GEOD-N is a copy of GEO series GSEN, which the GEO harvest already holds; EGAC records are access committees, not data.
+    return [_row(repo, d) for d in datasets.values() if not d["id"].startswith(("E-GEOD-", "EGAC"))]
 
 
 def harvest_workbench(client: httpx.Client) -> list[dict]:

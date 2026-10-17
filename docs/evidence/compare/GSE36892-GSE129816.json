@@ -1,0 +1,139 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "GSE129816",
+  "source": "GEO",
+  "title": "Next Generation Sequencing Facilitates Quantitative Analysis of Wild Type, genome-edited MTOR(G4448A)-p.C1483Y, and Torin1-treated Wild type Translatomics",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina HiSeq 2000",
+  "material": "cell line",
+  "tissue": "fibroblast",
+  "case": 6,
+  "control": 11,
+  "contrast": "C1483Y vs WT",
+  "build": "mm10"
+ },
+ "verdict": "no",
+ "reason": "Different contrasts: Torin1 vs Vehicle, and C1483Y vs WT.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Mus musculus",
+   "status": "same",
+   "note": "",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "translatome + transcriptome",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "Ribo-seq + RNA-seq",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": "cases and controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": "C1483Y vs WT",
+   "status": "differs",
+   "note": "Different contrasts: Torin1 vs Vehicle, and C1483Y vs WT.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": "Illumina HiSeq 2000",
+   "status": "differs",
+   "note": "Different platforms or instruments add a batch effect; model it.",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": "cell line",
+   "status": "differs",
+   "note": "Different kinds of material (cell line, tissue, primary cells) can respond differently.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": "fibroblast",
+   "status": "differs",
+   "note": "Different tissues or cell types can respond differently; the effects may not carry over.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": "mm10",
+   "status": "differs",
+   "note": "Different genome builds: reprocess both against one build before comparing counts.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": "6 cases, 11 controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Do not combine these datasets. Different contrasts: Torin1 vs Vehicle, and C1483Y vs WT."
+ ]
+}

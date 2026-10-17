@@ -1,0 +1,131 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "GSE184247",
+  "source": "GEO",
+  "title": "eIF4A1 enhances LARP1-mediated translational repression during mTORC1 inhibition",
+  "organism": "Homo sapiens",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina HiSeq 4000",
+  "material": "cell line",
+  "tissue": "kidney (HEK293 T-REx)",
+  "case": 6,
+  "control": 10,
+  "contrast": "PP242 10 microM; PP242 1 microM; PP242 10 \u00b5M; PP242 1 \u00b5M vs DMSO; Control siRNA",
+  "build": "hg38"
+ },
+ "verdict": "effects",
+ "reason": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Homo sapiens",
+   "status": "differs",
+   "note": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+   "source": "repository record"
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "translatome + transcriptome",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type"
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "Ribo-seq + RNA-seq",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type"
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": "cases and controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts"
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": "PP242 10 microM; PP242 1 microM; PP242 10 \u00b5M; PP242 1 \u00b5M vs DMSO; Control siRNA",
+   "status": "related",
+   "note": "Torin1 vs Vehicle against PP242 10 microM; PP242 1 microM; PP242 10 \u00b5M; PP242 1 \u00b5M vs DMSO; Control siRNA. (\"Torin1 vs Vehicle\"; \"PP242 10 microM; PP242 1 microM; PP242 10 \u00b5M; PP242 1 \u00b5M vs DMSO; Control siRNA\")",
+   "source": "case and control labels"
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": "Illumina HiSeq 4000",
+   "status": "differs",
+   "note": "Different platforms or instruments add a batch effect; model it.",
+   "source": "GEO platform and instrument"
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": "cell line",
+   "status": "differs",
+   "note": "Different kinds of material (cell line, tissue, primary cells) can respond differently.",
+   "source": "sample type label"
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": "kidney (HEK293 T-REx)",
+   "status": "differs",
+   "note": "Different tissues or cell types can respond differently; the effects may not carry over.",
+   "source": "tissue label"
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": "hg38",
+   "status": "differs",
+   "note": "Different genome builds: reprocess both against one build before comparing counts.",
+   "source": "GEO data processing"
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": "6 cases, 10 controls",
+   "status": "differs",
+   "note": "Different group sizes: the larger dataset dominates a pooled analysis.",
+   "source": "GEO sample counts"
+  }
+ ],
+ "steps": [
+  "Analyse each dataset on its own, with the same method.",
+  "Compare the fold changes, their direction and the overlap of hits between the two results.",
+  "Map genes between the organisms through orthologs."
+ ]
+}

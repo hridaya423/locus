@@ -22,7 +22,7 @@ def _get(client: httpx.Client, endpoint: str, params: dict) -> dict:
             response = client.post(f"{EUTILS}/{endpoint}", data=params, timeout=120)
             if response.status_code == 200:
                 body = response.json()
-                if "result" in body or "esearchresult" in body:
+                if "result" in body or "esearchresult" in body or "linksets" in body:
                     return body
                 if "cannot be transformed to JSON" in response.text:
                     raise TooLarge

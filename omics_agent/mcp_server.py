@@ -115,5 +115,18 @@ def get_samplesheet(accession: str, topic: str) -> dict:
     return {"accession": accession, "files": agent.samplesheet_files(accession, topic)}
 
 
+@mcp.tool(annotations=READ_ONLY)
+def compare_datasets(a: str, b: str, topic: str) -> dict:
+    """Whether two datasets can be used together: "pool" (reprocess both and analyse as one, study as a batch term),
+    "effects" (analyse each on its own and compare fold changes and hits), or "no". Returns the verdict, the deciding
+    reason, one row per fact compared (organism, molecular layer, technology, both case and control groups in each,
+    contrast, platform, material, tissue, genome build, group sizes) and the next steps. `topic` is the condition that
+    counts as a case, for example "Torin1 mTOR inhibition"."""
+    try:
+        return asdict(agent.compare_datasets(a, b, topic))
+    except LookupError as error:
+        return {"error": str(error)}
+
+
 def main() -> None:
     mcp.run()

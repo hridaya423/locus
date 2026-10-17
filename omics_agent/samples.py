@@ -51,11 +51,17 @@ LABEL_SCHEMA = {
 
 FIELD_NAMES = {"!Sample_library_strategy": "library strategy", "!Sample_molecule_ch1": "molecule", "!Sample_source_name_ch1": "source name"}
 RECORD_FIELDS = {"title pattern", *FIELD_NAMES.values()}
+SAMPLE_META = {
+    "!Sample_platform_id": "platform",
+    "!Sample_instrument_model": "instrument",
+    "!Sample_library_selection": "library_selection",
+    "!Sample_library_source": "library_source",
+}
 
 
 def geo_records(accession: str) -> list[dict]:
-    """Each sample of a GEO series: its GSM and SRX accessions, full title, organism, and the `fields` that labelling reads.
-    Fields other than RECORD_FIELDS are the sample characteristics."""
+    """Each sample of a GEO series: its GSM and SRX accessions, full title, organism, platform, instrument, library selection
+    and source, genome build, and the `fields` that labelling reads. Fields other than RECORD_FIELDS are the sample characteristics."""
     path = CACHE / f"{accession}.txt"
     if not path.exists():
         response = ncbi_get(GEO_SAMPLES, {"acc": accession, "targ": "gsm", "form": "text", "view": "brief"})
@@ -64,7 +70,7 @@ def geo_records(accession: str) -> list[dict]:
 
     records = []
     for record in path.read_text().split("^SAMPLE")[1:]:
-        sample: dict = {"gsm": record.split("\n", 1)[0].strip(" ="), "title": "", "organism": "", "srx": "", "fields": {}}
+        sample: dict = {"gsm": record.split("\n", 1)[0].strip(" ="), "title": "", "organism": "", "srx": "", "genome_build": "", **dict.fromkeys(SAMPLE_META.values(), ""), "fields": {}}
         fields = sample["fields"]
         for line in record.splitlines():
             key, _, value = line.partition(" = ")
@@ -75,6 +81,10 @@ def geo_records(accession: str) -> list[dict]:
                 sample["organism"] = value
             elif key == "!Sample_relation" and (srx := re.search(r"\b[SED]RX\d+", value)):
                 sample["srx"] = srx.group()
+            elif key in SAMPLE_META:
+                sample[SAMPLE_META[key]] = value
+            elif key == "!Sample_data_processing" and (build := re.match(r"Genome_build:\s*(\S.*)", value)) and not sample["genome_build"]:
+                sample["genome_build"] = build.group(1).strip()
             elif key in FIELD_NAMES:
                 fields[FIELD_NAMES[key]] = value
             elif key == "!Sample_characteristics_ch1":
@@ -83,6 +93,20 @@ def geo_records(accession: str) -> list[dict]:
                 fields[f"{name} (characteristic)" if name in RECORD_FIELDS else name] = val if sep else value
         records.append(sample)
     return records
+
+
+def geo_files(accession: str) -> list[str]:
+    """Download links for the processed files a GEO series offers, at series or sample level; one cached series request."""
+    path = CACHE / f"{accession}.series.txt"
+    if not path.exists():
+        response = ncbi_get(GEO_SAMPLES, {"acc": accession, "targ": "self", "form": "text", "view": "brief"})
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(response.text)
+    samples = CACHE / f"{accession}.txt"
+    lines = path.read_text().splitlines() + (samples.read_text().splitlines() if samples.exists() else [])
+    files = (line.partition(" = ")[2] for line in lines if line.startswith(("!Series_supplementary_file", "!Sample_supplementary_file")))
+    # Series-level files (often one bundle of every sample's file) come before per-sample files.
+    return sorted({f.replace("ftp://", "https://", 1) for f in files if f and f != "NONE"}, key=lambda f: ("/geo/samples/" in f, f))
 
 
 def geo_samples(accession: str) -> list[dict[str, str]]:

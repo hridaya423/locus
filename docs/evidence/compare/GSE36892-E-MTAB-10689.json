@@ -1,0 +1,140 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "E-MTAB-10689",
+  "source": "ArrayExpress",
+  "title": "Analysis of HIF and mTOR dependent translational regulation of mRNAs resolved by their transcription start sites, using HP5 technology",
+  "organism": "Homo sapiens",
+  "layer": "transcriptome",
+  "technology": "RNA-seq",
+  "platform": null,
+  "material": null,
+  "tissue": null,
+  "case": null,
+  "control": null,
+  "contrast": null,
+  "build": null
+ },
+ "verdict": "unclear",
+ "reason": "Not stated for E-MTAB-10689: both groups in each.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Homo sapiens",
+   "status": "differs",
+   "note": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "transcriptome",
+   "status": "related",
+   "note": "Only part of the data matches; use the transcriptome data from both.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "RNA-seq",
+   "status": "related",
+   "note": "Only part of the data matches; use the RNA-seq data from both.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: both groups in each.",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": null,
+   "status": "unknown",
+   "note": "No case and control labels for E-MTAB-10689.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: platform.",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: material.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: tissue or cell type.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: genome build.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for E-MTAB-10689: group sizes.",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Check the both groups in each in the records of both datasets before combining them.",
+  "Check the contrast in the records of both datasets before combining them."
+ ]
+}

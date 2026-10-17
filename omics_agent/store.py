@@ -25,6 +25,14 @@ CREATE TABLE IF NOT EXISTS annotations (
   accession TEXT PRIMARY KEY,
   data TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS methods (
+  accession TEXT PRIMARY KEY,
+  data TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS metadata (
+  accession TEXT PRIMARY KEY,
+  data TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS facts (
   accession TEXT NOT NULL,
   topic TEXT NOT NULL,
@@ -77,3 +85,28 @@ def cache_facts(accession: str, topic: str, facts: dict) -> None:
 def summary(accession: str) -> str:
     row = connect().execute("SELECT title || '. ' || summary FROM datasets WHERE accession = ?", (accession,)).fetchone()
     return row[0] if row else ""
+
+
+def methods(accessions: list[str]) -> dict[str, dict]:
+    """PRIDE Map method tags for the given accessions, where they exist."""
+    rows = connect().execute(f"SELECT accession, data FROM methods WHERE accession IN ({','.join('?' * len(accessions))})", accessions)
+    return {a: json.loads(d) for a, d in rows}
+
+
+# Structured metadata read from each repository's own API, beyond what the bulk listings carry. Every value is a
+# list of strings except sample_count; a key is left out when the repository does not state it.
+METADATA_KEYS = ("instruments", "tissues", "cell_types", "diseases", "keywords", "modifications", "quantification",
+                 "experiment_types", "technologies", "sample_count", "source")
+
+
+def put_metadata(db: sqlite3.Connection, rows: dict[str, dict]) -> None:
+    """Store structured metadata per accession, replacing earlier values; unknown keys are rejected."""
+    if bad := {k for d in rows.values() for k in d} - set(METADATA_KEYS):
+        raise ValueError(f"unknown metadata keys: {sorted(bad)}")
+    db.executemany("INSERT OR REPLACE INTO metadata (accession, data) VALUES (?, ?)", [(a, json.dumps(d)) for a, d in rows.items()])
+    db.commit()
+
+
+def metadata(accessions: list[str]) -> dict[str, dict]:
+    rows = connect().execute(f"SELECT accession, data FROM metadata WHERE accession IN ({','.join('?' * len(accessions))})", accessions)
+    return {a: json.loads(d) for a, d in rows}

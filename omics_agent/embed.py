@@ -58,12 +58,14 @@ def _embed(client: httpx.Client, url: str, texts: list[str]) -> np.ndarray:
     raise RuntimeError(f"embedding failed: {response.status_code} {response.text[:200]}")
 
 
-def embed_corpus(url: str) -> None:
-    """Embed every dataset not yet embedded, in resumable chunks, then join all chunks into one matrix.
-    Each chunk records its accessions, so rows added by a later harvest only embed themselves."""
+def embed_corpus(url: str, redo: set[str] = frozenset()) -> None:
+    """Embed every dataset not yet embedded, plus any in `redo` whose text changed, in resumable chunks,
+    then join all chunks into one matrix. Each chunk records its accessions, so a later harvest or edit
+    only embeds the rows it touched; the newest vector of an accession wins."""
     PARTS.mkdir(parents=True, exist_ok=True)
-    done = {a for p in PARTS.glob("*.json") for a in json.loads(p.read_text())}
-    rows = [r for r in store.connect().execute("SELECT accession, title, summary, organism, modality FROM datasets ORDER BY rowid") if r[0] not in done]
+    done = {a for p in PARTS.glob("*.json") for a in json.loads(p.read_text())} - redo
+    stored = store.connect().execute("SELECT accession, title, summary, organism, modality FROM datasets ORDER BY rowid").fetchall()
+    rows = [r for r in stored if r[0] not in done]
     print(f"{len(done)} already embedded, {len(rows)} to embed", flush=True)
     headers = {"Authorization": f"Bearer {os.environ['HF_TOKEN']}"}
     with httpx.Client(headers=headers) as client, ThreadPoolExecutor(max_workers=8 * REPLICAS) as pool:
@@ -81,8 +83,13 @@ def embed_corpus(url: str) -> None:
             (PARTS / f"{n:05d}.json").write_text(json.dumps([r[0] for r in chunk]))
             print(f"embedded {start + len(chunk)}/{len(rows)} ({len(chunk) / (time.time() - began):.0f} docs/s)", flush=True)
     parts = sorted(PARTS.glob("*.json"))
-    np.save(index.VECTORS, np.vstack([np.load(p.with_suffix(".npy")) for p in parts]))
-    index.VECTOR_IDS.write_text(json.dumps([a for p in parts for a in json.loads(p.read_text())]))
+    ids = [a for p in parts for a in json.loads(p.read_text())]
+    # Later chunks re-embed edited rows, so keep each accession's last vector, and drop rows deleted since.
+    live = {r[0] for r in stored}
+    latest = {a: i for i, a in enumerate(ids) if a in live}
+    keep = sorted(latest.values())
+    np.save(index.VECTORS, np.vstack([np.load(p.with_suffix(".npy")) for p in parts])[keep])
+    index.VECTOR_IDS.write_text(json.dumps([ids[i] for i in keep]))
 
 
 if __name__ == "__main__":
@@ -90,7 +97,9 @@ if __name__ == "__main__":
     endpoint = start_endpoint()
     print(f"endpoint ready: {endpoint.url}", flush=True)
     try:
-        embed_corpus(endpoint.url)
+        # `--redo FILE` re-embeds the accessions listed in FILE, one per line, after their text changed.
+        redo = set(open(sys.argv[2]).read().split()) if sys.argv[1:2] == ["--redo"] else set()
+        embed_corpus(endpoint.url, redo)
     finally:
         endpoint.delete()
         print("endpoint deleted", file=sys.stderr)

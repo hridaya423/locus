@@ -265,7 +265,8 @@ function Bands() {
         const to = LOCI[(n + 1) % LOCI.length];
         const dir = Math.sign(to - from);
         const near = dir > 0 ? "left" : "right";
-        const far = dir > 0 ? "right" : "left";
+        // Finished animations are cancelled, so the resting orange is written down explicitly.
+        lights.current.forEach((el, i) => el && (el.style.clipPath = i === from ? "inset(0 0 0 0)" : "inset(0 100% 0 0)"));
 
         // The source kicks and cools.
         play(bands.current[from], [{ transform: "none" }, { transform: `translateX(${dir * 3}px) scaleX(1.35)`, offset: 0.3 }, { transform: "none" }], { duration: 420, easing: SNAP });
@@ -282,7 +283,6 @@ function Bands() {
         const arrive = Math.abs(to - from) * RIPPLE;
         play(bands.current[to], [{ transform: "none" }, { transform: `translateX(${dir * 3}px) scaleX(1.4) scaleY(1.35)`, offset: 0.25 }, { transform: "none" }], { duration: 560, delay: arrive, easing: SNAP });
         play(lights.current[to], [{ clipPath: `inset(0 ${near === "left" ? "100% 0 0" : "0 0 100%"})` }, { clipPath: "inset(0 0 0 0)" }], { duration: 260, delay: arrive, easing: SNAP });
-        void far;
 
         await pause(arrive + HOLD);
       }

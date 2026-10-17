@@ -1,0 +1,140 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "GSE167324",
+  "source": "GEO",
+  "title": "Analysis of the eIF4E3-dependent translatome after Torin1-induced stress in N2a cells ctrl and eIF4E3 KO",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina HiSeq 4000",
+  "material": "cell line",
+  "tissue": "neuroblastoma",
+  "case": 12,
+  "control": 12,
+  "contrast": "Torin1 2hrs vs DMSO 2hrs",
+  "build": "mm10"
+ },
+ "verdict": "pool",
+ "reason": "Organism, molecular layer, technology, both groups in each, contrast all agree.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Mus musculus",
+   "status": "same",
+   "note": "",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "translatome + transcriptome",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "Ribo-seq + RNA-seq",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": "cases and controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": "Torin1 2hrs vs DMSO 2hrs",
+   "status": "same",
+   "note": "Both compare Torin1, an mTOR kinase inhibitor, against a vehicle or solvent control, though one uses DMSO at a fixed 2 hours while the other uses an unspecified vehicle and time. (\"Torin1 vs Vehicle\"; \"Torin1 2hrs vs DMSO 2hrs\")",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": "Illumina HiSeq 4000",
+   "status": "differs",
+   "note": "Different platforms or instruments add a batch effect; model it.",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": "cell line",
+   "status": "differs",
+   "note": "Different kinds of material (cell line, tissue, primary cells) can respond differently.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": "neuroblastoma",
+   "status": "differs",
+   "note": "Different tissues or cell types can respond differently; the effects may not carry over.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": "mm10",
+   "status": "differs",
+   "note": "Different genome builds: reprocess both against one build before comparing counts.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": "12 cases, 12 controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Reprocess both datasets from raw reads with one pipeline.",
+  "Analyse the samples together and model the study as a batch term."
+ ]
+}
