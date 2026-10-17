@@ -88,7 +88,7 @@ function FileGroup({ group, accession }: { group: Group; accession: string }) {
         </span>
       </h3>
       <ul className="grid">
-        {shown.map((f) => <FileRow key={f.url} file={f} accession={accession} />)}
+        {shown.map((f, i) => <FileRow key={`${f.url}#${i}`} file={f} accession={accession} />)}
       </ul>
       {group.files.length > FILES_SHOWN && (
         <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[13px]", MUTED_LINK)}>

@@ -163,13 +163,15 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
 
 export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
 export type FilePreview = {
-  file: string; url: string; format: string; sheet: string | null; bytes_read: number; size: number | null; complete: boolean;
+  file: string; url: string; format: string; sheet: string | null; skipped: number; bytes_read: number; size: number | null; complete: boolean;
   rows_read: number; total_rows: number | null; column_count: number; columns: PreviewColumn[]; rows: string[][];
-  samples: { by: string; matched: number; of: number; factor: string | null; levels: Record<string, number> } | null;
+  samples: { by: string | null; matched: number; of: number; factor: string | null; levels: Record<string, number>; keys?: string[]; looks_like?: string | null } | null;
 };
 
 export async function filePreview(accession: string, file: string, signal?: AbortSignal): Promise<FilePreview> {
-  const res = await fetch(`${API}/preview/${encodeURIComponent(accession)}?file=${encodeURIComponent(file)}`, { signal });
+  const res = await fetch(`${API}/preview/${encodeURIComponent(accession)}?file=${encodeURIComponent(file)}`, { signal }).catch((e: Error) => {
+    throw e.name === "AbortError" ? e : Object.assign(new Error("locus could not reach its server."), { retry: true });
+  });
   if (!res.ok) throw Object.assign(new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`), { retry: res.status >= 500 });
   return res.json();
 }

@@ -6,15 +6,17 @@ has not shown stays None.
 """
 
 import csv
+import io
 import math
 import re
 import zlib
 from functools import lru_cache
+from itertools import islice
 from pathlib import Path
 
 import httpx
 
-from . import design, record
+from . import design, record, samples as geo_samples
 
 CACHE = Path.home() / "omics-data" / "previews"
 READ = 256 * 1024
@@ -31,8 +33,39 @@ INTEGER = re.compile(r"^[+-]?\d+$")
 MZTAB = (("PRH", "PRT"), ("SMH", "SML"), ("PSH", "PSM"))
 
 
-def previewable(f: dict) -> bool:
-    return bool(f["processed"] and (TABLE.search(f["name"]) or XLSX.search(f["name"]) and (f["bytes"] or 0) <= MAX_XLSX))
+NOT_A_TABLE = re.compile(r"read.?me|md5|checksum|filelist", re.I)
+SERIES_MATRIX = re.compile(r"(?:-(GPL\d+))?_series_matrix\.txt", re.I)
+
+
+@lru_cache(maxsize=256)
+def _data_rows(accession: str) -> dict[str, int] | None:
+    """The data rows GEO states for the samples of a series, by platform and in total (key ""); None without a sample file."""
+    path = geo_samples.CACHE / f"{accession}.txt"
+    if not path.exists():
+        return None
+    rows = {"": 0}
+    for block in path.read_text().split("^SAMPLE")[1:]:
+        count = re.search(r"^!Sample_data_row_count = (\d+)", block, re.M)
+        platform = re.search(r"^!Sample_platform_id = (\S+)", block, re.M)
+        n = int(count.group(1)) if count else 1
+        rows[""] += n
+        if platform:
+            rows[platform.group(1)] = rows.get(platform.group(1), 0) + n
+    return rows
+
+
+def previewable(f: dict, accession: str = "") -> bool:
+    """A processed table, or an xlsx up to 20 MB; not a series matrix whose samples GEO says have no data rows."""
+    name = f["name"]
+    if not f["processed"] or NOT_A_TABLE.search(name):
+        return False
+    if XLSX.search(name):
+        return (f["bytes"] or 0) <= MAX_XLSX
+    if not TABLE.search(name):
+        return False
+    matrix = SERIES_MATRIX.search(name)
+    rows = _data_rows(accession) if matrix else None
+    return not (rows and not rows.get(matrix.group(1) or "", 1))
 
 
 def _head(url: str) -> tuple[bytes, int | None]:
@@ -62,14 +95,41 @@ def _text(data: bytes, whole: bool) -> tuple[str, bool]:
     return (text if whole else text.rpartition("\n")[0]), whole
 
 
-def _delimiter(lines: list[str]) -> str:
-    """The delimiter that splits the first lines into the same number, at least two, of fields."""
+DELIMITERS = {"\t": "tab-separated", ",": "comma-separated", ";": "semicolon-separated", "|": "pipe-separated", " ": "space-separated"}
+
+
+def _reader(text: str, delimiter: str):
+    return csv.reader(io.StringIO(text), delimiter=delimiter, skipinitialspace=delimiter == " ")
+
+
+def _delimiter(text: str) -> str:
+    """The delimiter that splits the first rows into the same number, at least two, of fields; a header one field short of
+    the rows is a row-names table written by R."""
     best, width = "", 1
-    for d in "\t,;|":
-        counts = {len(line.split(d)) for line in lines}
-        if len(counts) == 1 and (n := counts.pop()) > width:
+    for d in DELIMITERS:
+        try:
+            widths = [len(r) for r in islice(_reader(text, d), 10) if r]
+        except csv.Error:
+            continue
+        n = max(widths, default=0)
+        if n > width and all(w == n for w in widths[1:]) and widths[0] in (n, n - 1):
             best, width = d, n
     return best
+
+
+def _table(text: str) -> tuple[list[str], list[list[str]], str, int]:
+    """The header, rows, delimiter name and number of `#` comment lines above the header of a delimited table."""
+    lines = text.split("\n")
+    first = next((i for i, l in enumerate(lines) if l.strip() and not l.startswith("#")), 0)
+    comments = sum(1 for l in lines[:first] if l.startswith("#"))
+    body = "\n".join(lines[first:])
+    if not (d := _delimiter(body)):
+        raise ValueError("This file is not a table: no tab, comma, semicolon, pipe or space splits its first lines into the same columns.")
+    try:
+        header, *rows = islice(_reader(body, d), MAX_ROWS + 3)
+    except csv.Error as error:
+        raise ValueError(f"This file is not a readable table: {error}.")
+    return header, rows, DELIMITERS[d], comments
 
 
 def _mztab(lines: list[str]) -> tuple[list[str], list[list[str]], str]:
@@ -103,7 +163,9 @@ def _series_matrix(lines: list[str]) -> tuple[list[str], list[list[str]], list[d
     return rows[0], rows[1:], samples
 
 
-def _xlsx(accession: str, f: dict) -> tuple[list[str], list[list[str]], bool, int, str]:
+def _xlsx(accession: str, f: dict) -> tuple[list[str], list[list[str]], bool, int, str, int]:
+    """Header, rows, whether all rows were read, file size, sheet name, and the rows above the header, which is the first
+    row with at least half as many filled cells as the widest of the first 50 rows."""
     from openpyxl import load_workbook
 
     path = CACHE / re.sub(r"[^\w.-]", "_", f"{accession}_{f['name']}")
@@ -114,19 +176,20 @@ def _xlsx(accession: str, f: dict) -> tuple[list[str], list[list[str]], bool, in
             for chunk in r.iter_raw():
                 data += chunk
                 if len(data) > MAX_XLSX:
-                    raise ValueError("The file is larger than 20 MB, so locus does not download it to preview it.")
+                    raise ValueError("This xlsx is larger than 20 MB, so locus does not download it to preview it.")
         CACHE.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
-    book = load_workbook(path, read_only=True, data_only=True)
-    sheet = book.worksheets[0]
+    sheet = load_workbook(path, read_only=True, data_only=True).worksheets[0]
     rows = []
     for cells in sheet.iter_rows(values_only=True):
         if any(c is not None for c in cells):
             rows.append(["" if c is None else str(c) for c in cells])
-        if len(rows) > MAX_ROWS:
+        if len(rows) > MAX_ROWS + 50:
             break
-    whole = len(rows) <= MAX_ROWS
-    return rows[0], rows[1:MAX_ROWS + 1], whole, path.stat().st_size, sheet.title
+    filled = [sum(1 for c in r if c) for r in rows[:50]]
+    start = next((i for i, n in enumerate(filled) if n >= max(2, math.ceil(max(filled, default=0) / 2))), 0)
+    body = rows[start + 1:]
+    return rows[start], body[:MAX_ROWS + 1], len(body) <= MAX_ROWS, path.stat().st_size, sheet.title, start
 
 
 def _column(name: str, values: list[str]) -> dict:
@@ -148,23 +211,34 @@ def _column(name: str, values: list[str]) -> dict:
     return out
 
 
+SAMPLE_KEY = re.compile(r"^(geo_accession|accession|title|run|sample|sample title|sample name|source name|name)$", re.I)
+ACCESSION = re.compile(r"^([A-Z]{3,5})\d+$")
+
+
 def _groups(headers: list[str], table: dict | None, samples: list[dict] | None = None) -> tuple[dict | None, list[str | None]]:
-    """Which sample each column is, by the identifier column of the sample table that matches most headers, and the
-    leading grouping factor of those samples. The first column is the feature identifier and is not matched."""
+    """Which sample each column is, matched only on a sample accession or a title that is unique in the sample table, and the
+    leading grouping factor of those samples. The first column is the feature identifier and is not matched. When no
+    column matches, the summary says which keys were tried and which accessions the headers look like."""
     if samples:
         table = {"columns": list(dict.fromkeys(k for s in samples for k in s)), "rows": []}
         table["rows"] = [[s.get(c, "") for c in table["columns"]] for s in samples]
-    ids = set(headers[1:])
-    if not table or not table["rows"]:
+    ids = headers[1:]
+    if not table or not table["rows"] or len(ids) < 2:
         return None, []
     cols = table["columns"]
-    found = [sum(1 for v in {r[i] for r in table["rows"]} if v in ids) for i in range(len(cols))]
-    key = max(range(len(cols)), key=found.__getitem__)
-    if found[key] < 2:
-        return None, []
+    keys = {}
+    for i, c in enumerate(cols):
+        values = [r[i] for r in table["rows"] if r[i]]
+        if SAMPLE_KEY.match(c) and len(values) == len(set(values)):
+            keys[i] = sum(1 for v in values if v in set(ids))
+    key = max(keys, key=keys.get, default=None)
+    if key is None or keys[key] < 2:
+        prefixes = [m.group(1) for h in ids if (m := ACCESSION.match(h))]
+        looks = max(set(prefixes), key=prefixes.count) if len(prefixes) * 2 >= len(ids) else None
+        return {"by": None, "matched": 0, "of": len(ids), "keys": [cols[i] for i in keys], "looks_like": looks, "factor": None, "levels": {}}, []
     rows = [dict(zip(cols, r)) for r in table["rows"]]
     factors = (design.from_rows([{c: v for c, v in r.items() if c != cols[key]} for r in rows], "") or {}).get("factors", [])
-    summary = {"by": cols[key], "matched": found[key], "of": len(ids), "factor": None, "levels": {}}
+    summary = {"by": cols[key], "matched": keys[key], "of": len(ids), "factor": None, "levels": {}}
     if not factors:
         return summary, []
     factor = next(c for c in cols if design._clean(c) == factors[0]["name"])
@@ -184,12 +258,12 @@ def preview(accession: str, file: str) -> dict:
     if not (row := record._row(accession)):
         raise LookupError(f"{accession} is not in the index.")
     rec = record.raw(accession, row)
-    f = next((f for f in rec.files if f["name"] == file), None)
-    if not f or not previewable(f):
+    f = next((f for f in rec.files if f["name"] == file and previewable(f, accession)), None)
+    if not f:
         raise LookupError(f"{accession} lists no processed table named {file}.")
-    sheet, samples = None, None
+    sheet, samples, skipped = None, None, 0
     if XLSX.search(file):
-        header, body, whole, read, sheet = _xlsx(accession, f)
+        header, body, whole, read, sheet, skipped = _xlsx(accession, f)
         kind, size = "xlsx", read
     else:
         data, size = _head(f["url"])
@@ -203,11 +277,7 @@ def preview(accession: str, file: str) -> dict:
             header, body, samples = _series_matrix(lines)
             kind = "series matrix"
         else:
-            lines = [l for l in lines if l.strip()]
-            if not (d := _delimiter(lines[:10])):
-                raise ValueError("The first lines of the file are not a table with separated columns.")
-            header, *body = csv.reader(lines, delimiter=d)
-            kind = {"\t": "tab-separated", ",": "comma-separated", ";": "semicolon-separated", "|": "pipe-separated"}[d]
+            header, body, kind, skipped = _table(text)
     body = [r for r in body if any(c.strip() for c in r)]
     whole = whole and len(body) <= MAX_ROWS
     body = body[:MAX_ROWS]
@@ -222,7 +292,7 @@ def preview(accession: str, file: str) -> dict:
     for c, g in zip(columns, groups or [None] * width):
         c["group"] = g
     return {
-        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "bytes_read": read, "size": size,
+        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "skipped": skipped, "bytes_read": read, "size": size,
         "complete": whole, "rows_read": len(body), "total_rows": len(body) if whole else None, "column_count": width,
         "columns": columns[:MAX_COLUMNS], "rows": [[v[:CELL] for v in r[:MAX_COLUMNS]] for r in body[:SHOWN]], "samples": summary,
     }
@@ -245,6 +315,28 @@ if __name__ == "__main__":
     proteins = preview("PXD069556", "proteinGroups_LFQ_Oct25.txt")
     assert proteins["column_count"] == 1534 and len(proteins["columns"]) == MAX_COLUMNS and proteins["samples"] is None, proteins["column_count"]
     assert not proteins["complete"] and proteins["bytes_read"] <= READ
+
+    space = preview("GSE114436", "GSE114436_Experiment1.txt.gz")
+    assert space["format"] == "space-separated" and space["column_count"] == 11 and space["columns"][0]["name"] == "", space["columns"][:2]
+    assert space["samples"]["by"] is None and space["samples"]["keys"] == ["Accession", "Title"], space["samples"]
+    quoted = preview("E-MTAB-10554", "fold_change.txt")
+    assert quoted["format"] == "tab-separated" and quoted["column_count"] == 56 and quoted["columns"][0]["name"] == "probe_set", quoted["columns"][:2]
+    twice = preview("E-TABM-346", "E-TABM-346-processed-data-2496486478.txt")
+    assert twice["column_count"] == 319, twice["column_count"]
+    sheet = preview("PXD066171", "AlgPro2_Resume_samples2.xlsx")
+    assert sheet["columns"][1]["name"] == "#name" and sheet["skipped"] == 8 and sheet["complete"], (sheet["skipped"], sheet["columns"][:2])
+
+    empty = next(f for f in record.raw("GSE235388", record._row("GSE235388")).files if f["name"].endswith("GPL20301_series_matrix.txt.gz"))
+    assert not previewable(empty, "GSE235388") and previewable(empty | {"name": "GSE86618_series_matrix.txt.gz"}, "GSE86618") is False
+
+    header, rows, kind, comments = _table("# Program:featureCounts v2\nGeneid\tChr\tS1\nA\t1\t5\nB\t1\t6")
+    assert header == ["Geneid", "Chr", "S1"] and len(rows) == 2 and kind == "tab-separated" and comments == 1
+    header, rows, kind, comments = _table('"S1" "S2"\n"g1" 1 2\n"g2" 3 4')
+    assert header == ["S1", "S2"] and rows[0] == ["g1", "1", "2"] and kind == "space-separated"
+    aggregate = {"columns": ["tissue", "diagnosis"], "rows": [["liver", "normal"], ["kidney", "normal"]]}
+    assert _groups(["gene", "liver", "kidney"], aggregate)[0]["by"] is None, "a characteristic value is not a sample key"
+    repeated = {"columns": ["Title", "diagnosis"], "rows": [["a", "x"], ["a", "y"], ["b", "x"]]}
+    assert _groups(["gene", "a", "b"], repeated)[0]["by"] is None, "a repeated title is not a sample key"
 
     for accession, file in [("GSE86618", "https://example.org/x.txt"), ("GSE86618", "GSE86618_RAW.tar"), ("PXD069556", "missing.txt")]:
         try:

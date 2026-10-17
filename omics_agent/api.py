@@ -91,7 +91,7 @@ def dataset_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,
     if not (found := record.record(accession)):
         raise HTTPException(404, f"{accession} is not in the index.")
     for f in found["files"]:
-        f["preview"] = preview.previewable(f)
+        f["preview"] = preview.previewable(f, accession)
     return found
 
 
@@ -123,7 +123,8 @@ def file_preview(file: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0
     except ValueError as error:
         raise HTTPException(422, str(error))
     except httpx.HTTPStatusError as error:
-        raise HTTPException(502, f"The repository answered {error.response.status_code} for this file.")
+        code = error.response.status_code
+        raise HTTPException(*(410, "The repository no longer serves this file (404).") if code == 404 else (502, f"The repository answered {code} for this file."))
     except httpx.HTTPError:
         raise HTTPException(502, "The repository did not answer.")
 
