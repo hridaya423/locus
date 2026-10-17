@@ -308,7 +308,35 @@ Sections nobody used to make a decision (look-back candidates for deletion):
 - "Commands to download everything": used by none. It showed up on pages with no files (MSV000093129, PXD023840).
 - Compare modal: used once (expert 1), mostly confirmed what was already known.
 
-Critic moments (23:40): see /tmp/locus-night/critic-B/verdict.md, /tmp/locus-night/critic-C/verdict.md.
+Critic moments (23:45; verdicts in /tmp/locus-night/critic-*/verdict.md: A FIX, B FIX, C FIX):
+- critic-A · /d/GSE173357 · GSE173357 · I picked ipf and female and had to scroll past every chart to learn the answer was 8 of 74.
+- critic-A · /d/GSE173357 · GSE173357 · The diagnosis chart read "ipf 8 · normal 8" while only 8 samples were selected; I did not trust the number.
+- critic-A · /d/GSE188464 · GSE188464 · Gender showed F 21 and M 15 of 48; I did not know what the other 12 were.
+- critic-A · /d/GSE173357 · GSE173357 · I selected a combination with 0 samples and could still download an empty CSV and "download everything" commands.
+- critic-A · /d/GSE314505 · GSE314505 · The table said "filter to find the others" under a filter that matched 2,065 rows; I did not know the CSV held them all.
+- critic-A · /d/GSE10667 · GSE10667 · Two levels looked identical after truncation, so I could not tell which to pick.
+- critic-A · /d/PRJNA413393 · PRJNA413393 · An ENA project of 128 runs had no factor to click; I had to use the text box.
+- critic-A · /d/GSE130051 · GSE130051 · The first selection took 50 s with no sign why.
+- critic-B · /d/GSE304101 · GSE304101 · Preview showed the first 20 rows and the 8 columns in one click, but I still had to guess which RNA_AT… column was ataxia-telangiectasia (the sample table sat right above and the preview said nothing about matching it).
+- critic-B · /d/GSE235388 · GSE235388 · Clicked Preview on a 4 KB series matrix and got "The file has no data rows.": a button that cannot work.
+- critic-B · /d/GSE114436 · GSE114436 · The authors' count matrix (space-separated) would not preview, so I downloaded it by hand.
+- critic-B · /d/E-MTAB-10554 · E-MTAB-10554 · The 73 MB fold-change table would not open ("not a table"); I went to the BioStudies page instead.
+- critic-B · /d/E-TABM-346 · E-TABM-346 · The Preview on the processed data file answered "lists no processed table named …" for a file that is in the list.
+- critic-B · /d/GSE86618 · GSE86618 · The 540 columns, each labelled Control or IPF, was the moment I would retell; the summary line "Control (215); IPF (325)" and 0 mismatches against GEO made me trust it.
+- critic-B · /d/GSE86618 · GSE86618 · At 390 px only one column fits, so the group row cannot be read; I scrolled sideways for 215 columns to reach IPF.
+- critic-B · /d/PXD010103 · PXD010103 · Showed 4 of 171 proteinGroups columns, so I could not see which are the LFQ intensities without scrolling.
+- critic-B · /d/PXD066171 · PXD066171 · The xlsx opened with a sentence as its header ("Microalgae", "Chlorella vulgaris"), so I distrusted every column name.
+- critic-B · /d/GSE86618 · GSE86618 · The list says 28 MB and the preview line says 29 MB for the same file, and I distrusted both.
+- critic-B · /d/GSE304101 · GSE304101 · Asking an agent to use `preview_file` has no way to get a file name; I had to read the web page for it.
+- critic-C · /p/35680905 · GSE184894 · The authors state the paper deposited GSE184894 and MSV000089303 and reused GSE169049, but locus lists GSE169049 and not the MassIVE set, so the researcher cannot trust "datasets of this paper" and goes back to the full text.
+- critic-C · / · GSE36892 · I pasted the GEO URL of GSE36892 from my browser bar and locus started a paid search instead of opening the dataset.
+- critic-C · / · GSE36892 · I pasted the SRA study SRP011987 and landed on a single sample page, not the dataset.
+- critic-C · / · GSE36892 · I pasted the BioProject PRJNA157105 that the dataset page itself links to, and locus said it has no such record.
+- critic-C · /p/40874606 · PRJDB20463 · The supplementary files list "size not stated" for a 1.6 MB PDF, so I cannot tell what I would be downloading.
+- critic-C · /p/33481834 · PXD021455 · The data availability quote names PXD021455 as plain text, so I copy it into a search box rather than clicking.
+- critic-C · /p/22955616 · none · A big consortium paper gives an error page and "Try again" that can never work.
+- critic-C · /d/PRJNA270957 · PRJNA270957 · The dataset page's paper link opens a 1975 formate assay paper that has nothing to do with the dataset.
+- assistant (Opus 5.5 + web search) · q1 · GSE36892 · the assistant quoted the paper's 'Cellular extracts were partitioned for either ribosome profiling or mRNA profiling'; locus only reads GEO text, so it cannot quote the split for GSE36892 (task audit hit the same gap)
 
 ### Ladder, found tonight
 - Dictate the question (mic in the search box), asked by the user at 23:05. Built by C (step 3).
