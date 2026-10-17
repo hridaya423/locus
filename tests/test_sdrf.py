@@ -27,6 +27,8 @@ def test_label_free_with_individuals_counts_samples_and_individuals_separately()
     assert facts["runs"] == 6 and facts["excluded_pooled"] == 0 and facts["grain"] == "samples"
     assert facts["labels"] == {"label free sample": {"case": 3, "control": 3}}
     assert facts["libraries"] == {} and facts["assays"] == []
+    # Semen is a biofluid by the table's organism part; the model's 'patient_tissue' label is overridden.
+    assert facts["sample_type"] == "patient_biofluid"
 
 
 def test_tmt_pooled_reference_is_left_out_and_runs_are_counted_per_channel():
@@ -73,3 +75,13 @@ def test_ontology_cells_and_missing_markers_are_reduced(tmp_path: Path):
     assert sdrf.column(t, "factor value[x]") is None
     facts = sdrf.count(t, labels("disease", ["lung cancer"], ["normal"]), "SDRF samples")
     assert facts["individuals"] == 1 and facts["individuals_by_group"] == {"control": 1}
+
+
+def test_the_table_decides_the_sample_type_when_it_can():
+    assert sdrf.material_of({"cell line": Counter({"HeLa": 3})}, "Homo sapiens") == "cell_line"
+    assert sdrf.material_of({"organism part": Counter({"liver": 3})}, "Mus musculus") == "animal_or_organoid_model"
+    assert sdrf.material_of({"material type": Counter({"biofluid": 3}), "organism part": Counter({"blood serum": 3})}, "Homo sapiens") == "patient_biofluid"
+    assert sdrf.material_of({"organism part": Counter({"colon": 3}), "material type": Counter({"tissue": 3})}, "Homo sapiens") == "patient_tissue"
+    assert sdrf.material_of({}, "Homo sapiens") is None
+    facts = sdrf.count(table("PXD042101"), labels("disease", ["endometriosis"], ["normal"]), "SDRF samples")
+    assert facts["sample_type"] == "patient_biofluid"

@@ -1,0 +1,31 @@
+{
+  "accession": "PXD027637",
+  "topic": "male infertility, sperm",
+  "sdrf_rows": 6,
+  "facts": {
+    "case": 3,
+    "control": 3,
+    "mixed": 0,
+    "has_control": true,
+    "sample_type": "patient_biofluid",
+    "tissue": "semen",
+    "assays": [],
+    "library": {},
+    "libraries": {},
+    "grain": "samples",
+    "individuals": 6,
+    "individuals_by_group": {
+      "case": 3,
+      "control": 3
+    },
+    "runs": 6,
+    "excluded_pooled": 0,
+    "labels": {
+      "label free sample": {
+        "case": 3,
+        "control": 3
+      }
+    },
+    "source": "6 SDRF samples (bigbio/sdrf-annotated-datasets)"
+  }
+}

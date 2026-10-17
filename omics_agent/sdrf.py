@@ -114,6 +114,26 @@ def sdrf_fields(table: dict) -> dict[str, Counter]:
     return dict(fields)
 
 
+FLUIDS = re.compile(r"fluid|serum|plasma|blood|urine|saliva|semen|sputum|lavage|milk|sweat|tears|csf|bile|ascites", re.I)
+
+
+def material_of(fields: dict[str, Counter], organism: str) -> str | None:
+    """The sample type as the table states it: a cell line column means cell_line, a biofluid material or organism
+    part means patient_biofluid, other human material patient_tissue, non-human material a model. None when the table
+    does not say, so the model's label stands."""
+    if any(v for v in fields.get("cell line", {})):
+        return "cell_line"
+    if organism and "homo sapiens" not in organism.lower():
+        return "animal_or_organoid_model"
+    material = " ".join(fields.get("material type", {})).lower()
+    part = " ".join(fields.get("organism part", {})).lower()
+    if "biofluid" in material or FLUIDS.search(part):
+        return "patient_biofluid"
+    if material or part:
+        return "patient_tissue"
+    return None
+
+
 def count(table: dict, labels: dict, source: str) -> dict:
     """Case and control counts at sample grain, individuals when the table names them (`None` means unknown), runs,
     the pooled samples left out, and runs per label type. Same keys as samples.count, plus grain, individuals, runs,
@@ -138,12 +158,14 @@ def count(table: dict, labels: dict, source: str) -> dict:
     label_runs: dict[str, Counter] = defaultdict(Counter)
     for r in kept:
         label_runs[re.sub(r"\d+[NC]?$", "", r.get("label", "")).strip() or "unlabelled"][groups[r["source name"]]] += r["runs"]
+    fields = sdrf_fields(table)
+    organism = " ".join(fields.get("organism", {}))
     return {
         "case": case if known else None,
         "control": control if known else None,
         "mixed": mixed,
         "has_control": control + mixed > 0 if known else None,
-        "sample_type": labels["sample_type"],
+        "sample_type": material_of(fields, organism) or labels["sample_type"],
         "tissue": labels["tissue"],
         "assays": [],
         "library": {},

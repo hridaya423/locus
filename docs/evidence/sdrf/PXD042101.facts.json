@@ -1,0 +1,31 @@
+{
+  "accession": "PXD042101",
+  "topic": "endometriosis",
+  "sdrf_rows": 120,
+  "facts": {
+    "case": 3,
+    "control": 6,
+    "mixed": 0,
+    "has_control": true,
+    "sample_type": "patient_biofluid",
+    "tissue": "menstrual fluid",
+    "assays": [],
+    "library": {},
+    "libraries": {},
+    "grain": "samples",
+    "individuals": 9,
+    "individuals_by_group": {
+      "control": 6,
+      "case": 3
+    },
+    "runs": 120,
+    "excluded_pooled": 1,
+    "labels": {
+      "TMT": {
+        "control": 72,
+        "case": 36
+      }
+    },
+    "source": "10 SDRF samples (bigbio/sdrf-annotated-datasets)"
+  }
+}

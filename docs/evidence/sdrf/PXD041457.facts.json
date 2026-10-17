@@ -1,0 +1,31 @@
+{
+  "accession": "PXD041457",
+  "topic": "cystic fibrosis",
+  "sdrf_rows": 60,
+  "facts": {
+    "case": 5,
+    "control": 5,
+    "mixed": 0,
+    "has_control": true,
+    "sample_type": "patient_biofluid",
+    "tissue": "lung",
+    "assays": [],
+    "library": {},
+    "libraries": {},
+    "grain": "samples",
+    "individuals": 10,
+    "individuals_by_group": {
+      "case": 5,
+      "control": 5
+    },
+    "runs": 60,
+    "excluded_pooled": 4,
+    "labels": {
+      "label free sample": {
+        "case": 10,
+        "control": 10
+      }
+    },
+    "source": "14 SDRF samples (bigbio/sdrf-annotated-datasets)"
+  }
+}
