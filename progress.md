@@ -224,3 +224,4 @@ Door audit baseline (seed 1, 30 datasets, 38 pages, 23:05): 5.97 outbound links 
 
 ### Ladder, found tonight
 - Dictate the question (mic in the search box), asked by the user at 23:05.
+- Rule (user, 23:20): changes to data/ (re-embedding, FTS rebuilds, DB writes) only after a checkpoint: `cp -c data/omics.db data/checkpoints/omics.db.<time>` (APFS clone, instant) plus a line here naming it.
