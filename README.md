@@ -19,10 +19,21 @@ cd web && npm ci && npm run dev  # http://localhost:3000
 MCP server (stdio), for Claude Code or any MCP client:
 
 ```sh
-claude mcp add omics-agent -- uv run --directory "$PWD" omics-mcp
+claude mcp add locus -- uv run --directory "$PWD" omics-mcp
 ```
 
-It exposes two tools: `search_datasets(question)` runs the full search, and `geo_sample_groups(accession, topic)` counts disease and control samples in one GEO series.
+It exposes eight tools. Every tool is read-only.
+
+| Tool | What it returns |
+|---|---|
+| `search_datasets(question)` | The full graded search, which takes about a minute. It returns the plan; each dataset's grade, checks, case/control counts, libraries per assay, paper and download plan; and groups of datasets from the same paper. |
+| `plan_search(question)` | Topic terms, organism, the assays that can answer the question, the assays that must come from the same samples, and notes on what each method can and cannot measure. It does not search. |
+| `find_datasets(query, repositories?, organism?, limit?)` | A fast keyword and semantic lookup in the local index, without grading. |
+| `get_dataset(accession)` | The stored record: title, description, repository, organism, sample count, linked paper and download plan. |
+| `geo_sample_groups(accession, topic)` | Case/control sample counts and libraries per assay for one GEO series. For example, GSE36892 has 4 + 4 Ribo-seq libraries but only 2 + 2 RNA-seq libraries. |
+| `get_methods(accession)` | The methods section of the linked paper, one paragraph at a time, from Europe PMC open-access full text. If no full text is available, it says so. |
+| `get_download_plan(accession)` | Shell commands that fetch the dataset's processed files and raw reads, for the user to review before running. |
+| `get_samplesheet(accession, topic)` | An nf-core/riboseq samplesheet for one GEO series: a CSV with each sample's FASTQ links from ENA, the contrasts between conditions, and a README that says which samples were paired or left out, and why. |
 
 How it works:
 

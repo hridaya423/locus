@@ -4,6 +4,7 @@ import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from xml.etree import ElementTree
 
 import httpx
 
@@ -180,3 +181,73 @@ def search_cellxgene(plan: dict, limit: int) -> list[Dataset]:
         )
     return hits[:limit]
 
+
+
+REPOSITORY_NAMES = {"MetabolomicsWorkbench": "Metabolomics Workbench", "ExpressionAtlas": "Expression Atlas", "PanoramaPublic": "Panorama Public"}
+
+
+def download_plan(accession: str, source: str, url: str) -> str:
+    """Shell commands that fetch a dataset's files. Shown for review; nothing runs them."""
+    a = accession
+    lines = [f"mkdir -p ~/omics-data/{a} && cd ~/omics-data/{a}"]
+    if source in ("EGA", "dbGaP"):
+        lines += ["# controlled access: apply to the data access committee on the study page, then use the repository's download client", f"open {url}"]
+    elif source == "GEO":
+        prefix = "GSE" if int(a[3:]) < 1000 else a[:-3]
+        lines += [
+            "# processed files from GEO",
+            f'wget -r -np -nH --cut-dirs=3 -R "index.html*" https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}nnn/{a}/suppl/',
+            "# raw reads from SRA (needs NCBI EDirect and sra-tools)",
+            f"esearch -db sra -query {a} | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch",
+            "ls */*.sra | xargs -n1 fasterq-dump --split-files",
+        ]
+    elif source == "PRIDE":
+        lines += ["# raw files", "uv tool install pridepy", f"pridepy download-all-public-raw-files -a {a} -o ."]
+    elif source == "CELLxGENE":
+        lines += [
+            "# source .h5ad (needs pip install cellxgene-census)",
+            f"python -c \"import cellxgene_census as c; c.download_source_h5ad('{a}', to_path='{a}.h5ad')\"",
+        ]
+    elif source == "ArrayExpress":
+        cut = a.rfind("-") + 1
+        lines += [
+            "# all study files from BioStudies",
+            f'wget -r -np -nH --cut-dirs=6 -R "index.html*" https://ftp.ebi.ac.uk/biostudies/fire/{a[:cut]}/{a[cut:][-3:].zfill(3)}/{a}/Files/',
+        ]
+    elif source == "ENA":
+        lines += [
+            "# raw reads from ENA",
+            f'curl -s "https://www.ebi.ac.uk/ena/portal/api/filereport?accession={a}&result=read_run&fields=fastq_ftp&format=tsv" | tail -n +2 | cut -f2 | tr \';\' \'\\n\' | xargs -n1 -I{{}} wget ftp://{{}}',
+        ]
+    else:
+        lines += [f"# files are listed on the {REPOSITORY_NAMES.get(source, source)} study page", f"open {url}"]
+    return "\n".join(lines)
+
+
+def paper_methods(paper: str) -> dict:
+    """The methods section of a paper ('pmid:…' or 'doi:…') from its Europe PMC open-access full text, one entry per paragraph."""
+    query = f"EXT_ID:{paper[5:]} AND SRC:MED" if paper.startswith("pmid:") else f'DOI:"{paper[4:]}"'
+    found = httpx.get(
+        "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+        params={"query": query, "format": "json", "resultType": "core"},
+        timeout=30,
+    ).json()["resultList"]["result"]
+    if not found:
+        return {"paper": paper, "available": False, "reason": "not found in Europe PMC"}
+    record = found[0]
+    head = {"paper": paper, "title": record.get("title", ""), "pmcid": record.get("pmcid")}
+    if not record.get("pmcid") or record.get("isOpenAccess") != "Y":
+        return head | {"available": False, "reason": "no open-access full text"}
+    xml = httpx.get(f"https://www.ebi.ac.uk/europepmc/webservices/rest/{record['pmcid']}/fullTextXML", timeout=60)
+    root = ElementTree.fromstring(xml.content)
+    sections = [
+        s for s in root.iter("sec")
+        if "method" in (s.get("sec-type") or "") or re.search(r"method|materials|experimental procedures", s.findtext("title") or "", re.I)
+    ]
+    outer = [s for s in sections if not any(s is not o and s in o.iter("sec") for o in sections)]
+    paragraphs = []
+    for section in outer:
+        for sub in section.iter("sec"):
+            heading = " ".join((sub.findtext("title") or "").split())
+            paragraphs += [{"section": heading, "text": " ".join("".join(p.itertext()).split())} for p in sub.findall("p")]
+    return head | {"available": bool(paragraphs), "paragraphs": paragraphs} | ({} if paragraphs else {"reason": "full text has no methods section"})

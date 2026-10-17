@@ -3,9 +3,9 @@ import queue
 import threading
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
 load_dotenv()
@@ -43,6 +43,16 @@ def search(body: SearchIn) -> StreamingResponse:
                 return
 
     return StreamingResponse(stream(), media_type="application/x-ndjson")
+
+
+@app.get("/samplesheet/{accession}")
+def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Response:
+    """nf-core/riboseq samplesheet, contrasts and README for one GEO series, as a zip. `topic` is the search's terms, so the labels match the result table."""
+    return Response(
+        agent.export_samplesheet(accession, topic),
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{accession}-riboseq.zip"'},
+    )
 
 
 def main() -> None:

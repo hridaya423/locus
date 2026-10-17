@@ -5,8 +5,8 @@ import NumberFlow from "@number-flow/react";
 import { ArrowDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import type { Hit, Result } from "@/lib/api";
-import { DatasetRow, assayOf, downloadPlan, materialOf } from "@/components/result-card";
+import { repositoryName, type Hit, type Result } from "@/lib/api";
+import { DatasetRow, assayOf, materialOf } from "@/components/result-card";
 
 type SortKey = "control" | "case" | "samples" | "year";
 
@@ -34,13 +34,13 @@ function sortHits(hits: Hit[], key: SortKey) {
   return [...groups.values()];
 }
 
-function StudyHeader({ hits }: { hits: Hit[] }) {
+function StudyHeader({ hits, columns }: { hits: Hit[]; columns: number }) {
   const paper = hits.find((h) => h.paper)?.paper;
-  const types = [...new Set(hits.map((h) => `${assayOf(h)} (${h.source})`))];
+  const types = [...new Set(hits.map((h) => `${assayOf(h)} (${repositoryName(h.source)})`))];
   return (
     <tbody>
       <tr>
-        <td colSpan={6} className="pt-4 pb-1">
+        <td colSpan={columns} className="pt-4 pb-1">
           <div className="grid gap-0.5">
             <span className="label text-foreground">
               One study · {hits.length} datasets · {types.join(" + ")}
@@ -111,15 +111,17 @@ function SortHeader({ label, k, sort, setSort, className }: { label: string; k: 
   );
 }
 
-function Table({ hits, matched, sort, setSort, selected, toggle }: { hits: Hit[]; matched: string[]; sort: SortKey; setSort: (k: SortKey) => void; selected: Set<string>; toggle: (a: string) => void }) {
+function Table({ hits, matched, topic, sort, setSort, selected, toggle }: { hits: Hit[]; matched: string[]; topic: string; sort: SortKey; setSort: (k: SortKey) => void; selected: Set<string>; toggle: (a: string) => void }) {
   const rows = useMemo(() => sortHits(hits, sort), [hits, sort]);
+  // Case and control columns only appear when some dataset in the table was counted.
+  const counts = hits.some(counted);
   return (
     <table className="w-full table-fixed border-collapse">
       <colgroup>
-        <col className="w-7 sm:w-8" />
+        <col className="w-10 sm:w-11" />
         <col />
-        <col className="w-14 sm:w-20" />
-        <col className="w-16 sm:w-20" />
+        {counts && <col className="w-14 sm:w-20" />}
+        {counts && <col className="w-16 sm:w-20" />}
         <col className="w-0 sm:w-20" />
         <col className="w-7" />
       </colgroup>
@@ -132,17 +134,17 @@ function Table({ hits, matched, sort, setSort, selected, toggle }: { hits: Hit[]
               <ArrowDown aria-hidden className={cn("size-3", sort !== "year" && "opacity-0")} />
             </button>
           </th>
-          <SortHeader label="Case" k="case" sort={sort} setSort={setSort} />
-          <SortHeader label="Control" k="control" sort={sort} setSort={setSort} />
+          {counts && <SortHeader label="Case" k="case" sort={sort} setSort={setSort} />}
+          {counts && <SortHeader label="Control" k="control" sort={sort} setSort={setSort} />}
           <SortHeader label="Samples" k="samples" sort={sort} setSort={setSort} className="overflow-hidden max-sm:invisible max-sm:p-0" />
           <th />
         </tr>
       </thead>
       {rows.map((group) => (
         <Fragment key={studyOf(group[0])}>
-          {group.length > 1 && <StudyHeader hits={group} />}
+          {group.length > 1 && <StudyHeader hits={group} columns={counts ? 6 : 4} />}
           {group.map((hit) => (
-            <DatasetRow key={hit.accession} hit={hit} matched={matched} selected={selected.has(hit.accession)} onSelect={toggle} sameStudy={group.length > 1} />
+            <DatasetRow key={hit.accession} hit={hit} matched={matched} topic={topic} selected={selected.has(hit.accession)} onSelect={toggle} sameStudy={group.length > 1} counts={counts} />
           ))}
         </Fragment>
       ))}
@@ -163,6 +165,7 @@ export function Results({ result }: { result: Result }) {
   const strong = visible.filter((d) => d.fit === "strong");
   const partial = visible.filter((d) => d.fit === "partial");
   const picked = result.datasets.filter((d) => selected.has(d.accession));
+  const strongCount = result.datasets.filter((d) => d.fit === "strong").length;
 
   const flip = <T,>(set: Set<T>, v: T) => {
     const next = new Set(set);
@@ -179,28 +182,29 @@ export function Results({ result }: { result: Result }) {
   return (
     <motion.section initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={motionTier.entrance} className="grid grid-cols-1 gap-5 pb-16">
       <h2 className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-        {result.datasets.some((d) => d.fit === "strong") ? (
-          <Tally value={result.datasets.filter((d) => d.fit === "strong").length} label="usable as is" className="text-signal" />
+        {strongCount > 0 ? (
+          <Tally value={strongCount} label="usable as is" className="text-signal" />
         ) : (
           <span className="text-sm font-medium">No dataset meets every requirement</span>
         )}
-        <Tally value={result.datasets.length} label="relevant" />
-        <Tally value={result.candidates} label="searched" className="sm:ml-auto" />
+        {strongCount !== result.datasets.length && <Tally value={result.datasets.length} label="relevant" />}
       </h2>
 
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="basis-full text-xs text-muted-foreground sm:basis-24">Show</span>
         {sources.map((s) => (
           <Toggle key={s} strike on={!hidden.has(s)} onClick={() => setHidden((h) => flip(h, s))}>
-            {s} {result.datasets.filter((d) => d.source === s).length}
+            {repositoryName(s)} {result.datasets.filter((d) => d.source === s).length}
           </Toggle>
         ))}
-        <Toggle on={countedOnly} onClick={() => setCountedOnly((v) => !v)}>
-          counted only
-        </Toggle>
+        {result.datasets.some(counted) && (
+          <Toggle on={countedOnly} onClick={() => setCountedOnly((v) => !v)}>
+            counted only
+          </Toggle>
+        )}
       </div>
 
-      {strong.length > 0 && <Table hits={strong} matched={result.plan.matched_assays ?? []} sort={sort} setSort={setSort} selected={selected} toggle={toggle} />}
+      {strong.length > 0 && <Table hits={strong} matched={result.plan.matched_assays ?? []} topic={result.plan.terms.join(", ")} sort={sort} setSort={setSort} selected={selected} toggle={toggle} />}
 
       {partial.length > 0 && (
         <div className="grid grid-cols-1 gap-2">
@@ -213,7 +217,7 @@ export function Results({ result }: { result: Result }) {
             <ChevronDown className={cn("size-4 transition-transform duration-200", showPartial && "rotate-180")} />
             {showPartial ? "Hide" : "Show"} {partial.length} {partial.length === 1 ? "close match that misses" : "close matches that miss"} a requirement
           </button>
-          {showPartial && <Table hits={partial} matched={result.plan.matched_assays ?? []} sort={sort} setSort={setSort} selected={selected} toggle={toggle} />}
+          {showPartial && <Table hits={partial} matched={result.plan.matched_assays ?? []} topic={result.plan.terms.join(", ")} sort={sort} setSort={setSort} selected={selected} toggle={toggle} />}
         </div>
       )}
 
@@ -229,7 +233,7 @@ export function Results({ result }: { result: Result }) {
             <span className="font-mono tabular">{picked.length} selected</span>
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(picked.map(downloadPlan).join("\n\n")).then(() => setCopied(true))}
+              onClick={() => navigator.clipboard.writeText(picked.map((h) => h.download_plan).join("\n\n")).then(() => setCopied(true))}
               onBlur={() => setCopied(false)}
               className="underline decoration-background/30 underline-offset-4 hover:decoration-background"
             >

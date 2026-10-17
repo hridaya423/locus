@@ -49,29 +49,45 @@ LABEL_SCHEMA = {
 }
 
 
-def geo_samples(accession: str) -> list[dict[str, str]]:
-    """Each sample of a GEO series as a field-to-value map."""
+FIELD_NAMES = {"!Sample_library_strategy": "library strategy", "!Sample_molecule_ch1": "molecule", "!Sample_source_name_ch1": "source name"}
+RECORD_FIELDS = {"title pattern", *FIELD_NAMES.values()}
+
+
+def geo_records(accession: str) -> list[dict]:
+    """Each sample of a GEO series: its GSM and SRX accessions, full title, organism, and the `fields` that labelling reads.
+    Fields other than RECORD_FIELDS are the sample characteristics."""
     path = CACHE / f"{accession}.txt"
     if not path.exists():
         response = ncbi_get(GEO_SAMPLES, {"acc": accession, "targ": "gsm", "form": "text", "view": "brief"})
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(response.text)
 
-    names = {"!Sample_library_strategy": "library strategy", "!Sample_molecule_ch1": "molecule", "!Sample_source_name_ch1": "source name"}
     records = []
     for record in path.read_text().split("^SAMPLE")[1:]:
-        sample: dict[str, str] = {}
+        sample: dict = {"gsm": record.split("\n", 1)[0].strip(" ="), "title": "", "organism": "", "srx": "", "fields": {}}
+        fields = sample["fields"]
         for line in record.splitlines():
             key, _, value = line.partition(" = ")
             if key == "!Sample_title":
-                sample["title pattern"] = re.sub(r"\d+", "#", value)
-            elif key in names:
-                sample[names[key]] = value
+                sample["title"] = value
+                fields["title pattern"] = re.sub(r"\d+", "#", value)
+            elif key == "!Sample_organism_ch1":
+                sample["organism"] = value
+            elif key == "!Sample_relation" and (srx := re.search(r"\b[SED]RX\d+", value)):
+                sample["srx"] = srx.group()
+            elif key in FIELD_NAMES:
+                fields[FIELD_NAMES[key]] = value
             elif key == "!Sample_characteristics_ch1":
                 name, sep, val = value.partition(": ")
-                sample[name if sep else "characteristic"] = val if sep else value
+                name = name if sep else "characteristic"
+                fields[f"{name} (characteristic)" if name in RECORD_FIELDS else name] = val if sep else value
         records.append(sample)
     return records
+
+
+def geo_samples(accession: str) -> list[dict[str, str]]:
+    """Each sample of a GEO series as a field-to-value map."""
+    return [record["fields"] for record in geo_records(accession)]
 
 
 def geo_fields(accession: str) -> dict[str, Counter]:
@@ -113,22 +129,39 @@ def summarize(fields: dict[str, Counter]) -> str:
     return "\n".join(lines)
 
 
+def group_of(sample: dict[str, str], labels: dict) -> str:
+    value = sample.get(labels["group_field"], "")
+    case, control = value in labels["case_values"], value in labels["control_values"]
+    return "mixed" if case and control else "case" if case else "control" if control else "other"
+
+
 def libraries(records: list[dict[str, str]], labels: dict) -> dict[str, dict[str, int]]:
     """How many libraries of each assay fall in each group, so unmatched assays show up."""
     assay_of = {v: a["assay"] for a in labels.get("assay_values", []) for v in a["values"]}
-    cases, controls = set(labels["case_values"]), set(labels["control_values"])
     table: dict[str, Counter] = defaultdict(Counter)
     for sample in records:
-        assay = assay_of.get(sample.get(labels.get("assay_field", ""), ""))
-        if not assay:
-            continue
-        value = sample.get(labels["group_field"], "")
-        group = "mixed" if value in cases and value in controls else "case" if value in cases else "control" if value in controls else "other"
-        table[assay][group] += 1
+        if assay := assay_of.get(sample.get(labels.get("assay_field", ""), "")):
+            table[assay][group_of(sample, labels)] += 1
     return {assay: dict(groups) for assay, groups in table.items()}
 
 
+def resolve(name: str, values: set[str], fields: dict[str, Counter]) -> str:
+    """The labelled field if it exists, else the field holding most of the labelled values; the model sometimes renames fields."""
+    if name in fields or not values:
+        return name
+    best = max(fields, key=lambda f: len(values & set(fields[f])), default="")
+    return best if best and values & set(fields[best]) else name
+
+
+def resolve_labels(labels: dict, fields: dict[str, Counter]) -> dict:
+    return labels | {
+        "group_field": resolve(labels["group_field"], set(labels["case_values"]) | set(labels["control_values"]), fields),
+        "assay_field": resolve(labels.get("assay_field", ""), {v for a in labels.get("assay_values", []) for v in a["values"]}, fields),
+    }
+
+
 def count(fields: dict[str, Counter], labels: dict, source: str, records: list[dict[str, str]] | None = None) -> dict:
+    labels = resolve_labels(labels, fields)
     values = fields.get(labels["group_field"], Counter())
     cases, controls = set(labels["case_values"]) & set(values), set(labels["control_values"]) & set(values)
     case = sum(values[v] for v in cases - controls)
@@ -194,4 +227,9 @@ if __name__ == "__main__":
                          {"assay": "RNA-seq", "values": [v for v in values if v.startswith("mRNA")]}],
     }
     assert libraries(records, labels) == {"Ribo-seq": {"case": 4, "control": 4}, "RNA-seq": {"case": 2, "control": 2}}
+    fields = {"title pattern": Counter(r["title pattern"] for r in records)}
+    renamed = labels | {"group_field": "title", "assay_field": "", "sample_type": "unknown", "tissue": ""}
+    facts = count(fields, renamed, "test", records)
+    assert (facts["case"], facts["control"]) == (6, 6), "renamed group field resolves by its values"
+    assert facts["libraries"] == libraries(records, labels), "missing assay field resolves by its values"
     print("ok")

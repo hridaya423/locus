@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { ArrowUp, Check, LoaderCircle } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
@@ -23,7 +23,7 @@ const STEPS = [
 
 type StepKey = (typeof STEPS)[number]["key"];
 
-const STEP_COUNT: Partial<Record<StepKey, string>> = { candidates: "candidates", facts: "datasets read" };
+const STEP_COUNT: Partial<Record<StepKey, string>> = { facts: "datasets read" };
 
 function Progress({ reached, counts, seconds }: { reached: StepKey[]; counts: Record<string, number>; seconds: number }) {
   const current = STEPS[Math.min(reached.length, STEPS.length - 1)];
@@ -166,7 +166,7 @@ export function Search() {
         if (s.stage === "error") return setError(s.data);
         setReached((r) => [...r, s.stage]);
         if (s.stage === "plan") setPlan(s.data);
-        if (s.stage === "candidates" || s.stage === "facts") setCounts((c) => ({ ...c, [s.stage]: s.data.count }));
+        if (s.stage === "facts") setCounts((c) => ({ ...c, facts: s.data.count }));
         if (s.stage === "done") setResult(s.data);
       }, controller.signal);
     } catch (e) {
@@ -228,15 +228,89 @@ export function Search() {
   );
 }
 
-// A chromosome ideogram: one lit band is the dataset the question lands on.
+// A chromosome ideogram that passes a signal along like a Newton's cradle. Orange marks one locus. When it fires,
+// a knock travels band to band toward the next locus: each band jolts, stretches, and snaps back in turn. The
+// band at the end takes the hit and the orange wipes into it from the side the knock arrived on.
 const BANDS = [3, 8, 2, 14, 5, 2, 9, 3, 20, 4, 6, 2, 11, 3, 7, 2, 16, 4, 3, 10, 2, 6, 13, 3, 5, 2, 8, 18, 3, 4, 7, 2, 12, 5, 3, 9];
+const LOCI = [27, 8, 21, 33, 14, 3];
+const RIPPLE = 45;
+const HOLD = 1700;
+const SNAP = "cubic-bezier(0.22, 1, 0.36, 1)";
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const visible = () => new Promise<void>((r) => {
+  if (!document.hidden) return r();
+  document.addEventListener("visibilitychange", () => r(), { once: true });
+});
 
 function Bands() {
+  const bands = useRef<(HTMLSpanElement | null)[]>([]);
+  const inks = useRef<(HTMLSpanElement | null)[]>([]);
+  const lights = useRef<(HTMLSpanElement | null)[]>([]);
+  const still = useReducedMotion();
+
+  useEffect(() => {
+    if (still) return;
+    let stopped = false;
+    const running: Animation[] = [];
+    const play = (el: HTMLElement | null, frames: Keyframe[], timing: KeyframeAnimationOptions) => {
+      const a = el?.animate(frames, { fill: "both", ...timing });
+      if (a) running.push(a);
+    };
+    (async () => {
+      await pause(700);
+      for (let n = 0; !stopped; n++) {
+        await visible();
+        running.splice(0).forEach((a) => a.cancel());
+        const from = LOCI[n % LOCI.length];
+        const to = LOCI[(n + 1) % LOCI.length];
+        const dir = Math.sign(to - from);
+        const near = dir > 0 ? "left" : "right";
+        const far = dir > 0 ? "right" : "left";
+
+        // The source kicks and cools.
+        play(bands.current[from], [{ transform: "none" }, { transform: `translateX(${dir * 3}px) scaleX(1.35)`, offset: 0.3 }, { transform: "none" }], { duration: 420, easing: SNAP });
+        play(lights.current[from], [{ clipPath: "inset(0 0 0 0)" }, { clipPath: `inset(0 ${dir > 0 ? "0 0 100%" : "100% 0 0"})` }], { duration: 320, delay: 60, easing: "cubic-bezier(0.4, 0, 1, 1)" });
+
+        // The knock travels: each band jolts toward the target, stretches, darkens, and snaps back.
+        for (let k = from + dir; k !== to; k += dir) {
+          const delay = Math.abs(k - from) * RIPPLE;
+          play(bands.current[k], [{ transform: "none" }, { transform: `translateX(${dir * 2.5}px) scaleX(1.18)`, offset: 0.3 }, { transform: "none" }], { duration: 340, delay, easing: SNAP });
+          play(inks.current[k], [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 380, delay, easing: "ease-out" });
+        }
+
+        // The target takes the hit; the orange wipes in from the side the knock arrived on.
+        const arrive = Math.abs(to - from) * RIPPLE;
+        play(bands.current[to], [{ transform: "none" }, { transform: `translateX(${dir * 3}px) scaleX(1.4) scaleY(1.35)`, offset: 0.25 }, { transform: "none" }], { duration: 560, delay: arrive, easing: SNAP });
+        play(lights.current[to], [{ clipPath: `inset(0 ${near === "left" ? "100% 0 0" : "0 0 100%"})` }, { clipPath: "inset(0 0 0 0)" }], { duration: 260, delay: arrive, easing: SNAP });
+        void far;
+
+        await pause(arrive + HOLD);
+      }
+    })();
+    return () => {
+      stopped = true;
+      running.forEach((a) => a.cancel());
+    };
+  }, [still]);
+
   return (
-    <div aria-hidden className="mt-3 flex h-2 w-full max-w-xl gap-[2px]">
+    <motion.div
+      aria-hidden
+      initial={still ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ ...motionTier.entrance, delay: 0.15 }}
+      className="mt-3 flex h-2 w-full max-w-xl gap-[2px]"
+    >
       {BANDS.map((w, i) => (
-        <span key={i} style={{ flex: w }} className={i === 27 ? "rounded-[1px] bg-signal" : "rounded-[1px] bg-foreground/12"} />
+        <span key={i} ref={(el) => { bands.current[i] = el; }} style={{ flex: w }} className="relative rounded-[1px] bg-foreground/12 will-change-transform">
+          <span ref={(el) => { inks.current[i] = el; }} className="absolute inset-0 rounded-[1px] bg-foreground/25 opacity-0" />
+          <span
+            ref={(el) => { lights.current[i] = el; }}
+            className="absolute inset-0 rounded-[1px] bg-signal"
+            style={{ clipPath: i === LOCI[0] ? "inset(0 0 0 0)" : "inset(0 100% 0 0)" }}
+          />
+        </span>
       ))}
-    </div>
+    </motion.div>
   );
 }

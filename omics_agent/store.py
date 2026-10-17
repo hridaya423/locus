@@ -72,3 +72,8 @@ def cache_facts(accession: str, topic: str, facts: dict) -> None:
     db = connect()
     db.execute("INSERT OR REPLACE INTO facts (accession, topic, data) VALUES (?, ?, ?)", (accession, topic, json.dumps(facts)))
     db.commit()
+
+
+def summary(accession: str) -> str:
+    row = connect().execute("SELECT title || '. ' || summary FROM datasets WHERE accession = ?", (accession,)).fetchone()
+    return row[0] if row else ""

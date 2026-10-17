@@ -12,7 +12,7 @@ export type Hit = {
   accession: string; source: string; modality: string; title: string; organism: string;
   samples: number | null; url: string; papers: string[]; facts: Facts | null; published: string | null;
   fit: "strong" | "partial"; checks: Record<"topic" | "patient_material" | "data_type" | "controls", Check>;
-  reason: string; evidence: string; paper: Paper | null;
+  reason: string; evidence: string; paper: Paper | null; download_plan: string;
 };
 export type Result = { question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][] };
 export type Stage =
@@ -47,6 +47,17 @@ export async function search(question: string, onStage: (s: Stage) => void, sign
   }
   if (!finished) throw new Error("The search stopped before it finished. Please try again.");
 }
+
+export async function samplesheet(accession: string, topic: string): Promise<Blob> {
+  const res = await fetch(`${API}/samplesheet/${accession}?topic=${encodeURIComponent(topic)}`);
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.blob();
+}
+
+const REPOSITORY_NAMES: Record<string, string> = {
+  MetabolomicsWorkbench: "Metabolomics Workbench", ExpressionAtlas: "Expression Atlas", PanoramaPublic: "Panorama Public",
+};
+export const repositoryName = (source: string) => REPOSITORY_NAMES[source] ?? source;
 
 export const SAMPLE_TYPE: Record<string, string> = {
   patient_tissue: "patient tissue", patient_biofluid: "patient fluid", primary_cells: "primary cells",

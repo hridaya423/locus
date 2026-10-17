@@ -8,8 +8,8 @@ from pathlib import Path
 import anthropic
 import httpx
 
-from . import index, samples, store
-from .sources import Dataset, cellxgene_diseases, search_cellxgene, search_geo, search_pride
+from . import index, samples, samplesheet, store
+from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
 PLANNER = "claude-sonnet-5-5"
 WORKER = "claude-haiku-5-5"
@@ -220,23 +220,47 @@ def gather(search_plan: dict, question: str) -> list[Dataset]:
     return list(seen.values())
 
 
+def _label_key(topic: str) -> str:
+    """A changed labelling prompt or schema makes a new key, so stale facts and labels are never reused."""
+    return f"{topic} #{hashlib.sha1((samples.label_prompt('', '', {}) + json.dumps(samples.LABEL_SCHEMA)).encode()).hexdigest()[:8]}"
+
+
+def geo_labels(topic: str, accession: str, summary: str) -> dict:
+    """Haiku's reading of which GEO sample fields mark case, control and assay; cached so the search and the samplesheet export agree."""
+    key = f"labels {_label_key(topic)}"
+    fields = samples.geo_fields(accession)
+    if not (labels := store.cached_facts(accession, key)):
+        labels = _ask(samples.label_prompt(topic, accession, fields, summary[:2000]), samples.LABEL_SCHEMA, effort="low")
+        store.cache_facts(accession, key, labels)
+    return samples.resolve_labels(labels, fields)
+
+
+def samplesheet_files(accession: str, topic: str) -> dict[str, str]:
+    """The nf-core/riboseq samplesheet, contrasts and README for one GEO series, by file name."""
+    records = samples.geo_records(accession)
+    labels = geo_labels(topic, accession, store.summary(accession))
+    runs = samplesheet.ena_runs(sorted({r["srx"] for r in records if r["srx"]}))
+    return samplesheet.build(accession, records, labels, runs)
+
+
+def export_samplesheet(accession: str, topic: str) -> bytes:
+    """A zip of samplesheet_files, for download."""
+    return samplesheet.zipped(accession, samplesheet_files(accession, topic))
+
+
 def _geo_facts(topic: str, dataset: Dataset) -> None:
     """Prefer Gemma's expert-curated sample groups; fall back to the raw GEO sample records.
-    Counted groups are cached per dataset and topic, so a repeated topic skips the labelling call."""
-    # A changed labelling prompt or schema makes a new key, so stale facts are never reused.
-    key = f"{topic} #{hashlib.sha1((samples.label_prompt('', '', {}) + json.dumps(samples.LABEL_SCHEMA)).encode()).hexdigest()[:8]}"
-    if cached := store.cached_facts(dataset.accession, key):
-        dataset.facts = cached
-        return
-    fields, source, records = samples.gemma_fields(dataset.accession), "samples, groups curated by Gemma", None
-    if not fields:
-        records = samples.geo_samples(dataset.accession)
-        fields, source = samples.geo_fields(dataset.accession), "GEO sample records"
-    if not fields:
-        return
-    labels = _ask(samples.label_prompt(topic, dataset.accession, fields, dataset.text[:2000]), samples.LABEL_SCHEMA, effort="low")
-    dataset.facts = samples.count(fields, labels, source, records)
-    store.cache_facts(dataset.accession, key, dataset.facts)
+    Only the labelling call is cached; counts are recomputed, so a counting fix applies to every past search."""
+    if fields := samples.gemma_fields(dataset.accession):
+        key = f"gemma labels {_label_key(topic)}"
+        labels = store.cached_facts(dataset.accession, key)
+        if not labels:
+            labels = _ask(samples.label_prompt(topic, dataset.accession, fields, dataset.text[:2000]), samples.LABEL_SCHEMA, effort="low")
+            store.cache_facts(dataset.accession, key, labels)
+        dataset.facts = samples.count(fields, labels, "samples, groups curated by Gemma")
+    elif fields := samples.geo_fields(dataset.accession):
+        labels = geo_labels(topic, dataset.accession, dataset.text)
+        dataset.facts = samples.count(fields, labels, "GEO sample records", samples.geo_samples(dataset.accession))
 
 
 def add_facts(search_plan: dict, candidates: list[Dataset]) -> None:
@@ -443,6 +467,8 @@ def run(question: str, limit: int = 40, progress=lambda stage, data: None) -> di
     progress("facts", {"count": sum(1 for d in keep if d.facts)})
     hits = grade(search_plan, keep, verdicts)
     add_papers(hits)
+    for h in hits:
+        h["download_plan"] = download_plan(h["accession"], h["source"], h["url"])
     groups = bundles(hits)
     return {
         "question": question,

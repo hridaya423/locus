@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { SAMPLE_TYPE, type Check, type Facts, type Hit } from "@/lib/api";
+import { SAMPLE_TYPE, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
 
 const WARNING: Record<string, Partial<Record<Check, string>>> = {
   patient_material: { no: "not patient material", unclear: "sample source not confirmed" },
@@ -29,52 +29,6 @@ const DATA_TYPE: [RegExp, string][] = [
 export function dataType(modality: string) {
   const types = modality.split(";").map((m) => DATA_TYPE.find(([re]) => re.test(m.trim()))?.[1] ?? m.trim());
   return [...new Set(types)].filter(Boolean).join(", ");
-}
-
-const CONTROLLED = new Set(["EGA", "dbGaP"]);
-
-function sourceLines(hit: Hit): string[] {
-  const a = hit.accession;
-  if (CONTROLLED.has(hit.source)) {
-    return ["# controlled access: apply to the data access committee on the study page, then use the repository's download client", `open ${hit.url}`];
-  }
-  switch (hit.source) {
-    case "GEO": {
-      const n = Number(a.slice(3));
-      return [
-        "# processed files from GEO",
-        `wget -r -np -nH --cut-dirs=3 -R "index.html*" https://ftp.ncbi.nlm.nih.gov/geo/series/${n < 1000 ? "GSE" : a.slice(0, -3)}nnn/${a}/suppl/`,
-        "# raw reads from SRA (needs NCBI EDirect and sra-tools)",
-        `esearch -db sra -query ${a} | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch`,
-        "ls */*.sra | xargs -n1 fasterq-dump --split-files",
-      ];
-    }
-    case "PRIDE":
-      return ["# raw files", "uv tool install pridepy", `pridepy download-all-public-raw-files -a ${a} -o .`];
-    case "CELLxGENE":
-      return [
-        "# source .h5ad (needs pip install cellxgene-census)",
-        `python -c "import cellxgene_census as c; c.download_source_h5ad('${a}', to_path='${a}.h5ad')"`,
-      ];
-    case "ArrayExpress": {
-      const [prefix, num] = [a.slice(0, a.lastIndexOf("-") + 1), a.slice(a.lastIndexOf("-") + 1)];
-      return [
-        "# all study files from BioStudies",
-        `wget -r -np -nH --cut-dirs=6 -R "index.html*" https://ftp.ebi.ac.uk/biostudies/fire/${prefix}/${num.slice(-3).padStart(3, "0")}/${a}/Files/`,
-      ];
-    }
-    case "ENA":
-      return [
-        "# raw reads from ENA",
-        `curl -s "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${a}&result=read_run&fields=fastq_ftp&format=tsv" | tail -n +2 | cut -f2 | tr ';' '\\n' | xargs -n1 -I{} wget ftp://{}`,
-      ];
-    default:
-      return [`# files are listed on the ${hit.source} study page`, `open ${hit.url}`];
-  }
-}
-
-export function downloadPlan(hit: Hit) {
-  return [`mkdir -p ~/omics-data/${hit.accession} && cd ~/omics-data/${hit.accession}`, ...sourceLines(hit)].join("\n");
 }
 
 export function assayOf(hit: Hit) {
@@ -156,29 +110,74 @@ function Libraries({ libraries, matched }: { libraries: NonNullable<Facts["libra
   );
 }
 
+// A native checkbox, restyled: the box fills with ink and the tick draws itself in.
+function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
+  return (
+    <label className="relative mt-[2px] grid size-4 cursor-pointer place-items-center before:absolute before:-inset-3 before:content-['']">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        aria-label={label}
+        className="peer size-4 cursor-pointer appearance-none rounded-[4px] border border-foreground/25 bg-card transition-[background-color,border-color,transform] duration-150 ease-out hover:border-foreground/60 active:scale-[0.92] checked:border-foreground checked:bg-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+      />
+      <svg aria-hidden viewBox="0 0 12 12" className="pointer-events-none absolute size-3 text-background peer-checked:[&_path]:[stroke-dashoffset:0]">
+        <path
+          d="M2.5 6.4 5 8.8 9.6 3.6"
+          pathLength={1}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="transition-[stroke-dashoffset] duration-200 ease-out [stroke-dasharray:1] [stroke-dashoffset:1]"
+        />
+      </svg>
+    </label>
+  );
+}
+
 type RowProps = {
   hit: Hit;
   matched: string[];
+  topic: string;
   selected: boolean;
   onSelect: (accession: string) => void;
   sameStudy: boolean;
+  counts: boolean;
 };
 
-export function DatasetRow({ hit, matched, selected, onSelect, sameStudy }: RowProps) {
+export function DatasetRow({ hit, matched, topic, selected, onSelect, sameStudy, counts }: RowProps) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [sheet, setSheet] = useState<"idle" | "writing" | "failed">("idle");
   useEffect(() => {
     if (!copied) return;
     const t = setTimeout(() => setCopied(false), 1600);
     return () => clearTimeout(t);
   }, [copied]);
   const facts = hit.facts;
-  const plan = downloadPlan(hit);
+  const plan = hit.download_plan;
+  const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
+
+  async function exportSamplesheet() {
+    setSheet("writing");
+    try {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(await samplesheet(hit.accession, topic));
+      a.download = `${hit.accession}-riboseq.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setSheet("idle");
+    } catch {
+      setSheet("failed");
+    }
+  }
   const samplesUrl = hit.source === "GEO" ? `https://www.ncbi.nlm.nih.gov/geo/browse/?view=samples&series=${hit.accession.slice(3)}` : hit.url;
   const warnings = Object.entries(WARNING).map(([k, text]) => text[hit.checks[k as keyof Hit["checks"]]]).filter(Boolean);
   // Assay and material move into the expanded row on phones.
   const meta = [
-    { text: hit.source, phone: true },
+    { text: repositoryName(hit.source), phone: true },
     { text: hit.published?.slice(0, 4), phone: true },
     { text: assayOf(hit), phone: false },
     { text: materialOf(hit), phone: false },
@@ -187,14 +186,8 @@ export function DatasetRow({ hit, matched, selected, onSelect, sameStudy }: RowP
   return (
     <tbody className={cn("border-b border-rule transition-colors duration-150 last:border-b-0", selected && "bg-card", expanded && "bg-card")}>
       <tr className="group/row">
-        <td className="py-3 align-top">
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={() => onSelect(hit.accession)}
-            aria-label={`Select ${hit.accession}`}
-            className="mt-[3px] size-3.5 cursor-pointer accent-foreground"
-          />
+        <td className="py-3 pl-3 align-top">
+          <Checkbox checked={selected} onChange={() => onSelect(hit.accession)} label={`Select ${hit.accession}`} />
         </td>
         <td className="min-w-0 py-3 pr-2 align-top">
           <button
@@ -217,8 +210,8 @@ export function DatasetRow({ hit, matched, selected, onSelect, sameStudy }: RowP
             {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
           </button>
         </td>
-        <CountCell value={facts?.case} tone="signal" href={samplesUrl} />
-        <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} href={samplesUrl} />
+        {counts && <CountCell value={facts?.case} tone="signal" href={samplesUrl} />}
+        {counts && <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} href={samplesUrl} />}
         <td className="overflow-hidden py-3 pl-2 text-right align-top font-mono text-[13px] tabular text-muted-foreground max-sm:invisible max-sm:p-0">{hit.samples ?? "–"}</td>
         <td className="py-3 pl-1 align-top">
           <ChevronDown aria-hidden className={cn("mt-[2px] size-4 text-muted-foreground transition-transform duration-200", expanded && "rotate-180")} />
@@ -228,12 +221,12 @@ export function DatasetRow({ hit, matched, selected, onSelect, sameStudy }: RowP
         {expanded && (
           <tr>
             <td />
-            <td colSpan={5} className="pb-4 pr-2">
+            <td colSpan={counts ? 5 : 3} className="pb-4 pr-2">
               <motion.div {...reveal} className="grid gap-3">
                 <p className="label text-muted-foreground sm:hidden">{[assayOf(hit), materialOf(hit)].filter(Boolean).join("  ·  ")}</p>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
                   <a href={hit.url} target="_blank" rel="noreferrer" className="group/link flex items-center gap-1 font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
-                    Open in {hit.source}
+                    Open in {repositoryName(hit.source)}
                     <ArrowUpRight aria-hidden className="size-3.5 text-muted-foreground group-hover/link:text-foreground" />
                   </a>
                   {hit.paper && (
@@ -280,6 +273,20 @@ export function DatasetRow({ hit, matched, selected, onSelect, sameStudy }: RowP
                     </span>
                   </div>
                 </details>
+                {riboseq && (
+                  <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <button type="button" onClick={exportSamplesheet} disabled={sheet === "writing"} className={cn(ACTION, "w-fit disabled:cursor-wait disabled:no-underline")}>
+                      Samplesheet for nf-core/riboseq
+                    </button>
+                    <span role="status" className={cn("text-xs", sheet === "failed" ? "text-warn" : "text-muted-foreground")}>
+                      {sheet === "failed"
+                        ? "The samplesheet could not be written. Try again."
+                        : sheet === "writing"
+                          ? "Reading the sample records and ENA runs…"
+                          : "zip with samplesheet, contrasts and a README of what to check"}
+                    </span>
+                  </span>
+                )}
               </motion.div>
             </td>
           </tr>

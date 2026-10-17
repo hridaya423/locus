@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="border-b border-rule px-5 py-3.5">
             <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
               <Link href="/" aria-label="locus home"><Wordmark className="text-[28px]" /></Link>
-              <span className="label flex gap-3 text-muted-foreground"><span>GEO</span><span>PRIDE</span><span>CELLxGENE</span></span>
+              <span className="label text-muted-foreground" title="GEO, ArrayExpress, ENA, PRIDE, MassIVE, MetaboLights, CELLxGENE and 11 more">891k datasets · 18 repositories</span>
             </div>
           </header>
           <main className="flex-1 w-full px-5 pt-12 pb-24">{children}</main>
