@@ -311,5 +311,12 @@ Sections nobody used to make a decision (look-back candidates for deletion):
 Critic moments (23:40): see /tmp/locus-night/critic-B/verdict.md, /tmp/locus-night/critic-C/verdict.md.
 
 ### Ladder, found tonight
-- Dictate the question (mic in the search box), asked by the user at 23:05.
+- Dictate the question (mic in the search box), asked by the user at 23:05. Built by C (step 3).
+- Data type from the methods in the dataset header (moments: GSE132703 "RNA-seq, Other", GSE36892 "RNA-seq", GSE286182 "ChIP-seq, RNA-seq", GSE30839, GSE86618 "RNA-seq" for C1 single cells; task audit and all three use sessions). Done: header shows what the methods say. Gate: harness pages for q1/q3 show Ribo-seq / single-cell in the header.
+- Delete "Protein/Gene data on the same tissue" (opened by all 3 experts, acted on by none, distrusted as generic: same PXDs on every lung row; kidney proteomes for HEK-293T). Done: removed from rows, API and agent. Gate: rerun use session finds nothing missing.
+- Record fields that contradict the protocol (PXD047213 instrument Q Exactive HF vs timsTOF in protocol; modifications without phospho). Done: the assay line flags record-vs-methods disagreement with both sentences.
+- Search in the URL so results can be shared (wet-lab session). Done: /?q=… reruns the cached search.
+- Donors vs libraries/cells in case/control counts (GSE86618 540 cells from ~9 patients shown as 325/215). Done: counts say what they count.
+- Group the same study across repositories (E-MTAB-13568 / PRJEB70520, E-MTAB-16150 / PRJEB103803 identical titles not grouped).
+- "Commands to download everything" on pages with no files (MSV000093129, PXD023840); locus API failure blamed on the repository ("did not send the record").
 - Rule (user, 23:20): changes to data/ (re-embedding, FTS rebuilds, DB writes) only after a checkpoint: `cp -c data/omics.db data/checkpoints/omics.db.<time>` (APFS clone, instant) plus a line here naming it.
