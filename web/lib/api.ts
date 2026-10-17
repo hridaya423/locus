@@ -200,3 +200,29 @@ export async function paperCheck(accession: string, pick: { factor: string; case
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
+
+export type GeneRow = { accession: string; title: string; status: "higher" | "lower" | "no clear change" | "not tested" | "no table" | "no groups" | "failed"; reason?: string;
+  factor?: string; case?: string[]; control?: string[]; n_case?: number; n_control?: number; source?: string; file?: string;
+  log2fc?: number; minus_log10_p?: number; q?: number; rank?: number; tested?: number };
+export type GeneAcross = { gene: string; description: string; hint: string; rows: GeneRow[]; measured: number; higher: number; lower: number; method: string };
+
+export async function geneAcross(gene: string, accessions: string[], hint: string, signal?: AbortSignal): Promise<GeneAcross> {
+  const q = new URLSearchParams({ hint });
+  accessions.forEach((a) => q.append("in", a));
+  const res = await fetch(`${API}/gene/${encodeURIComponent(gene)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export const genePath = (gene: string, accessions: string[], hint: string) =>
+  `/g/${encodeURIComponent(gene)}?${new URLSearchParams([...accessions.map((a) => ["in", a]), ["hint", hint]])}`;
+
+export function foundAll(): { accessions: string[]; topic: string } {
+  try {
+    const all: Record<string, Found> = JSON.parse(localStorage.getItem(FOUND) ?? "{}");
+    const list = Object.values(all);
+    return { accessions: list.map((f) => f.hit.accession), topic: list[0]?.topic ?? "" };
+  } catch {
+    return { accessions: [], topic: "" };
+  }
+}

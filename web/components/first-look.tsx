@@ -4,7 +4,8 @@ import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
-import { firstLook, paperCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type TableSummary } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { foundAll, genePath, firstLook, paperCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type TableSummary } from "@/lib/api";
 
 type Pick = { factor: string; case: string[]; control: string[] };
 
@@ -100,7 +101,12 @@ function Volcano({ look, ringed }: { look: FirstLook; ringed: Set<string> }) {
   );
 }
 
-function TopList({ title, genes, tone }: { title: string; genes: Gene[]; tone: "signal" | "control" }) {
+function TopList({ accession, title, genes, tone }: { accession: string; title: string; genes: Gene[]; tone: "signal" | "control" }) {
+  const router = useRouter();
+  const across = (gene: string) => {
+    const last = foundAll();
+    router.push(genePath(gene, [...new Set([accession, ...last.accessions.filter((a) => a.startsWith("GSE"))])], last.topic));
+  };
   return (
     <div className="grid content-start gap-2">
       <h3 className="flex items-center gap-2 text-[13px] font-medium">
@@ -118,7 +124,9 @@ function TopList({ title, genes, tone }: { title: string; genes: Gene[]; tone: "
         <tbody>
           {genes.slice(0, LISTED).map((g) => (
             <tr key={g[0]} className="border-b border-rule/60 last:border-b-0">
-              <td className="py-1 font-medium">{g[0]}</td>
+              <td className="py-1 font-medium">
+                <button type="button" onClick={() => across(g[0])} title={`${g[0]} in every dataset of the search`} className={cn("cursor-pointer", LINK)}>{g[0]}</button>
+              </td>
               <td className="py-1 text-right font-mono tabular">{g[1].toFixed(2)}</td>
               <td className="py-1 text-right font-mono tabular text-muted-foreground">{g[3].toExponential(1)}</td>
             </tr>
@@ -248,8 +256,8 @@ export function FirstLookSection({ accession }: { accession: string }) {
           <div className={cn("grid gap-8 transition-opacity duration-200", busy && "opacity-50")}>
             <Volcano look={look} ringed={ringed} />
             <div className="grid content-start gap-6 sm:grid-cols-2 sm:gap-10">
-              <TopList title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" />
-              <TopList title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" />
+              <TopList accession={accession} title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" />
+              <TopList accession={accession} title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" />
             </div>
           </div>
           <p className="max-w-[80ch] text-[12px] leading-relaxed text-muted-foreground">

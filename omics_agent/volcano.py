@@ -61,7 +61,7 @@ def groups(accession: str) -> dict:
 def compare(accession: str, factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None) -> dict:
     data = table.counts(accession)
     if not data:
-        return {"accession": accession, "available": False, "reason": "GEO has no NCBI-generated counts for this series"}
+        return {"accession": accession, "available": False, "reason": "no gene by sample table: neither NCBI's counts nor the authors' files"}
     choice = groups(accession)
     if factor is None:
         if not choice["default"]:
@@ -79,9 +79,18 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
         return {"accession": accession, "available": False, "reason": f"{n_case} case and {n_control} control samples have counts; each group needs at least 2"}
 
     m = data["matrix"].astype(float)
-    cpm = m / m.sum(axis=0) * 1e6
-    keep = (cpm[:, in_case | in_control] >= 1).sum(axis=1) >= min(n_case, n_control)
-    logged = np.log2(cpm[keep] + 1)
+    smaller = min(n_case, n_control)
+    if data["kind"] == "raw counts":
+        cpm = m / m.sum(axis=0) * 1e6
+        keep = (cpm[:, in_case | in_control] >= 1).sum(axis=1) >= smaller
+        logged = np.log2(cpm[keep] + 1)
+        method = METHOD
+    else:
+        values = m if data["kind"] == "log scale" else np.log2(m + 1)
+        floor = np.percentile(values[:, in_case | in_control], 25)
+        keep = (values[:, in_case | in_control] > floor).sum(axis=1) >= smaller
+        logged = values[keep]
+        method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; genes above the 25th percentile in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
     a, b = logged[:, in_case], logged[:, in_control]
     lfc = a.mean(axis=1) - b.mean(axis=1)
     t, p = stats.ttest_ind(a, b, axis=1, equal_var=False)
@@ -94,7 +103,7 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     down = [g for g in genes if g[3] < Q and g[1] <= -LFC]
     return {
         "accession": accession, "available": True, "factor": factor, "case": case, "control": control,
-        "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": METHOD, "q": Q, "lfc": LFC,
+        "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": method, "q": Q, "lfc": LFC,
         "up": len(up), "down": len(down), "genes": genes, "source": data["source"], "groups": choice,
     }
 

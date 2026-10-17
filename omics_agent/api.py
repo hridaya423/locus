@@ -1,6 +1,7 @@
 import json
 import os
 import queue
+import re
 import threading
 from dataclasses import asdict
 from typing import Annotated
@@ -13,7 +14,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, everywhere, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -111,6 +112,13 @@ def first_look_paper(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | N
     """The genes the dataset's paper names, and where each lands in the same comparison."""
     look = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     return volcano.paper_genes(accession, look) if look.get("available") else {"available": False, "reason": look.get("reason")}
+
+
+@app.get("/gene/{symbol}")
+def gene_across(symbol: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,29}$"), accession: Annotated[list[str] | None, Query(alias="in")] = None, hint: str = "") -> dict:
+    """One gene's change between cases and controls in each listed GEO dataset, one row each."""
+    accessions = [a for a in (accession or []) if re.fullmatch(r"GSE\d+", a)][:40]
+    return everywhere.gene_everywhere(symbol, accessions, hint)
 
 
 @app.get("/record/{accession}")

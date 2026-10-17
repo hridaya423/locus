@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, everywhere, index, table, volcano  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -125,6 +125,14 @@ def first_look(accession: str, factor: str = "", case: list[str] | None = None, 
     result["top_up"] = [dict(zip(columns, g)) for g in genes if g[1] > 0][:top]
     result["top_down"] = [dict(zip(columns, g)) for g in genes if g[1] < 0][:top]
     return result
+
+
+@mcp.tool(annotations=READ_ONLY)
+def gene_everywhere(gene: str, accessions: list[str], hint: str = "") -> dict:
+    """One gene across several GEO RNA-seq datasets: in each, its log2 fold change and BH q between the cases and the
+    controls (the characteristic with a control-like level; the case level preferring words of `hint`, e.g. the disease),
+    from NCBI's counts or the authors' own table. One row per dataset, with the reason when a dataset cannot answer."""
+    return everywhere.gene_everywhere(gene, accessions, hint)
 
 
 @mcp.tool(annotations=READ_ONLY)
