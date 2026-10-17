@@ -27,7 +27,12 @@ export async function browser() {
     if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") errors.push(m.params.args.map((a) => a.value ?? a.description).join(" "));
     if (m.method === "Log.entryAdded" && m.params.entry.level === "error") errors.push(`${m.params.entry.text} ${m.params.entry.url ?? ""}`.trim());
   });
-  const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+  const send = (method, params = {}) => new Promise((resolve, reject) => {
+    const i = ++id;
+    const timer = setTimeout(() => reject(new Error(`${method} timed out`)), 60000);
+    pending.set(i, (m) => { clearTimeout(timer); resolve(m); });
+    ws.send(JSON.stringify({ id: i, method, params }));
+  });
   await send("Page.enable");
   await send("Runtime.enable");
   await send("Log.enable");
@@ -61,4 +66,4 @@ export async function browser() {
 }
 
 // The dataset page has finished reading its record when the About heading or an error line is on screen.
-export const PAGE_READY = `!!(document.querySelector('#about, #samples') || [...document.querySelectorAll('p')].some(p => /did not send|has no dataset|has no sample/.test(p.textContent)))`;
+export const PAGE_READY = `!!(document.querySelector('#about, #samples, #characteristics, #files') || [...document.querySelectorAll('p')].some(p => /did not send|has no dataset|has no sample/.test(p.textContent)))`;
