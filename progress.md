@@ -191,3 +191,17 @@
 - Not committed.
 - Sample pages (17 Oct, later): `/d/<dataset>/<sample>` (`web/components/sample.tsx`) for GEO samples and ENA runs; the dataset page's sample table links each accession there. `record.sample` reads GEO samples from the cached series sample records (characteristics, both channels of two-colour arrays, every protocol, data processing, platform, contact, BioSample and SRA links, supplementary files with sizes, and the run's FASTQ files through ENA) and ENA runs from the run table plus BioSamples characteristics. Previous and Next step through the dataset's samples (arrow keys too). `GET /record/{dataset}/samples/{sample}`. Self-check covers GSM4560505, a two-channel GSM262497 and ERR000005 with no unmapped fields. Checked by screenshot at 1280 px (GSM2680571, ERR000005) and 390 px (GSM262497), no console errors. ArrayExpress and PRIDE list no per-sample accessions, so they have no sample pages.
 - Metadata enrichment finished (17 Oct, 22:30): proteomics job 68,371 accessions, 7,305 + 225 (failure retry) descriptions improved, 158 still failing; `--retry-failed` clears cached failures. Re-embedded in two batches (27,876 and 20,380 rows; 888,335 vectors aligned), FTS rebuilt, API restarted. PRIDE re-tag skipped: no PRIDE modality changed. Compare now reads store.metadata for empty values only (instruments → platform, tissues/cell types → tissue, technologies → layer/technology) plus a Disease caution row; metadata never feeds contrast or groups (self-checks in compare.py).
+
+## Overnight run (17–18 Oct)
+Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17` in worktree `/Users/hridyaagrawal/.t3/worktrees/sciencefinder/overnight-2026-10-17`, from `overnight/prep` (the day's uncommitted work committed as 61fe27a, then `origin/main` merged as 0d3b304; conflicts in agent.py, result-card.tsx, row-details.tsx resolved: main's partner dropdown kept, its links open locus pages). Your checkout on `corpus-expansion` is untouched.
+- Servers: API `OMICS_API_PORT=8010 uv run omics-api`, web `cd web && OMICS_API_URL=http://localhost:8010 npx next dev -p 3010`. Logs in `/tmp/locus-night/`.
+- New worktree: `sh scripts/worktree-setup.sh` (symlinks data/, copies .env, clones node_modules copy-on-write; a symlinked node_modules breaks Turbopack).
+- Harness: `node scripts/harness.mjs [--only 3] [--pages] [--out DIR]` (8 questions → top 3 dataset pages + one sample page each, screenshots at 1280/390, console errors, overflow, timings).
+- Door audit: `node scripts/doors.mjs [--seed 1] [--out DIR]` (30 random datasets, one per repository first; outbound links and values that open nothing).
+- `dataset.tsx` split into `page-kit.tsx`, `sample-table.tsx`, `files.tsx`, `aside.tsx` so parallel builders never share a file.
+
+### Moments
+(one line each: source · page · dataset · moment)
+
+### Ladder, found tonight
+- Dictate the question (mic in the search box), asked by the user at 23:05.

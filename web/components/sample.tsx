@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
-import { About, Aside, Files, Heading, LINK, MUTED_LINK } from "@/components/dataset";
+import { About } from "@/components/dataset";
+import { Aside } from "@/components/aside";
+import { Files } from "@/components/files";
+import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import { datasetPath, repositoryName, samplePath, sampleRecord, type SampleRecord } from "@/lib/api";
 
