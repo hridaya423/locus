@@ -212,6 +212,7 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - G why it matched — t3/why-matched-highlights 2b71f7e; critic G running.
 - H the answer, "Start with" (lead) — feat/answer a05bd32; no critic yet.
 - Trial integration of A–G on integrate/trial: merges resolve (union for append-only files, by hand for dataset.tsx); all 14 self-checks pass; harness 36 pages, 0 problems, median 341 ms.
+- Incident 00:32: the disk filled (0 bytes free); every tool call failed for a few minutes. Cause: memory pressure → swap on the shared APFS container. 21 orphaned headless Chromes from critics' scripts held 17 GB, plus ~15 APIs warmed with the 2.5 GB embedding index. Fix: killed orphans (Chrome 17 GB → 0.5 GB); critic APIs restarted without warm-up (`python -c 'import os, uvicorn; from omics_agent.api import app; uvicorn.run(app, port=...)'`, index loads on first search); watchdog `/tmp/locus-night/watchdog.sh` kills orphan Chrome each minute and stops if free disk < 5 GB. Nothing in data/ or caches was deleted; only the lead-look .next cache, a half-copied node_modules, stale Chrome profiles and a mistakenly downloaded 135 MB GSE150910 kallisto file under ~/omics-data.
 - Rule learned: union-merging two appended functions can drop a shared closing tail; after any union merge run tsc and list every route and tool.
 
 ### Moments
