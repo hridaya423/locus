@@ -1,0 +1,128 @@
+{
+  "accession": "GSE273888",
+  "tier": "laptop",
+  "pipeline": "locus process",
+  "organism": "Homo sapiens",
+  "topic": "mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2, mTOR signaling",
+  "tools": {
+    "salmon": "2.8.0",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "tximport": "1.38.2",
+    "apeglm": "1.32.0",
+    "ggplot2": "4.0.3"
+  },
+  "reference": {
+    "source": "GENCODE",
+    "release": "human-46",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_46/gencode.v46.transcripts.fa.gz",
+    "index": "salmon k=31, transcriptome only, no decoys"
+  },
+  "reads_per_fastq": 2000000,
+  "subsampled": true,
+  "contrast": {
+    "field": "treatment",
+    "reference": "no_treatment",
+    "target": "100_nm_rapamycin",
+    "levels": {
+      "control": "no treatment",
+      "case": "100 nM rapamycin"
+    }
+  },
+  "samples": [
+    {
+      "gsm": "GSM8438790",
+      "title": "HeLa cells for control, biol rep 1",
+      "srx": "SRX25588153",
+      "run": "SRR30115823",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/023/SRR30115823/SRR30115823_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/023/SRR30115823/SRR30115823_2.fastq.gz"
+      ],
+      "condition": "no_treatment",
+      "reads": 2000000,
+      "mapped": 1794502,
+      "mapping_rate": 89.7251,
+      "library_type": "IU"
+    },
+    {
+      "gsm": "GSM8438791",
+      "title": "HeLa cells for control, biol rep 2",
+      "srx": "SRX25588154",
+      "run": "SRR30115822",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/022/SRR30115822/SRR30115822_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/022/SRR30115822/SRR30115822_2.fastq.gz"
+      ],
+      "condition": "no_treatment",
+      "reads": 2000000,
+      "mapped": 1787442,
+      "mapping_rate": 89.3721,
+      "library_type": "IU"
+    },
+    {
+      "gsm": "GSM8438792",
+      "title": "HeLa cells for control, biol rep 3",
+      "srx": "SRX25588155",
+      "run": "SRR30115821",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/021/SRR30115821/SRR30115821_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/021/SRR30115821/SRR30115821_2.fastq.gz"
+      ],
+      "condition": "no_treatment",
+      "reads": 2000000,
+      "mapped": 1787867,
+      "mapping_rate": 89.39335,
+      "library_type": "IU"
+    },
+    {
+      "gsm": "GSM8438787",
+      "title": "HeLa cells treated with 100 nM rapamycin, biol rep 1",
+      "srx": "SRX25588150",
+      "run": "SRR30115826",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/026/SRR30115826/SRR30115826_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/026/SRR30115826/SRR30115826_2.fastq.gz"
+      ],
+      "condition": "100_nm_rapamycin",
+      "reads": 2000000,
+      "mapped": 1788400,
+      "mapping_rate": 89.42,
+      "library_type": "IU"
+    },
+    {
+      "gsm": "GSM8438788",
+      "title": "HeLa cells treated with 100 nM rapamycin, biol rep 2",
+      "srx": "SRX25588151",
+      "run": "SRR30115825",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/025/SRR30115825/SRR30115825_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/025/SRR30115825/SRR30115825_2.fastq.gz"
+      ],
+      "condition": "100_nm_rapamycin",
+      "reads": 2000000,
+      "mapped": 1785196,
+      "mapping_rate": 89.2598,
+      "library_type": "IU"
+    },
+    {
+      "gsm": "GSM8438789",
+      "title": "HeLa cells treated with 100 nM rapamycin, biol rep 3",
+      "srx": "SRX25588152",
+      "run": "SRR30115824",
+      "fastq": [
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/024/SRR30115824/SRR30115824_1.fastq.gz",
+        "https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR301/024/SRR30115824/SRR30115824_2.fastq.gz"
+      ],
+      "condition": "100_nm_rapamycin",
+      "reads": 2000000,
+      "mapped": 1796477,
+      "mapping_rate": 89.82385,
+      "library_type": "IU"
+    }
+  ],
+  "skipped": [],
+  "started": "2026-10-17T22:45:39+00:00",
+  "finished": "2026-10-17T22:48:31+00:00",
+  "seconds": 172
+}
