@@ -1,0 +1,60 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#121110;--bone:#F2EEE6;--sig:#FF4F1A;--moss:#2F5D50;--fog:#B9B3A8}
+*{box-sizing:border-box}body{margin:0;font-family:'Inter Tight',sans-serif;color:var(--ink)}
+.g{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.t{border-radius:14px;padding:22px;position:relative;overflow:hidden}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.serif{font-family:'Instrument Serif',serif;font-weight:400}
+.hero{grid-column:span 6;background:var(--ink);color:var(--bone);min-height:340px;display:flex;flex-direction:column;justify-content:space-between}
+.hero .strand{position:absolute;left:0;right:0;top:50%;height:2px;background:repeating-linear-gradient(90deg,#3a3733 0 6px,transparent 6px 12px)}
+.word{display:flex;align-items:center;gap:18px;position:relative;z-index:1}
+.word span{font-size:104px;line-height:.9;letter-spacing:-.02em}
+.tag{font-size:26px;max-width:460px;line-height:1.15;position:relative;z-index:1}
+.tag i{color:var(--sig)}
+.row{display:flex;justify-content:space-between;color:var(--fog);position:relative;z-index:1}
+.sw{grid-column:span 2;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end}
+.sw b{font-family:'Instrument Serif';font-weight:400;font-size:28px}
+.half{grid-column:span 3;background:var(--bone)}
+.card{background:#fff;border:1px solid #e4dfd5;border-radius:10px;padding:14px;margin-top:14px}
+.acc{font-family:'JetBrains Mono';font-size:13px;font-weight:500}
+.pill{display:inline-block;border-radius:99px;padding:2px 9px;font-size:11px;font-family:'JetBrains Mono'}
+.bar{height:8px;border-radius:4px;display:flex;overflow:hidden;margin:10px 0 6px}
+.icons{display:flex;gap:16px;align-items:center;margin-top:14px}
+@media(max-width:560px){.word span{font-size:64px}.sw,.half{grid-column:span 6}}
+</style></head><body>
+<div class="g">
+ <div class="t hero"><div class="strand"></div>
+  <div class="row mono"><span>Brand v1 — 2026</span><span>chr ∞ : every dataset</span></div>
+  <div class="word"><svg width="96" height="96" viewBox="0 0 64 64" fill="none"><path d="M4 32h17M43 32h17" stroke="#F2EEE6" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="13" stroke="#F2EEE6" stroke-width="4"/><circle cx="32" cy="32" r="5" fill="#FF4F1A"/></svg><span class="serif">locus</span></div>
+  <div class="row"><div class="tag serif">Ask in plain English.<br>Land on the <i>exact</i> dataset.</div><div class="mono" style="align-self:flex-end">GEO · PRIDE · CELLxGENE</div></div>
+ </div>
+
+ <div class="t sw" style="background:var(--ink);color:var(--bone)"><b>Ink</b><span class="mono">#121110</span></div>
+ <div class="t sw" style="background:var(--sig);color:var(--ink)"><b>Signal</b><span class="mono">#FF4F1A · the match</span></div>
+ <div class="t sw" style="background:var(--bone);border:1px solid #e4dfd5"><b>Bone</b><span class="mono">#F2EEE6 · paper</span></div>
+
+ <div class="t half">
+  <div class="mono" style="color:#7a746a">The idea</div>
+  <p class="serif" style="font-size:24px;line-height:1.2;margin:10px 0">A <b style="font-weight:400;color:var(--sig)">locus</b> is a fixed spot on a chromosome. The mark is a strand, a lens, and the one point you came for.</p>
+  <div class="icons">
+   <svg width="44" height="44" viewBox="0 0 64 64" fill="none"><path d="M4 32h17M43 32h17" stroke="#121110" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="13" stroke="#121110" stroke-width="4"/><circle cx="32" cy="32" r="5" fill="#FF4F1A"/></svg>
+   <div style="width:44px;height:44px;border-radius:11px;background:var(--ink);display:grid;place-items:center"><svg width="30" height="30" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="14" stroke="#F2EEE6" stroke-width="5"/><circle cx="32" cy="32" r="6" fill="#FF4F1A"/></svg></div>
+   <div style="width:44px;height:44px;border-radius:50%;background:var(--sig);display:grid;place-items:center"><svg width="26" height="26" viewBox="0 0 64 64"><circle cx="32" cy="32" r="14" fill="none" stroke="#121110" stroke-width="6"/></svg></div>
+   <span class="mono" style="color:#7a746a">mark · app · favicon</span>
+  </div>
+ </div>
+
+ <div class="t half" style="background:#E9E4DA">
+  <div class="mono" style="color:#7a746a">In product</div>
+  <div class="card">
+   <div style="display:flex;justify-content:space-between;align-items:center"><span class="acc">GSE328392</span><span class="pill" style="background:var(--ink);color:var(--bone)">● usable as is</span></div>
+   <div style="font-size:14px;font-weight:500;margin-top:6px">Single-cell atlas of idiopathic pulmonary fibrosis lung</div>
+   <div class="bar"><div style="flex:102;background:var(--sig)"></div><div style="flex:90;background:var(--moss)"></div></div>
+   <div class="mono" style="display:flex;justify-content:space-between;color:#5d574e"><span style="color:var(--sig)">case 102</span><span style="color:var(--moss)">control 90</span></div>
+  </div>
+  <div class="mono" style="margin-top:12px;color:#7a746a">Instrument Serif · Inter Tight · JetBrains Mono</div>
+ </div>
+</div>
+</body></html>

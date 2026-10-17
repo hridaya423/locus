@@ -1,0 +1,177 @@
+{
+ "a": {
+  "accession": "GSE241588",
+  "source": "GEO",
+  "title": "Ribosome profiling sequencing (Ribo-seq) in Huh7 control and SMYD5 KO cells upon normal condition or Torin1 treatment",
+  "organism": "Homo sapiens",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina NovaSeq 6000",
+  "material": "cell line",
+  "tissue": "liver (hepatocellular carcinoma, Huh7)",
+  "case": 12,
+  "control": 12,
+  "contrast": "50 nM Torin1 for 12 hr vs NA",
+  "build": null,
+  "contrast_name": null,
+  "access": "raw reads + processed files",
+  "sex": null,
+  "shared": null
+ },
+ "b": {
+  "accession": "PXD008913",
+  "source": "PRIDE",
+  "title": "Ribo Mega-SEC Provides a Rapid, Efficient and Reproducible Analysis of Mammalian Polysomes and Ribosomal Subunits",
+  "organism": "Mus musculus (mouse)",
+  "layer": "proteome",
+  "technology": "label-free DDA",
+  "platform": "Orbitrap",
+  "material": "animal or organoid model",
+  "tissue": "liver",
+  "case": null,
+  "control": null,
+  "contrast": null,
+  "build": null,
+  "contrast_name": null,
+  "access": null,
+  "sex": null,
+  "shared": null
+ },
+ "verdict": "no",
+ "reason": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Homo sapiens",
+   "b": "Mus musculus (mouse)",
+   "status": "differs",
+   "note": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "proteome",
+   "status": "differs",
+   "note": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "label-free DDA",
+   "status": "differs",
+   "note": "Different technologies have different biases and scales that reprocessing cannot remove, so analyse each dataset on its own.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD008913: both groups in each.",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "50 nM Torin1 for 12 hr vs NA",
+   "b": null,
+   "status": "unknown",
+   "note": "No case and control labels for PXD008913.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "shared",
+   "label": "Shared samples",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for GSE241588 and PXD008913: shared samples.",
+   "source": "GEO sample accessions",
+   "required": false
+  },
+  {
+   "key": "access",
+   "label": "Data available",
+   "a": "raw reads + processed files",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD008913: data available.",
+   "source": "GEO sample and series records",
+   "required": false
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina NovaSeq 6000",
+   "b": "Orbitrap",
+   "status": "differs",
+   "note": "Different platforms or instruments add a batch effect; model it.",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "cell line",
+   "b": "animal or organoid model",
+   "status": "differs",
+   "note": "Different kinds of material (cell line, tissue, primary cells) can respond differently.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "liver (hepatocellular carcinoma, Huh7)",
+   "b": "liver",
+   "status": "same",
+   "note": "",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for GSE241588 and PXD008913: genome build.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sex",
+   "label": "Women in each group",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for GSE241588 and PXD008913: women in each group.",
+   "source": "sex in the sample characteristics",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "12 cases, 12 controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD008913: group sizes.",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Do not combine these datasets. Different molecular layers measure different things; combining them is multi-omics integration, a different analysis."
+ ]
+}

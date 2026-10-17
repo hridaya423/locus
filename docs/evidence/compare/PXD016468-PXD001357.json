@@ -1,0 +1,177 @@
+{
+ "a": {
+  "accession": "PXD016468",
+  "source": "PRIDE",
+  "title": "human liver cancer Phosphoproteomics",
+  "organism": "Homo sapiens (human)",
+  "layer": "phosphoproteome",
+  "technology": "TMT",
+  "platform": "Orbitrap",
+  "material": "cell line",
+  "tissue": "liver",
+  "case": null,
+  "control": null,
+  "contrast": null,
+  "build": null,
+  "contrast_name": null,
+  "access": null,
+  "sex": null,
+  "shared": null
+ },
+ "b": {
+  "accession": "PXD001357",
+  "source": "PRIDE",
+  "title": "Direct evidence of milk consumption from ancient human dental calculus, St Helena",
+  "organism": "Homo sapiens (human)",
+  "layer": "proteome",
+  "technology": "DDA",
+  "platform": "Orbitrap",
+  "material": null,
+  "tissue": "dental calculus",
+  "case": null,
+  "control": null,
+  "contrast": null,
+  "build": null,
+  "contrast_name": null,
+  "access": null,
+  "sex": null,
+  "shared": null
+ },
+ "verdict": "no",
+ "reason": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Homo sapiens (human)",
+   "b": "Homo sapiens (human)",
+   "status": "same",
+   "note": "",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "phosphoproteome",
+   "b": "proteome",
+   "status": "differs",
+   "note": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "TMT",
+   "b": "DDA",
+   "status": "differs",
+   "note": "Different technologies have different biases and scales that reprocessing cannot remove, so analyse each dataset on its own.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: both groups in each.",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "No case and control labels for PXD016468 and PXD001357.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "shared",
+   "label": "Shared samples",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: shared samples.",
+   "source": "GEO sample accessions",
+   "required": false
+  },
+  {
+   "key": "access",
+   "label": "Data available",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: data available.",
+   "source": "GEO sample and series records",
+   "required": false
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Orbitrap",
+   "b": "Orbitrap",
+   "status": "same",
+   "note": "",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "cell line",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: material.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "liver",
+   "b": "dental calculus",
+   "status": "differs",
+   "note": "Different tissues or cell types can respond differently; the effects may not carry over.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: genome build.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sex",
+   "label": "Women in each group",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: women in each group.",
+   "source": "sex in the sample characteristics",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": null,
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD016468 and PXD001357: group sizes.",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Do not combine these datasets. Different molecular layers measure different things; combining them is multi-omics integration, a different analysis."
+ ]
+}

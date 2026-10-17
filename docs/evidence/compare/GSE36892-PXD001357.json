@@ -1,0 +1,139 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "PXD001357",
+  "source": "PRIDE",
+  "title": "Direct evidence of milk consumption from ancient human dental calculus, St Helena",
+  "organism": "Homo sapiens (human)",
+  "layer": "proteome",
+  "technology": null,
+  "platform": null,
+  "material": null,
+  "tissue": null,
+  "case": null,
+  "control": null,
+  "contrast": null,
+  "build": null
+ },
+ "verdict": "no",
+ "reason": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Homo sapiens (human)",
+   "status": "differs",
+   "note": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "proteome",
+   "status": "differs",
+   "note": "Different molecular layers measure different things; combining them is multi-omics integration, a different analysis.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: technology.",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: both groups in each.",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": null,
+   "status": "unknown",
+   "note": "No case and control labels for PXD001357.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: platform.",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: material.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: tissue or cell type.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: genome build.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for PXD001357: group sizes.",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Do not combine these datasets. Different molecular layers measure different things; combining them is multi-omics integration, a different analysis."
+ ]
+}

@@ -1,0 +1,141 @@
+{
+ "a": {
+  "accession": "GSE36892",
+  "source": "GEO",
+  "title": "A unifying model for mTORC1-mediated regulation of mRNA translation",
+  "organism": "Mus musculus",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "primary cells",
+  "tissue": "embryonic fibroblast",
+  "case": 6,
+  "control": 6,
+  "contrast": "Torin1 vs Vehicle",
+  "build": "mm9"
+ },
+ "b": {
+  "accession": "GSE35469",
+  "source": "GEO",
+  "title": "The translational landscape of mTOR signaling steers cancer initiation and metastasis",
+  "organism": "Homo sapiens",
+  "layer": "translatome + transcriptome",
+  "technology": "Ribo-seq + RNA-seq",
+  "platform": "Illumina Genome Analyzer II",
+  "material": "cell line",
+  "tissue": "prostate",
+  "case": 8,
+  "control": 4,
+  "contrast": "rapamycin; PP242 vs vehicle",
+  "build": null
+ },
+ "verdict": "effects",
+ "reason": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+ "facets": [
+  {
+   "key": "organism",
+   "label": "Organism",
+   "a": "Mus musculus",
+   "b": "Homo sapiens",
+   "status": "differs",
+   "note": "Different organisms: genes match only through orthologs, so the samples cannot be mixed.",
+   "source": "repository record",
+   "required": true
+  },
+  {
+   "key": "layer",
+   "label": "Molecular layer",
+   "a": "translatome + transcriptome",
+   "b": "translatome + transcriptome",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "technology",
+   "label": "Technology",
+   "a": "Ribo-seq + RNA-seq",
+   "b": "Ribo-seq + RNA-seq",
+   "status": "same",
+   "note": "",
+   "source": "assay labels, else repository data type",
+   "required": true
+  },
+  {
+   "key": "groups",
+   "label": "Both groups in each",
+   "a": "cases and controls",
+   "b": "cases and controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": true
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "a": "Torin1 vs Vehicle",
+   "b": "rapamycin; PP242 vs vehicle",
+   "status": "related",
+   "note": "Related contrasts: Torin1 vs Vehicle, and rapamycin; PP242 vs vehicle.",
+   "source": "case and control labels",
+   "required": true
+  },
+  {
+   "key": "platform",
+   "label": "Platform",
+   "a": "Illumina Genome Analyzer II",
+   "b": "Illumina Genome Analyzer II",
+   "status": "same",
+   "note": "",
+   "source": "GEO platform and instrument",
+   "required": false
+  },
+  {
+   "key": "material",
+   "label": "Material",
+   "a": "primary cells",
+   "b": "cell line",
+   "status": "differs",
+   "note": "Different kinds of material (cell line, tissue, primary cells) can respond differently.",
+   "source": "sample type label",
+   "required": false
+  },
+  {
+   "key": "tissue",
+   "label": "Tissue or cell type",
+   "a": "embryonic fibroblast",
+   "b": "prostate",
+   "status": "differs",
+   "note": "Different tissues or cell types can respond differently; the effects may not carry over.",
+   "source": "tissue label",
+   "required": false
+  },
+  {
+   "key": "build",
+   "label": "Genome build",
+   "a": "mm9",
+   "b": null,
+   "status": "unknown",
+   "note": "Not stated for GSE35469: genome build.",
+   "source": "GEO data processing",
+   "required": false
+  },
+  {
+   "key": "sizes",
+   "label": "Group sizes",
+   "a": "6 cases, 6 controls",
+   "b": "8 cases, 4 controls",
+   "status": "same",
+   "note": "",
+   "source": "GEO sample counts",
+   "required": false
+  }
+ ],
+ "steps": [
+  "Analyse each dataset on its own, with the same method.",
+  "Compare the fold changes, their direction and the overlap of hits between the two results.",
+  "Map genes between the organisms through orthologs."
+ ]
+}

@@ -1,0 +1,182 @@
+# Progress
+
+## Done
+- CLI `omics` searches GEO, PRIDE, and CELLxGENE from a plain-English question (Claude Haiku 5.5 via the Anthropic API).
+- GEO single-cell filter: single-cell questions now return single-cell GEO studies.
+- Sample-level facts for GEO (case/control counts from sample records, including title patterns and mixed pools) and CELLxGENE (controls from disease labels).
+- Rule-based grading from four checks; counted facts override the model.
+- Same-paper bundles across repositories (PMID, DOI → PMID through Europe PMC). Logic verified on a known PMID/DOI pair; the fibrosis query found no cross-repository pair.
+- NCBI rate-limit retry (HTTP 429).
+- Plan cache per question in `~/.cache/omics-agent/plans.json`.
+
+## Evidence (fibrosis question, single-cell + proteomics, patients + controls)
+- Counts checked against raw GEO records: GSE328392 IPF 102 / control 90 (exact); GSE326573 IPF 19 / control 20 (exact when the topic is IPF only).
+- Grade agreement over 3 runs: 67% before → 83% after rule-based grading and plan cache. Fixed candidates: 94%.
+- Strong results per run: 7, 7, 7 (6 identical).
+- One run takes about 50 seconds.
+
+## Done (interfaces)
+- One shared `agent.run()` used by the CLI, the API, and the MCP server.
+- MCP server (`omics-mcp`, MCP SDK 2.x `MCPServer`): tools `search_datasets`, `geo_sample_groups`. Tested over stdio with a real MCP client; `geo_sample_groups(GSE328392)` returned 102 / 90.
+- Streaming API (`omics-api`, FastAPI): `POST /search` streams NDJSON stages (plan, candidates, facts, done). Tested with curl: 27 candidates, 23 datasets, 8 strong, 57 s.
+- Web UI in `web/` (Next.js 16, Tailwind 4, shadcn shell and tokens from PRIDE Map): centered search bar, live progress, plan chips, result cards with counts, checks, and source quote. Checked by screenshot at 1280 px and 390 px.
+
+## Done (local index, 17 Oct)
+- Local SQLite index `data/omics.db` (776 MB): GEO 298,702 series (all), PRIDE 42,131 projects, CELLxGENE 2,243 datasets. Harvesters: `omics_agent/harvest.py` (GEO, resumable, POST, splits batches over NCBI's 10 MB JSON limit), `omics_agent/harvest_pride.py` (PRIDE listing + search top-up for PRD/PAD series the listing skips; CELLxGENE).
+- Full-text index (FTS5, BM25) built once with `store.rebuild_fts`; keyword search 3-12 ms over the whole corpus.
+- `omics_agent/index.py`: keyword + embedding search fused with reciprocal rank fusion; `gather` uses it (live search only if no index).
+- `omics_agent/embed.py`: embeds the corpus on a Hugging Face GPU endpoint (`NeuML/pubmedbert-base-embeddings`), resumable, deletes the endpoint when done. Waiting for HF_TOKEN.
+- Search time for a fresh question: 65 s -> 22 s (smaller parallel Haiku batches, keyed NCBI requests). Plan and sample-record caches were warm in the 22 s run.
+- UI: grouped results ("usable as is" first, close matches collapsed), one fact line per result, only failed checks shown, footer removed (MIT notice in web/LICENSE.pridemap).
+
+## Done (download plan, 17 Oct)
+- Result card: "download plan" toggle shows copyable shell commands per source. GEO: supplementary files over HTTPS plus SRA runs (EDirect + sra-tools). PRIDE: `pridepy`. CELLxGENE: `cellxgene_census.download_source_h5ad`. Frontend only; nothing runs.
+- Checked: GEO suppl URL returns 200, SRA search by GSE returns runs (GSE326573: 59), screenshots at 1280 px and 390 px.
+
+## Known limits
+- The plan can add a broader term (for example "interstitial lung disease"); then related diseases such as CTD-ILD count as cases (GSE326573 showed case 39 instead of 19).
+- PRIDE has no sample facts yet (SDRF files not read).
+- GEO counts are sample records, not patients (one patient can have several libraries).
+- "Partial" is still generous: 14 partial of 22 relevant.
+
+## Next
+- Merge with PRIDE Map: use its method tags (DIA, phospho, TMT) for PRIDE results.
+- Data loading (CELLxGENE .h5ad, GEO counts).
+- Build `eval.csv` from the biologists' `product.md` files and report recall@10.
+
+## Done (locus brand, 17 Oct)
+- Name: locus. Boards in `brand/` (a-lab, b-editorial, c-observatory). Chosen: B's serif wordmark (the `o` is a ring with a signal dot) on A's lab system.
+- Web app restyled: tokens in `web/app/globals.css` (ink, bone, signal = case/match only, control green), Instrument Serif + Inter Tight + JetBrains Mono, `components/logo.tsx` (Wordmark, Reticle), `app/icon.svg`, header, idle hero with chromosome bands, mono labels, case/control ratio bar on result cards.
+- Checked live with a real search at 1280 px and 390 px.
+- Not done: dark mode has tokens but no toggle; `thinking-orbs` dependency is now unused.
+
+## Done (scientist-facing polish, 17 Oct)
+- Five skill audits (design-engineering, design-taste-frontend, emil-design-eng, ui-ux-pro-max, animation-systems) merged into 17 changes; all applied.
+- Trust: full question in an auto-growing field; "Searched for" / "Filters" groups; four-step progress checklist with live counts and a moving bar; close-match marker; source quote in mono; record facts in ink, model reason muted.
+- Grammar: failed checks neutral with an icon (orange only for case/match); 11.5 px labels and 15 px counts; actions underlined with chevrons and focus rings; header on the content column; 8 px radius.
+- Motion: tiers micro 150 ms / ui 200 ms / entrance 450 ms, no bounce (`lib/springs.ts`); results header then cards stagger 70 ms; case/control bar draws once; scanning reticle; view transition skipped under reduced motion.
+- Checked at 1280 px and 390 px with a browser-only replay of real accessions and counts, because the running API (PID 37655, started 13:17) predates the `modalities` -> `assays` change and returns `error: 'repositories'`.
+- Turbopack served stale CSS; fixed by clearing `web/.next/dev/cache` and restarting `npm run dev`.
+
+## Open
+- Restart `omics-api` and clear stale entries in `~/.cache/omics-agent/plans.json` (old plans lack `assays`), then run one live search end to end.
+
+## Done (results table, 17 Oct)
+- Design: `docs/plans/2026-10-17-results-table-design.md`.
+- Results are now a table: `web/components/results.tsx` (summary counts, repository and "counted only" filters, sorting, selection bar with combined download plan and CSV export) and `web/components/result-card.tsx` (`DatasetRow`: expandable row with paper, failed checks, quote, download plan).
+- Cut: reason sentence on strong matches, repeated "usable as is" on rows, per-card bars, per-card staggered entrance.
+- Pooled libraries show as "+N pooled" under Control. GSE292589 (2 case, 0 control, 2 mixed) is graded strong on purpose (`samples.py:107`); grading was not changed.
+- `color-scheme: light` forced; the PRIDE Map dark-scheme rule made native checkboxes dark on dark-mode systems.
+- Checked at 1280 px and 390 px with a replay of a real live search (38 datasets), driven over Chrome DevTools Protocol (`/tmp/locus-cdp/shot.mjs`), because the T3 preview tab hangs after results render. The page itself stays responsive.
+
+## Known issue
+- Turbopack keeps serving stale `globals.css` after edits (twice today). Fix: stop `npm run dev`, `rm -rf web/.next/dev/cache`, start again.
+
+## Done (ngrok, 17 Oct)
+- Cause: over ngrok the browser called `http://localhost:8000`, which is the visitor's own machine (also mixed content and outside the CORS allowlist).
+- Fix: the web app calls `/api` on its own origin; `web/next.config.ts` rewrites `/api/*` to `http://localhost:8000/*`. `NEXT_PUBLIC_API_URL` still overrides.
+- Checked: a streamed search through the ngrok URL returned plan, candidates, screened, facts, done as separate lines over 22 s.
+
+## Done (more repositories + richer embeddings, 17 Oct)
+- Harvesters (Sonnet subagents, each tested on ~100 records first): `harvest_omicsdi.py` (MassIVE, iProX, jPOST, PeptideAtlas, PanoramaPublic, MetaboLights, MetabolomicsWorkbench, GNPS, EGA, dbGaP, NODE, ExpressionAtlas, EVA, LINCS), `harvest_arrayexpress.py` (skips E-GEOD mirrors of GEO), `harvest_ena.py` (read studies without a GEO series). They do not rebuild FTS; run `store.rebuild_fts` once after all finish.
+- Embedding text is now title + data type + organism + summary (`index.document`). `embed.py` writes `data/vector_chunks/NNNNN.{npy,json}`; each chunk lists its accessions, so a rerun embeds only rows not yet embedded. 3 L4 replicas, about 450 docs/s. Log: `/tmp/embed_rich.log`.
+- After harvests: rerun `uv run python -m omics_agent.embed` for the new rows, then `rebuild_fts`, restart the API.
+- Planner: `agent.ARCHIVES` lists all 19 repositories with what each holds; it drives the enum and the prompt. Plan cache keys now include a hash of the prompt and schema.
+- UI: per-repository download commands (ArrayExpress FTP, ENA filereport, EGA/dbGaP controlled access, other repos link to the study page); fixed the GEO FTP path for GSE1–999.
+- Papers: preprints show their server (bioRxiv) as the journal. Europe PMC's accession search was rejected for paper linking: it mostly returns reuse papers, which would group unrelated datasets as one study.
+- Old `data/vector_parts/` can be deleted once the new vectors are in place.
+
+## Done (OmicsDI harvest, 17 Oct)
+- `omics_agent/harvest_omicsdi.py` pulls all 14 repositories (MassIVE, iProX, jPOST, PeptideAtlas, PanoramaPublic, MetaboLights, MetabolomicsWorkbench, GNPS, EGA, dbGaP, NODE, ExpressionAtlas, EVA, LINCS) from `https://www.omicsdi.org/ws/dataset/search?query=repository:"<name>"`, one filter query per repository, size=1000 (max the API accepts; 2000 returns 404), 6 concurrent workers (20 concurrent triggered intermittent 404s under load — looked like throttling, not real 429s). Pages cached under `data/omicsdi_pages/<repo>_NNNN.json` so a rerun only re-fetches missing pages (confirmed: cold run 9 s for 2,294 PeptideAtlas rows, warm rerun 0.1 s).
+- No per-dataset calls: the search endpoint already carries title, description, organisms, omicsType, publicationDate; per-record `/ws/dataset/{db}/{acc}` adds publication IDs but at 68k records that is 68k extra HTTP calls, so `papers` is left `[]` for every OmicsDI-sourced row. MassIVE's native `datasets_json.jsp` was tried and dropped — it hung past 2 minutes with no gain over OmicsDI.
+- Full run: 14 s, 68,059 rows fetched. Rerun: `uv run python -I -m omics_agent.harvest_omicsdi` (cached pages make it near-instant unless `data/omicsdi_pages/` is cleared).
+- **Surprising repository behavior, not patched**: `datasets` has a single-column `PRIMARY KEY (accession)`, but OmicsDI gives the same accession to the same physical submission under more than one repository facet — GNPS re-lists MassIVE spectral submissions under their original `MSV*` IDs. Writing MassIVE first and GNPS later (an arbitrary order in `REPOS`) meant GNPS's `INSERT OR REPLACE` silently relabeled 1,602 MassIVE rows as GNPS (`source='MassIVE'` count: 9,931 listed vs 8,329 stored; the gap is exactly explained by GNPS keeping all 4,390 of its own `MSV*` rows). iProX/jPOST/PanoramaPublic also share `PXD*` accessions with PRIDE but no loss showed up this run — order-dependent, so it could bite on a future rerun. Needs a lead decision: either key on `(accession, source)` or namespace the accession, not something to change unilaterally mid-harvest.
+- Field quality varies by repository, all from OmicsDI itself, not a mapping bug: `MetabolomicsWorkbench` has no `description` in search results at all (summary empty for all 2,167 rows); `EGA`, `MetaboLights`, `ExpressionAtlas`, `dbGaP` have no `organisms`; `EGA` and `dbGaP` have no `publicationDate`. `iProX`, `jPOST`, `PanoramaPublic`, `EVA`, `NODE` are fully populated on summary/organism.
+
+## Done (ENA harvest, 17 Oct)
+- `omics_agent/harvest_ena.py`: ENA/SRA studies (BioProjects) with real read data that GEO doesn't already cover. Portal API (`ebi.ac.uk/ena/portal/api/search`) streamed as TSV, chunked by year (study metadata) and quarter (per-run `library_strategy`/`instrument_model`, aggregated in Python to one run count + strategy/model set per study) — a single unbounded `limit=0` request gets silently cut off by the server after about 2 minutes regardless of row count, so each chunk stays well under that. Chunks cached under `data/ena/studies/*.tsv` and `data/ena/read_run/*.tsv`; a rerun only re-fetches chunks it doesn't have (confirmed empty 2008/2009 quarters re-skip correctly, and a chunk that silently 429'd and cached an HTML error page was caught by checking the response doesn't start with `<` before writing to disk).
+- Filter stages, each counted: 1,097,183 ENA studies total -> 705,467 have at least one read run (drops genome-assembly-only and metadata-only submissions) -> 538,450 are not a GEO mirror (ENA's own `geo_accession` field is a complete, well-populated signal: 271,465 studies carry it, and cross-checking `center_name='GEO'`/`study_alias` starting `GSE` found zero additional mirrors it missed) -> 461,758 after dropping 73,823 templated mass single-isolate submissions (MRSA/plant-panel/etc. resequencing where 15+ studies share one title with digits stripped and every one of them has 5 runs or fewer — verified this rule keeps legitimately-varied-size studies like "homo sapiens raw sequence reads" while catching exact noise clusters like "mrsa surveillance ii" ×1,264) and 2,869 studies whose title or description says "surveillance". The big single-BioProject pathogen-surveillance dumps (COG-UK, CDC SARS-CoV-2, PulseNet Salmonella — millions of runs under one accession each) are literally one row each in the output regardless, so they cost almost nothing even where left in.
+- `modality` = library strategies + instrument models, e.g. `"RNA-Seq; Illumina NovaSeq 6000"`. `samples` = run count (proxy; ENA has no per-study sample count without a second per-sample join). `papers` left empty — ENA's `read_study`/`study` results have no PubMed field, and the xref service wasn't worth a call per study at this count.
+- Full run: 461,758 rows written to `data/omics.db` (`source='ENA'`) in 46 s wall time once chunks are cached (download pass itself was about 15 minutes earlier, done once). Rerun: `uv run python -m omics_agent.harvest_ena`.
+- Not run: `store.rebuild_fts` (left for the lead per instructions).
+
+## Plan (17 Oct)
+- Megaplan for judging: `docs/plans/2026-10-17-megaplan.md` (workstreams A–G, 3-day schedule, cut list). Not started; awaiting approval and team split.
+- Phase 0 tests run (17 Oct): `docs/evidence/phase0/REPORT.md`. G1 pass (GSE36892 #4, GSE35469 #12, counts exact). G2 pass but needs per-assay library split (Opus+web guessed 8+8 for GSE36892; records say 8 footprint + 4 mRNA). G3 pending labels. Grading bug: GSE25626 (no RNA-seq) graded strong for a matched question.
+- Builds done (17 Oct): per-assay library counts from GEO sample records (`samples.geo_samples`, `samples.libraries`, self-check `uv run python -m omics_agent.samples`); plan field `matched_assays` + grading override in `agent._apply_facts`; facts cache key versioned by label prompt/schema hash; UI library line + unmatched warning + count links to GEO sample list. Verified live on port 8001 and by screenshot (1280 px, 390 px). Port 8000 API still runs old code until restarted.
+
+### Result (15:30)
+- Corpus: 890,961 datasets in 18 repositories (ENA 461,758; GEO 298,702; PRIDE 42,111; ArrayExpress 21,604; EGA 18,671; MassIVE 12,719 incl. GNPS; iProX 8,207; NODE 7,865; MetabolomicsWorkbench 4,639 via its native API; MetaboLights 3,534; jPOST 3,179; PeptideAtlas 2,294; CELLxGENE 2,243; dbGaP 1,316; EVA 1,021; PanoramaPublic 476; LINCS 447; ExpressionAtlas 195).
+- All 890,961 embedded with the richer text (`data/vector_chunks`); FTS rebuilt; API restarted.
+- Harvest rule: a dataset keeps the first repository that stored it (OmicsDI lists some under several). E-GEOD copies are skipped everywhere.
+- Rows with no species (most ENA, EGA, MetaboLights, NODE, dbGaP) pass any species filter (`index.py`).
+- Planner prompt is cached (`_ask(cached=...)`): 7,625 tokens read from cache on repeat calls.
+- Live searches through the API (all returned results): T2D plasma metabolomics 34 s (MetaboLights 6, Workbench 9, GEO 8, MassIVE 2); glioblastoma phosphoproteomics 25 s (PRIDE 22, MassIVE 4, iProX 3); C-section infant microbiome 28 s (ENA 34); IPF RNA-seq 61 s (GEO 38, ENA 1, ArrayExpress 1).
+- Open: ENA species (needs a re-download of read_run with scientific_name); paper links for OmicsDI and ENA rows; old `data/vector_parts/` (527 MB) can be deleted.
+
+## Done (UI polish, 17 Oct)
+- Results header: "relevant" shows only when it differs from "usable as is"; the "searched 300" count is gone (also from the progress step). Case/Control columns and the "counted only" filter appear only when something was counted. Readable repository names via `repositoryName` in `web/lib/api.ts`.
+- Row checkbox: custom ink checkbox with a drawn tick, inset 12 px, 40 px hit area through its label.
+- Idle hero bands (`Bands` in `search.tsx`): a Newton's-cradle signal pass. Orange rests on one locus (`LOCI`); when it fires, the source kicks and its orange wipes out, a grey knock travels band to band (`RIPPLE` 45 ms apart: jolt, stretch, darken, snap back), and the target takes the hit while orange wipes in from the impact side; hold 1.7 s, repeat. All WAAPI transforms and clip-paths; waits while the tab is hidden; static under reduced motion. Rejected along the way: scan head with labels, sliding orange window (read as a worm), spring-chain physics (muddy). Header reads "891k datasets · 18 repositories".
+- MCP server (17 Oct): `omics_agent/mcp_server.py` has 8 read-only tools (search_datasets, plan_search, find_datasets, get_dataset, geo_sample_groups, get_methods, get_download_plan, get_samplesheet via `agent.samplesheet_files`), all verified through a real stdio MCP client (`/tmp/locus-mcp/client.py`). New `sources.download_plan` (single source; web reads `hit.download_plan`) and `sources.paper_methods` (Europe PMC OA full text). Fixes found on the way: `samples.resolve()` maps renamed fields (model says "title", field is "title pattern"); `_geo_facts` caches labels only and recomputes counts. README updated.
+
+## Done (nf-core/riboseq samplesheet export, 17 Oct)
+- Design: `docs/plans/2026-10-17-samplesheet-export-design.md`. locus writes the files; it does not run the pipeline (the researcher runs it on their own compute).
+- `omics_agent/samplesheet.py`: samplesheet.csv + contrasts.csv + README.txt per GEO series. GSM per sample, FASTQ from one ENA query per 100 SRX, `type` from the assay labels, `pair` from titles minus assay-only words plus equal characteristics (ambiguous = empty), `condition` = treatment level inside each crossed factor (genotype), unpaired libraries get `_unpaired` so no contrast includes them (nf-core/riboseq sorts both assays by `pair` and runs anota2seq with `--subset_to_contrast_samples TRUE`). Contrasts only with >= 2 pairs per side.
+- Labels: `agent.geo_labels` (cached per study and topic, shared with the search); `samples.resolve_labels` repairs renamed fields for both. `samples.geo_records` keeps GSM/SRX/title/organism; `geo_samples` output unchanged on 652 cached series.
+- API `GET /samplesheet/{GSE}?topic=` (zip, accession pattern-checked, 422 otherwise). UI: "Samplesheet for nf-core/riboseq" in the expanded row of GEO Ribo-seq/TIS-seq studies. The other session added MCP tool `get_samplesheet` over `agent.samplesheet_files`.
+- Evidence: self-check `uv run python -m omics_agent.samplesheet`; real exports of GSE36892, GSE35469, GSE132703, GSE225683 match hand expectations (GSE36892: 4 pairs, 4 unpaired rep-2 footprints, no contrast because 1 pair per side; GSE35469: pp242/rapamycin vs vehicle; GSE132703: 3 genotype contrasts, 4 reseq RPF unpaired; GSE225683: 1 contrast, paired-end RNA). All four pass nf-core/riboseq 1.2.0 `schema_input.json` (jsonschema). Button checked by screenshot at 1280 px and 390 px with a replayed search; the zip downloaded.
+- Not done: no Nextflow run (low memory here; the researcher runs it). Port 8000 API predates the route; restart it to serve `/samplesheet`. Independent check: the team researcher reviews one export.
+
+## Done (samplesheet coverage run, 17 Oct)
+- Exported every GEO Ribo-seq study from the saved mTOR and isoform searches (10). All 10 pass nf-core/riboseq `schema_input.json`. Contrasts written for 6 (GSE225683, GSE132703, GSE241588, GSE35469, GSE167324: checked by hand against titles). No contrast, with the reason in README, for 4: GSE36892 and GSE118422 (1 pair per side), GSE263767 (labels mark no case/control for the mTOR topic; the real design is parental vs resistant, only in titles), GSE184247 (RNA-seq libraries have no treatment, so nothing pairs; RIP-seq left out).
+- Fixed on the way: (1) GSE129816 wrote a wrong contrast, because "control" mixed untreated and Torin1-treated wild type (only the titles differ). New guard: paired samples in one condition must share a title stem (title minus assay words and replicate IDs); otherwise the contrast is not written and the README names the stems. (2) `geo_records` let GEO's `!Sample_molecule_ch1` overwrite a characteristic named `molecule`; a colliding characteristic is now `<name> (characteristic)`. Affects 1 of 658 cached series (GSE118422); its stale cached labels were deleted. (3) ENA requests retry on TLS drops and 5xx. (4) README states why no contrast was written.
+- Known ceiling: cached labels are keyed by topic and prompt, not by the fields the model saw; a future parser change needs the affected label rows deleted.
+- Results list (17 Oct, later): rows lead with the title, then one meta line (accession, repository, year, data type, tissue; truncates on desktop, two lines on phones), then the paper (*journal* year · title, title skipped when it repeats the dataset's). Same-paper datasets collapse into one `StudyRow` (paper title, ink "N datasets" badge, repositories and types, journal and year; checkbox selects the whole study with a mixed state); opening it slides the datasets out on a thread. Row and study expansion animate height (`unfold`). Removed the "counted only" filter. Checked with a recorded DKD search (3 multi-dataset studies) at 1280 and 390 px.
+
+## Done (study tree connectors, 17 Oct)
+- Datasets of one study now hang off it as a tree: an SVG trunk under the study's checkbox (x = 20.5) and a rounded branch (r = 8) into each dataset's checkbox, which indents to x = 36 (`Cols nested`, first column w-14). `Stem` (study row) and `Branch` (dataset row) live in `result-card.tsx`; each row draws its own piece, so rows can expand to any height.
+- The path from the study to every selected dataset turns ink; a hovered row darkens its branch. Strokes are opaque `color-mix` tones, so pieces that meet never darken at the joint. Branches draw in with a 50 ms stagger when the group opens; reduced motion shows them without the draw.
+- Checked with a replay of the isoform search (6-dataset group) by close-up screenshots of the joint and an elbow, at 1280 px and 390 px, mid-draw and with one dataset selected. tsc and eslint pass.
+
+## Done (copy cleanup, 17 Oct)
+- clean-copy pass on the results UI (`result-card.tsx`): cut the `✕ N` failed-check count on rows, the truncated paper title (journal and year stay), the library line on single-assay rows (it repeated the Case/Control columns), the warning chips when the reason sentence is shown, GEO's "library: RNA-seq N" clause under the quote (it contradicted locus's own per-assay counts), and "review before running; nothing runs from here". Samplesheet note is now "zip, with contrasts and a README"; its loading text is "Writing…". `PaperLine` was inlined (one caller).
+- Checked by screenshot at 1280 px: strong rows, the close-match table, an expanded close match and an expanded Ribo-seq row. tsc and eslint pass.
+
+## Done (logo hover, 17 Oct)
+- `Wordmark` (`web/components/logo.tsx`, now a client component) acts out a search on mouse hover, in the header and on the home page: the signal dot shrinks and sends six shards out as a comet at 12 o'clock, the comet sweeps once around the inside of the ring (0.6 s, strong ease-in-out), the shards fall back in, and the dot springs to a larger lock (r 5.2 to 6.5) with one ripple. Leaving retracts everything in about 0.2 s, also mid-sweep. Mouse only (`pointerType`); reduced motion grows the dot without shards. `Reticle` (progress checklist) is unchanged.
+- First version used six evenly spaced shards and a 120° turn; the frames showed the pattern looked identical before and after, so the sweep was invisible. Replaced with the comet trail.
+- Header: removed "891k datasets · 18 repositories".
+- Checked with frame captures at 1280 px (contact sheets of hero and header) and measured radii (rest 5.2, hovered 6.5, after leave 5.2, shards 0 after a mid-sweep leave, shards 0 under reduced motion). tsc and eslint pass.
+- Fluid pass (17 Oct): the hover no longer runs as four awaited steps that each stop. Three values overlap in time: `reach` (fling out, hold, spiral in as keyframes), `turn` (one turn, accumulating across hovers) and `lock`. Each shard follows `turn` through its own `useSpring` (stiffness 320 down to 130), so the trail stretches when fast and closes when slow. Dot size and shard size are derived from `reach` and `lock`, so nothing pops. Leaving uses springs; a ripple cut short fades out instead of freezing.
+- Measured with a per-frame trace of one hover (109 frames, 60 fps): the head's speed never drops below 20% of its peak while visible (the first fluid version paused about 100 ms between fling and sweep; fixed by an earlier-starting sweep curve and a softer fling). Filmstrip every 70 ms checked by eye.
+- Crispness pass (17 Oct): rebuilt the hover as one path (spiral out, one turn, spiral in) driven by a linear clock; each of 5 shards replays the head's path 34 ms later. Path speed 0.6 at the ends and 1.4 mid-sweep; outward ramp is a cubic smoothstep over the first and last 14% of the path. Lock is `useSpring` on a target set when the last shard re-enters; the ripple stays inside the ring (r 6.3 to 12.5) and fades in, then out. Leaving keeps the comet travelling while a 0.14 s spring pulls it in; re-entering resumes the sweep.
+- Evidence (per-frame recorder `/tmp/locus-cdp/record.mjs`, analyzer `/tmp/locus-scripts/analyze.py`, 60 fps, no frame over 20 ms): shard overlaps 176 to 4 pair-frames, trail gap unevenness 0.15 to 0.08, head speed jumps 10 to 0, ripple over the ring 150 ms to none, first shard 79 ms. Idle cost: 0 attribute writes and 0 rAF callbacks per second at rest; about 470 writes/s only while hovered. Header (28 px) and hero frames checked by eye.
+- Paper links (17 Oct, later): `enrich_omicsdi.py` filled 11,496 OmicsDI-harvested rows; `enrich_workbench.py` filled 120 Workbench papers and replaced 4,628 placeholder summaries with real study summaries (re-embedded with `uv run python -m omics_agent.embed --redo data/workbench_summaries_changed.txt`; FTS rebuilt). `enrich_ena.py` (NCBI BioProject → PubMed) still running. Deleted 2,626 EGAC rows (EGA access committees, not datasets) and the harvester now skips them. Corpus: 888,335 datasets, vectors aligned.
+- Ripple removed (17 Oct, on request): the hover ends when the comet spirals back into the dot and the dot settles slightly larger. Checked by frame capture; tsc and eslint pass.
+- Haiku efficiency (17 Oct, later), measured on fresh questions: triage answers by number with thinking off (about 2 s, was 6–7 s); screen keeps medium effort with the reason written first, in batches of 4 (about 7 s, was 9–10 s); sample records prefetch during the screen and all label calls run at once (about 11 s for 29 datasets, was 11–27 s); `ncbi_get` paces every thread to 9 requests/s. A warm search takes about 22–28 s (was 40–55 s). Rejected: merging triage and screen into one pass without written reasons (inconsistent checks: a Parkinson's study scored top match with "other" topic), and thinking off for the screen (passed healthy kidney atlases for a DKD question). Per-search cost is about $0.02–0.03 at Haiku 5.5 rates.
+- ENA papers: `enrich_ena.py` (bioproject_pubmed filter → elink → esummary) linked 26,667 ENA projects; the 220 linked to more than 3 papers (umbrella projects) were cleared and are now skipped, leaving 26,447.
+
+## Done (compare two datasets, 17 Oct)
+- Design: `docs/plans/2026-10-17-compare-design.md`. Verdicts: pool ("Can be analysed together"), effects ("Compare results, not samples"), no ("Not comparable"), unclear ("Not enough information"). Code computes the verdict from a facet registry (`omics_agent/compare.py`); Haiku only classifies the two contrasts (same, related, differs) with quotes that must appear in the labels. Required facets: organism (pool), layer, technology (pool), both groups in each, contrast. Cautions: platform, material, tissue, genome build, group sizes (flag under 3).
+- Backend: `compare.py` (pure), `agent.compare_datasets` (looks up both, refuses a same-paper pair, labels, judges the contrast once per pair in accession order, cached), `POST /compare` (accession pattern-checked; 404 unknown, 422 same paper or bad input), MCP tool `compare_datasets`. `samples.geo_records` also keeps platform, instrument, library selection and source, genome build (geo_samples unchanged over 846 cached series).
+- Frontend: `web/components/compare.tsx` (gutter connector from both checkboxes to a sticky Compare button at >=1056 px; native dialog with verdict, facet table, steps; loading, error with the server's reason, retry). Selection bar shows Compare for any two rows not from the same paper.
+- Evidence: real pairs in `docs/evidence/compare/` (pool GSE36892/GSE167324, effects GSE36892/GSE35469 and GSE36892/GSE138417 on shared RNA-seq, no GSE36892/GSE129816 and GSE36892/PXD001357, unclear GSE36892/E-MTAB-10689); user's pair GSE213001/GSE124685 gives effects (related contrast) in 3.8 s through the web proxy. End to end in the browser against the real API (`/tmp/locus-cdp/e2e-compare.mjs`): Compare appears, dialog answers in 0.5 s (cached); a same-paper study selection shows no Compare.
+- Fixed: the port 8000 API predated `/compare` (route list had only /search and /samplesheet), so the dialog said "could not be made"; restarted it. Reviewed both delegates' diffs; fixed in review: unclear verdict, set-valued layers, model reason naming "dataset 1", related contrast reading as agreement, wasted label call on a missing accession, ResizeObserver re-subscribing every render, duplicate Compare for screen readers.
+- Not committed.
+- Strands dialog (17 Oct, chosen over a "clarity" layout after a side-by-side prototype on real data): each dataset is one strand down the facets, joined where the datasets agree, close where related, apart where they differ; ringed ink dots mark a difference that decides the verdict, hollow dashed dots mark a fact not stated; case/control bars on the groups row; the strands end at the verdict pill, joined for pool. Desktop grid label | A | lane | B; on phones the label sits above A so the lines never cross text. Strands draw down over 0.9 s and knots appear as the line reaches them; reduced motion shows them still. Cautions keep their note as a hover title; deciding facets show it under B.
+- Checked against the real API at 1280 px and 390 px, including a mid-draw frame (`PAIR=GSE36892,GSE35469 node /tmp/locus-cdp/e2e-compare.mjs ...`). Fixed on the way: a note placed above its value on phones.
+- Compare (17 Oct, later): contrast row shows each dataset's plain-language contrast (`Profile.contrast_name`, display only; raw labels stay the evidence); "Next" steps removed from the dialog (still in API/MCP); rows neither dataset states are hidden; group sizes moved into numbered bars (row only returns for a group under 3). New deterministic facets: Shared samples (GSM overlap; any overlap makes the verdict "no"), Data available (raw reads / processed files from `samples.geo_files` / controlled access), Women in each group (flagged when case and control differ by more than 20 points); a Sample records link per dataset. Self-checks: `uv run python -m omics_agent.compare`. Real pair GSE213001 vs GSE38958: sex flagged (cases 17% vs controls 40% female in GSE38958).
+
+## Done (PRIDE method tags, 17 Oct)
+- `omics_agent/methods.py`: imports PRIDE Map's tags (github.com/FlynnLachendro/pridemap, MIT; shards cached in `data/pridemap/`) into a new `methods` table: 41,361 tag sets, 98% of locus's 42,111 PRIDE rows. Rerun: `uv run python -c "from omics_agent import methods; print(methods.import_tags())"` (28 s, rebuilds FTS, idempotent). Trust rule: a tag is a fact only if its source is PRIDE metadata or the paper and confidence >= 0.5 (about 96% of tag sets come from DeepSeek V4.1 Flash); other tags show as "probably" and never decide anything.
+- Search: trusted method, tissue and disease words appended to each PRIDE row's modality after " | " (41,345 rows), so FTS finds methods ("DIA phosphoproteome liver"). Embeddings not updated (needs the paid endpoint).
+- Grading: PRIDE rows load with tag facts (`index.load`); `_apply_facts` sets data_type from `methods.meets`, which treats the plan's assays as alternatives. Live liver phosphoproteomics search: 6 PRIDE phospho datasets now "usable as is"; trusted "no enrichment" datasets are close matches. Bug caught live: the first version required all alternatives at once and failed TMT phospho studies.
+- Ready-made results: `sources.pride_files` + `GET /files/{PXD}` (cached file lists; protein table, sample design, search output; raw count and size). Shown in the expanded PRIDE row.
+- Partners: `agent.add_partners` links each result with a tissue to up to 3 datasets of the other layer on the same topic, species and tissue (PRIDE tags for protein side; tissue named in the GEO/ArrayExpress/ENA/CELLxGENE text for gene side). mTOR search: 9 results with partners; liver phospho search: 21.
+- Compare: PRIDE profiles from trusted tags (layer from enrichment, e.g. phosphoproteome; technology = labelling + acquisition; platform = instrument). PRIDE pairs give real facets; verdict is "not enough information" when both are the same layer, because PRIDE has no counted groups.
+- UI (`web/components/row-details.tsx`): "How it was run" chips (untrusted dashed with "?"), "Ready-made results", "Protein/Gene data on the same tissue", and a partner count in the collapsed row. Checked live at 1280 px on two real searches.
+- Not done: other ProteomeXchange repos (iProX, jPOST, MassIVE) have no tags; MCP tools do not expose methods/files/partners yet.
+- Compare dialog fits a laptop screen without scrolling (694 px at a 900 px viewport, measured): tighter rows, one-line labels (`SHORT` in compare.tsx), close button overlaid, two-line titles, file chips without the accession prefix (2 shown, "+N" opens the GEO page), group bars without the redundant "cases and controls" text, and a short fallback contrast note instead of repeating both names.
+- Metadata enrichment (17 Oct, later): `store.metadata` table (`put_metadata`, `metadata`, `METADATA_KEYS`). Three Sonnet 5.5 jobs running: `enrich_proteomics.py` (PRIDE offline from data/pride_pages; MassIVE/ProteomeCentral PROXI), `enrich_misc.py` (MetaboLights, NODE, LINCS, EVA, ExpressionAtlas), `enrich_controlled.py` (EGA, dbGaP). Each writes changed accessions to data/enriched_*.txt; after they finish: re-embed with `embed --redo`, rebuild FTS, restart API, then make compare.build_profile read store.metadata for non-GEO rows (coordinate with the session that owns compare/PRIDE methods).
+- Compare metadata fallback (agreed with the session that owns PRIDE methods): trusted PRIDE Map tags stay first (`_tagged(facts)` in build_profile); store.metadata only fills values still None; never map diseases into Profile.contrast and never let sample_count satisfy "both groups in each" (a disease list or total count is not a case/control split); a separate caution facet for disease is fine. After the enrichment jobs: run `uv run python -c "from omics_agent import methods; print(methods.import_tags())"` (re-appends PRIDE method words after " | " and rebuilds FTS), then re-embed changed rows.
