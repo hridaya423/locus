@@ -17,7 +17,8 @@ export type Hit = {
   fit: "strong" | "partial"; checks: Record<"topic" | "patient_material" | "data_type" | "controls", Check>;
   reason: string; evidence: string; paper: Paper | null; download_plan: string; partners?: Partner[];
 };
-export type Result = { question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][] };
+export type AnswerItem = { accession: string; title: string; source: string; kind: "matched" | "cohort" | "ready"; fact: string; anchor: string };
+export type Result = { question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][]; answer?: AnswerItem[] };
 export type Stage =
   | { stage: "plan"; data: Plan }
   | { stage: "candidates"; data: { count: number } }
