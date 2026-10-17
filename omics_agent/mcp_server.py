@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, assay, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, index, qc  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -106,6 +106,14 @@ def classify_assays(accession: str) -> dict:
     it came from; for GEO footprint studies it lists which samples are which library, how the authors labelled them,
     and the methods sentence saying where matched RNA-seq and Ribo-seq samples were split."""
     return assay.classify(accession) or {"accession": accession, "error": "not in the index"}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def sample_qc(accession: str) -> dict:
+    """Quality from the records: reads and bases per sample from the ENA run table, grouped by library type, with
+    samples far from their group's median flagged; and the authors' own QC criteria (trimming, length selection, rRNA
+    filtering, thresholds) quoted from the record's processing text and the paper's open-access methods, with fields."""
+    return qc.sample_qc(accession)
 
 
 @mcp.tool(annotations=READ_ONLY)
