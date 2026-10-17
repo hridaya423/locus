@@ -16,6 +16,7 @@ const STEPS: Record<(typeof PROCESS_STAGES)[number], string> = {
   quantify: "Quantifying with salmon",
   count: "Gene counts: counts.tsv and one .count file per sample",
   test: "DESeq2 with apeglm shrinkage, PCA, volcano and MA plots",
+  explain: "The model writes a paragraph from the numbers; code checks every number",
   done: "Done",
 };
 
@@ -152,6 +153,13 @@ function Results({ accession, result }: { accession: string; result: ProcessResu
         <Genes accession={accession} file="volcano.json" title="Volcano" x="log2fc" y="neglog10p" xLabel="log2 fold change" yLabel="-log10 p" />
         <Genes accession={accession} file="ma.json" title="MA" x="log10_mean" y="log2fc" xLabel="log10 mean count" yLabel="log2 fold change" zero />
       </div>
+      {(result.explanation || result.note) && (
+        <div className="grid gap-1 border-l-2 border-rule pl-3">
+          <span className="label text-muted-foreground">{result.explanation ? "Written by the model from the numbers above" : "No explanation"}</span>
+          <p className="text-[13px] leading-relaxed">{result.explanation ?? result.note}</p>
+          {result.explanation && <span className="text-[11px] text-muted-foreground">{result.note}</span>}
+        </div>
+      )}
       <div className="grid gap-1.5">
         <span className="label text-muted-foreground">Top genes by adjusted p-value ({c.target} vs {c.reference}, apeglm shrinkage)</span>
         <table className="w-full text-[12.5px]">

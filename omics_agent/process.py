@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import samples, samplesheet, store
+from . import explain, samples, samplesheet, store
 
 ENV = "omics-rnaseq"
 TIER = "laptop"
@@ -33,10 +33,10 @@ GENCODE = {
     "Homo sapiens": ("human-46", "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_46/gencode.v46.transcripts.fa.gz"),
     "Mus musculus": ("mouse-M35", "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M35/gencode.vM35.transcripts.fa.gz"),
 }
-STAGES = ["plan", "reference", "fetch", "quantify", "count", "test", "done"]
+STAGES = ["plan", "reference", "fetch", "quantify", "count", "test", "explain", "done"]
 R_SCRIPT = Path(__file__).with_name("deseq2.R")
 SMALL_FILES = ["counts.tsv", "deseq2_results.tsv", "normalized_counts.tsv", "top_genes.tsv", "pca.json", "volcano.json", "ma.json",
-               "pca.png", "volcano.png", "ma.png", "deseq2_summary.json", "manifest.json", "result.json", "samples.tsv"]
+               "pca.png", "volcano.png", "ma.png", "deseq2_summary.json", "manifest.json", "result.json", "samples.tsv", "explanation.md"]
 
 
 def ref_dir() -> Path:
@@ -248,13 +248,14 @@ def top_genes(results_tsv: Path, n: int = 20) -> list[dict]:
 
 # ---------------------------------------------------------------- run
 
-def run(accession: str, topic: str = "", reads: int = READS, threads: int = THREADS, labels_for=None, progress=lambda stage, data: None) -> dict:
-    """The whole pipeline for one series. `labels_for(topic, accession, summary)` supplies the case/control labels
-    (agent.geo_labels in the app). Calls `progress(stage, data)` at each stage and returns the result summary, which is
-    also written to result.json next to the outputs."""
+def run(accession: str, topic: str = "", reads: int = READS, threads: int = THREADS, labels_for=None, ask=None, progress=lambda stage, data: None) -> dict:
+    """The whole pipeline for one series. `labels_for(topic, accession, summary)` supplies the case/control labels and
+    `ask(prompt, schema)` the model's explanation (agent.geo_labels and agent._ask in the app). Calls `progress(stage,
+    data)` at each stage and returns the result summary, which is also written to result.json next to the outputs."""
     from . import agent
 
     labels_for = labels_for or agent.geo_labels
+    ask = ask or (lambda prompt, schema: agent._ask(prompt, schema, effort="low", max_tokens=1500))
     started = datetime.now(timezone.utc)
     out = out_dir(accession)
     out.mkdir(parents=True, exist_ok=True)
@@ -328,6 +329,13 @@ def run(accession: str, topic: str = "", reads: int = READS, threads: int = THRE
             "pca": summary["pca"], "top_genes": top, "files": files_of(out), "seconds": manifest["seconds"], "reads_per_fastq": reads,
             "reference": manifest["reference"], "tools": manifest["tools"],
         }
+        stage("explain")
+        series = samples.geo_series(accession)
+        result.update(explain.explain(result, series["title"], " ".join(filter(None, (series["summary"], series["design"]))), ask))
+        log(f"  {result['note']}")
+        if result.get("rejected"):
+            log(f"  rejected paragraph: {result['rejected']}")
+        (out / "explanation.md").write_text(f"# {accession}: {series['title']}\n\n{result['explanation'] or '(no explanation)'}\n\n*{result['note']}*\n")
         (out / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         stage("done", result)
         return result
@@ -361,6 +369,7 @@ def summary_lines(result: dict) -> list[str]:
         f"genes: {result['genes']} counted, {result['genes_tested']} tested, {result['significant']} with padj < 0.05 ({result['up']} up, {result['down']} down)",
         "PCA means: " + "; ".join(f"{k} PC1 {v['PC1']} PC2 {v['PC2']}" for k, v in result["pca"]["means"].items()) + f"  (variance {result['pca']['variance'][0]}% / {result['pca']['variance'][1]}%)",
         "top genes: " + ", ".join(f"{g['gene_name'] or g['gene_id']} ({g['log2fc']:+.2f})" for g in result["top_genes"][:10]),
+        *(["explanation (written by the model from the numbers above, every number checked): " + result["explanation"]] if result.get("explanation") else [f"no explanation: {result.get('note', '')}"]),
         "files:",
         *(f"  {f['bytes']:>12,}  {f['name']}" for f in result["files"]),
     ]

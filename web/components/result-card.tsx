@@ -119,6 +119,20 @@ function Libraries({ libraries, matched }: { libraries: NonNullable<Facts["libra
   );
 }
 
+// Proteomics counts from an SDRF table: individuals, samples and runs are different things, so each is named, and a
+// table without an individual column says "unknown" rather than passing the sample count off as patients.
+function Grains({ facts }: { facts: Facts }) {
+  const individuals = facts.individuals === null || facts.individuals === undefined ? "unknown" : facts.individuals;
+  const samples = facts.source.split(" ")[0];
+  const labels = Object.keys(facts.labels ?? {});
+  return (
+    <span className="label text-muted-foreground" title="Counted from the curated SDRF sample table (bigbio/sdrf-annotated-datasets)">
+      {individuals} individuals{SEP}{samples} samples{SEP}{facts.runs} runs{labels.length > 0 && `${SEP}${labels.join(", ")}`}
+      {!!facts.excluded_pooled && `${SEP}${facts.excluded_pooled} pooled left out`}
+    </span>
+  );
+}
+
 // A native checkbox, restyled: the box fills with ink and the tick draws itself in.
 export function Checkbox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string }) {
   return (
@@ -255,6 +269,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
               </span>
             )}
             {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
+            {facts?.grain && <Grains facts={facts} />}
           </button>
           {!!hit.partners?.length && (
             <button

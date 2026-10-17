@@ -5,6 +5,9 @@ export type Facts = {
   case: number | null; control: number | null; mixed?: number; has_control: boolean | null;
   sample_type: string; tissue: string; source: string; assays?: string[]; library?: Record<string, number>;
   libraries?: Record<string, Partial<Record<"case" | "control" | "mixed" | "other", number>>>;
+  // SDRF-derived proteomics facts: counts at sample grain, with individuals and runs kept apart.
+  grain?: "samples"; individuals?: number | null; individuals_by_group?: Partial<Record<"case" | "control", number>>; runs?: number; excluded_pooled?: number;
+  labels?: Record<string, Partial<Record<"case" | "control" | "mixed" | "other", number>>>;
   methods?: Record<string, { value: string; label: string; evidence: string; trusted: boolean }>;
 };
 export type Partner = { accession: string; source: string; title: string; url: string; organism: string; assay: string; tissue: string };
@@ -97,7 +100,7 @@ export const SAMPLE_TYPE: Record<string, string> = {
 };
 
 // The laptop-tier processing job: subsampled reads -> salmon -> counts -> DESeq2 -> plots, run by the API in the background.
-export const PROCESS_STAGES = ["plan", "reference", "fetch", "quantify", "count", "test", "done"] as const;
+export const PROCESS_STAGES = ["plan", "reference", "fetch", "quantify", "count", "test", "explain", "done"] as const;
 export type ProcessStage = (typeof PROCESS_STAGES)[number] | "error";
 export type ProcessSample = { gsm: string; title: string; srx: string; run: string; fastq: string[]; condition: string; reads?: number; mapped?: number; mapping_rate?: number; library_type?: string };
 export type TopGene = { gene_id: string; gene_name: string; base_mean: number; log2fc: number; padj: number };
@@ -108,6 +111,7 @@ export type ProcessResult = {
   pca: { variance: [number, number]; means: Record<string, { PC1: number; PC2: number }> };
   top_genes: TopGene[]; files: { name: string; bytes: number }[]; seconds: number; reads_per_fastq: number;
   reference: { source: string; release: string; url: string; index: string }; tools: Record<string, string>;
+  explanation?: string | null; note?: string;
 };
 export type ProcessStatus = {
   accession: string; stage: ProcessStage | null; log: string[]; stages: Record<string, { count?: number; done?: number }>;

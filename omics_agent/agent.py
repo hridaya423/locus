@@ -9,7 +9,7 @@ from pathlib import Path
 import anthropic
 import httpx
 
-from . import compare, index, methods, samples, samplesheet, store
+from . import compare, index, methods, samples, samplesheet, sdrf, store
 from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
 PLANNER = "claude-sonnet-5-5"
@@ -141,13 +141,13 @@ LOCAL_LLM_MODEL = os.environ.get("LOCAL_LLM_MODEL", "")
 LOCAL_LLM_THINK = os.environ.get("LOCAL_LLM_THINK") == "1"
 
 
-def _ask_local(prompt: str, schema: dict, cached: str, think: bool) -> dict:
+def _ask_local(prompt: str, schema: dict, cached: str, think: bool, max_tokens: int) -> dict:
     """The same contract as `_ask`, on a local model; the server constrains decoding to the JSON schema."""
     response = httpx.post(
         f"{LOCAL_LLM_URL}/chat/completions",
         json={
             "model": LOCAL_LLM_MODEL,
-            "max_tokens": 16000,
+            "max_tokens": max_tokens,
             "temperature": 0,
             "messages": [{"role": "user", "content": "\n\n".join(filter(None, (cached, prompt)))}],
             "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema}},
@@ -162,16 +162,17 @@ def _ask_local(prompt: str, schema: dict, cached: str, think: bool) -> dict:
     return json.loads(choice["message"]["content"])
 
 
-def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: str = "", think: bool = True) -> dict:
+def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: str = "", think: bool = True, max_tokens: int = 16000) -> dict:
     """`cached` is a fixed prompt prefix, cached across calls so only the varying part is billed in full.
-    `think=False` skips the thinking pass, for coarse scoring where speed matters more than reasoning."""
+    `think=False` skips the thinking pass, for coarse scoring where speed matters more than reasoning.
+    `max_tokens` bounds the answer; a short paragraph needs far fewer than the default."""
     if LOCAL_LLM_URL:
-        return _ask_local(prompt, schema, cached, think)
+        return _ask_local(prompt, schema, cached, think, max_tokens)
     # Sonnet can route a safety decline to a fallback model; Haiku has no server-side fallback.
     fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if model == PLANNER else {}
     response = client.beta.messages.create(
         model=model,
-        max_tokens=16000,
+        max_tokens=max_tokens,
         output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
         messages=[{"role": "user", "content": [
             *([{"type": "text", "text": cached, "cache_control": {"type": "ephemeral"}}] if cached else []),
@@ -399,14 +400,29 @@ def prefetch(pool: list[Dataset]) -> None:
     workers.shutdown(wait=False)
 
 
+def _sdrf_facts(topic: str, dataset: Dataset) -> None:
+    """Sample-level counts for a proteomics project from its curated SDRF, when the corpus has one. The model only
+    labels which field marks case and control (cached per topic); the counts, grains and pooled exclusions are code."""
+    table = sdrf.sdrf_for(dataset.accession)
+    if not table or not (fields := sdrf.sdrf_fields(table)):
+        return
+    key = f"sdrf labels {_label_key(topic)}"
+    if not (labels := store.cached_facts(dataset.accession, key)):
+        labels = _ask(samples.label_prompt(topic, dataset.accession, fields, dataset.text[:2000]), samples.LABEL_SCHEMA, effort="low")
+        store.cache_facts(dataset.accession, key, labels)
+    dataset.facts = sdrf.count(table, samples.resolve_labels(labels, fields), "SDRF samples (bigbio/sdrf-annotated-datasets)")
+
+
 def add_facts(search_plan: dict, candidates: list[Dataset]) -> None:
     topic = ", ".join(search_plan["terms"])
     geo = [d for d in candidates if d.source == "GEO"][:MAX_FACTS]
+    pride = [d for d in candidates if d.source == "PRIDE"][:MAX_FACTS]
     with ThreadPoolExecutor(max_workers=10) as workers:
         list(workers.map(_fetch_samples, geo))
     # Fetching is rate-limited; labelling is not, so every labelling call runs at once.
-    with ThreadPoolExecutor(max_workers=len(geo) or 1) as workers:
+    with ThreadPoolExecutor(max_workers=len(geo) + len(pride) or 1) as workers:
         list(workers.map(lambda d: _geo_facts(topic, d), geo))
+        list(workers.map(lambda d: _sdrf_facts(topic, d), pride))
 
 
 TRIAGE_PROMPT = """Research question:

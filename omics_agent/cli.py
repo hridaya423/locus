@@ -14,6 +14,9 @@ def describe(facts: dict) -> str:
         parts.append(f"case {facts['case']} · control {facts['control']}")
         if facts.get("mixed"):
             parts.append(f"mixed pools {facts['mixed']}")
+    if facts.get("grain"):
+        individuals = "unknown" if facts["individuals"] is None else facts["individuals"]
+        parts.append(f"{individuals} individuals / {facts['source'].split()[0]} samples / {facts['runs']} runs" + (f" · {facts['excluded_pooled']} pooled left out" if facts["excluded_pooled"] else ""))
     elif facts["has_control"] is not None:
         parts.append("has controls" if facts["has_control"] else "no controls")
     return " · ".join(p for p in parts if p) + f"  (from {facts['source']})"
@@ -39,6 +42,7 @@ def process_main(argv: list[str]) -> None:
         "quantify": "quantifying with salmon",
         "count": "counting: tximport, counts.tsv and .count files",
         "test": "testing: DESeq2 with apeglm, PCA, volcano and MA plots",
+        "explain": "explaining: the model writes a paragraph from the numbers; code checks every number",
     }
 
     announced: set[str] = set()
