@@ -199,7 +199,17 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - Harness: `node scripts/harness.mjs [--only 3] [--pages] [--out DIR]` (8 questions → top 3 dataset pages + one sample page each, screenshots at 1280/390, console errors, overflow, timings).
 - Door audit: `node scripts/doors.mjs [--seed 1] [--out DIR]` (30 random datasets, one per repository first; outbound links and values that open nothing).
 - Harness baseline (23:10): all 8 questions return results (11–44 rows; warm searches 2–25 s); 36 pages, 2 with a problem (/design 500 on GSE179525, GSE149204); median page load 0.6 s; top datasets q1 GSE250593 GSE132703 GSE241588 · q2 GSE108778 GSE179525 GSE149204 · q3 GSE86618 GSE94555 GSE286182 · q4 PXD047213 PXD013934 PXD025836 · q5 ST003390 MTBLS352 ST000383 · q6 PRJEB39707 PRJEB44790 PRJNA481243 · q7 MSV000083560 PXD062418 MSV000097408 · q8 PXD010450 PXD062985 PXD015748. Results: /tmp/locus-night/harness/baseline/.
+- Assistant bar (00:05): Opus 5.5 + web search answered all 8 harness questions, $3.91 of the $5 cap (`scripts/assistant_bar.py`, answers in /tmp/locus-night/assistant/). Haiku spend: harness searches were cached; not metered separately.
 - `dataset.tsx` split into `page-kit.tsx`, `sample-table.tsx`, `files.tsx`, `aside.tsx` so parallel builders never share a file.
+
+### Pieces in flight (00:05)
+- A samples filter each other — builder t3/a92a90b9, critic A: FIX (summary line, zero-sample CSV, cap message, focus, truncation, not-stated counts); fix round running.
+- B file preview — t3/d788bbfb, critic B: FIX (preview only where it works, space/comment/quoted tables, mapping honesty, 390 px, list_files tool); fix round running.
+- C paste anything + paper page + mic — t3/7a65981b, critic C: FIX (URLs, SRP/BioProject, punctuation, numeric guard, ENCODE crash, deposited vs reused, sizes, pmid:1, mic state); fix round running.
+- D assays from the methods (lead) — feat/assay, critic D: FIX (36 RPF typed TIS in GSE157490, false positives); round 2 committed 25608cf, critic D2 running.
+- E table + first look + paper genes + gene everywhere (lead) — feat/first-look, critic E running (round started before gene-everywhere commit 389b95b).
+- F quality from the records (lead) — feat/qc 938deca, critic F running.
+- G why it matched — builder running.
 
 ### Moments
 (one line each: source · page · dataset · moment)
