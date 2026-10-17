@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, table, volcano  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -96,6 +96,31 @@ def get_methods(accession: str) -> dict:
     if not d or not d.papers:
         return {"accession": accession, "available": False, "reason": "no linked paper"}
     return {"accession": accession} | paper_methods(d.papers[0])
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_table(accession: str) -> dict:
+    """The finished, processed counts table locus can hand over for a GEO RNA-seq series (NCBI-generated raw counts,
+    one pipeline for all of GEO): genes, samples, total reads, genome build, source URL and checksum. The zip with
+    counts.tsv, samples.tsv, features.tsv and manifest.json is served at /table/<accession>/download by the locus API."""
+    return table.summary(accession)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25) -> dict:
+    """A first differential-expression look at a GEO RNA-seq series from its fetched counts: genes up and down between
+    two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
+    the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes and the
+    top genes each way with log2 fold change, -log10 p and BH q. A screen, not DESeq2."""
+    result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
+    if not result.get("available"):
+        return result
+    genes = result.pop("genes")
+    result.pop("groups")
+    columns = ["gene", "log2_fold_change", "minus_log10_p", "q"]
+    result["top_up"] = [dict(zip(columns, g)) for g in genes if g[1] > 0][:top]
+    result["top_down"] = [dict(zip(columns, g)) for g in genes if g[1] < 0][:top]
+    return result
 
 
 @mcp.tool(annotations=READ_ONLY)

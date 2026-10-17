@@ -6,14 +6,14 @@ from dataclasses import asdict
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -82,6 +82,27 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
 def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
     return design.design(accession, source) or {}
+
+
+@app.get("/table/{accession}")
+def processed_table(accession: str = Path(pattern=r"^GSE\d+$")) -> dict:
+    """Whether locus can hand over the finished counts table for a GEO series, its size and its source."""
+    return table.summary(accession)
+
+
+@app.get("/table/{accession}/download")
+def processed_table_zip(accession: str = Path(pattern=r"^GSE\d+$")) -> Response:
+    """counts, sample metadata, gene annotation and a manifest, as one zip."""
+    if not table.summary(accession)["available"]:
+        raise HTTPException(404, f"No processed table for {accession}.")
+    return Response(table.bundle(accession), media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{accession}_locus_table.zip"'})
+
+
+@app.get("/first-look/{accession}")
+def first_look(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+               control: Annotated[list[str] | None, Query()] = None) -> dict:
+    """Each gene's change between two sample groups and its significance, from the fetched counts; the method is in the result."""
+    return volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
 
 
 @app.get("/record/{accession}")

@@ -11,6 +11,7 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { SampleTable } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
+import { FirstLookSection } from "@/components/first-look";
 import { dataType } from "@/components/result-card";
 import { datasetRecord, found, repositoryName, type DatasetRecord, type Found, type Hit } from "@/lib/api";
 
@@ -139,6 +140,7 @@ function Body({ rec }: { rec: DatasetRecord }) {
       <div className="grid min-w-0 content-start gap-16">
         <About rec={rec} />
         <Samples rec={rec} />
+        {rec.source === "GEO" && <FirstLookSection accession={rec.accession} />}
         <Files rec={rec} />
       </div>
       <Aside rec={rec} />

@@ -160,3 +160,30 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
   return res.json();
 }
+
+export type TableSummary = { accession: string; available: boolean; reason?: string; genes?: number; samples?: number; reads?: number; organism?: string;
+  source?: { url: string; file: string; build: string; pipeline: string; sha256: string; bytes: number } };
+export type Gene = [symbol: string, lfc: number, minusLog10P: number, q: number];
+export type FirstLook = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
+  tested: number; method: string; q: number; lfc: number; up: number; down: number; genes: Gene[]; source: NonNullable<TableSummary["source"]>;
+  groups: { factors: { name: string; levels: Record<string, number> }[]; default: { factor: string; case: string[]; control: string[] } | null } };
+
+export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
+  const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export const tableDownload = (accession: string) => `${API}/table/${encodeURIComponent(accession)}/download`;
+
+export async function firstLook(accession: string, pick: { factor: string; case: string[]; control: string[] } | null, signal?: AbortSignal): Promise<FirstLook> {
+  const q = new URLSearchParams();
+  if (pick) {
+    q.set("factor", pick.factor);
+    pick.case.forEach((c) => q.append("case", c));
+    pick.control.forEach((c) => q.append("control", c));
+  }
+  const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
