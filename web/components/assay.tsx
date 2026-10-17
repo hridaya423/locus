@@ -4,9 +4,9 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK } from "@/components/page-kit";
-import { assays as fetchAssays, samplePath, type Assay, type Assays, type Evidence } from "@/lib/api";
+import { assays as fetchAssays, samplePath, type Assay, type Assays, type Evidence, type LibraryRow } from "@/lib/api";
 
-const SAMPLES_SHOWN = 24;
+const SAMPLES_SHOWN = 8;
 
 function Marked({ text, term }: { text: string; term?: string }) {
   const at = term ? text.toLowerCase().indexOf(term.toLowerCase()) : -1;
@@ -36,8 +36,29 @@ function Quote({ dataset, evidence }: { dataset: string; evidence: Evidence }) {
   );
 }
 
-function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
+function LibraryRows({ dataset, rows }: { dataset: string; rows: LibraryRow[] }) {
   const [all, setAll] = useState(false);
+  return (
+    <div className="grid gap-1 pb-3">
+      <ul className="grid text-[12.5px]">
+        {(all ? rows : rows.slice(0, SAMPLES_SHOWN)).map((r) => (
+          <li key={r.sample} className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-3 border-b border-rule/50 py-1 last:border-b-0 sm:grid-cols-[6.5rem_minmax(0,1fr)_minmax(0,16rem)]">
+            <Link href={samplePath(dataset, r.sample)} className={cn("font-mono text-[12px]", LINK)}>{r.sample}</Link>
+            <span className="truncate" title={r.title}>{r.title}</span>
+            <span className="truncate text-muted-foreground max-sm:col-start-2" title={r.why}>{r.why}</span>
+          </li>
+        ))}
+      </ul>
+      {rows.length > SAMPLES_SHOWN && (
+        <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[12.5px] text-muted-foreground", LINK)}>
+          {all ? "Fewer" : `All ${rows.length}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
   const samples = assay.samples ?? [];
   const labels = Object.entries(assay.labels ?? {});
   return (
@@ -61,33 +82,36 @@ function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
           {assay.evidence.map((e) => <Quote key={e.text} dataset={dataset} evidence={e} />)}
           {labels.length > 0 && assay.mislabelled === 0 && (
             <p className="text-[12.5px] text-muted-foreground">
-              Author label: {labels.map(([label, n]) => `${label} (${n})`).join(", ")}
+              Library type in the record: {labels.map(([label, n]) => `${label} (${n})`).join(", ")}
             </p>
           )}
-          {samples.length > 0 && (
-            <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[12px]">
-              {(all ? samples : samples.slice(0, SAMPLES_SHOWN)).map((g) => <Link key={g} href={samplePath(dataset, g)} className={LINK}>{g}</Link>)}
-              {samples.length > SAMPLES_SHOWN && (
-                <button type="button" onClick={() => setAll((v) => !v)} className={cn("text-muted-foreground", LINK)}>
-                  {all ? "fewer" : `+${samples.length - SAMPLES_SHOWN}`}
-                </button>
-              )}
-            </p>
-          )}
+          {assay.library_rows && <LibraryRows dataset={dataset} rows={assay.library_rows} />}
         </div>
       </details>
     </li>
   );
 }
 
-export function AssayList({ accession }: { accession: string }) {
-  const [state, setState] = useState<{ data?: Assays; failed?: boolean }>({});
-  useEffect(() => {
-    const ctrl = new AbortController();
-    fetchAssays(accession, ctrl.signal).then((data) => setState({ data }), () => !ctrl.signal.aborted && setState({ failed: true }));
-    return () => ctrl.abort();
-  }, [accession]);
+export type AssayState = { data?: Assays; failed?: boolean; slow?: boolean };
 
+export function useAssays(accession: string, enabled: boolean): AssayState {
+  const [state, setState] = useState<AssayState>({});
+  useEffect(() => {
+    if (!enabled) return;
+    const ctrl = new AbortController();
+    const slow = setTimeout(() => setState((s) => (s.data || s.failed ? s : { slow: true })), 8000);
+    fetchAssays(accession, ctrl.signal).then((data) => setState({ data }), () => !ctrl.signal.aborted && setState({ failed: true }));
+    return () => {
+      clearTimeout(slow);
+      ctrl.abort();
+    };
+  }, [accession, enabled]);
+  return state;
+}
+
+export const assayNames = (data?: Assays) => data?.assays.filter((a) => a.evidence.length || a.samples?.length).map((a) => a.assay.replace(/ \(.*\)$/, "")) ?? [];
+
+export function AssayList({ accession, state }: { accession: string; state: AssayState }) {
   const data = state.data;
   return (
     <section aria-labelledby="measured" className="grid gap-2">
@@ -95,13 +119,22 @@ export function AssayList({ accession }: { accession: string }) {
       {state.failed ? (
         <p className="text-[13px] text-muted-foreground">The methods could not be read.</p>
       ) : !data ? (
-        <p className="text-[13px] text-muted-foreground">Reading the methods…</p>
+        <p className="text-[13px] text-muted-foreground">{state.slow ? "Still reading the methods; a large series takes up to a minute the first time." : "Reading the methods…"}</p>
       ) : data.assays.length === 0 ? (
         <p className="text-[13px] text-muted-foreground">No method is named in the record{data.read_from.length ? ` (${data.read_from.join(", ")})` : ""}.</p>
       ) : (
         <ul className="grid border-t border-rule">
           {data.assays.map((a) => <Row key={a.assay} dataset={accession} assay={a} />)}
         </ul>
+      )}
+      {data && data.unassigned_samples.length > 0 && (
+        <details className="group/u border-b border-rule">
+          <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 py-2.5 text-[14px] [&::-webkit-details-marker]:hidden">
+            <span className="text-muted-foreground">Library type not determined</span>
+            <span className="font-mono text-[12px] tabular text-muted-foreground">{data.unassigned_samples.length} samples</span>
+          </summary>
+          <LibraryRows dataset={accession} rows={data.unassigned_samples} />
+        </details>
       )}
       {data?.split && (
         <div className="grid gap-2 pt-2">

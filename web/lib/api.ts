@@ -162,8 +162,9 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
 }
 
 export type Evidence = { text: string; term?: string; field: string; samples: string[] };
-export type Assay = { assay: string; how: "named" | "inferred"; terms: string[]; evidence: Evidence[]; samples?: string[]; labels?: Record<string, number>; mislabelled: number };
-export type Assays = { accession: string; source: string; assays: Assay[]; unassigned_samples: string[]; split: Evidence | null; read_from: string[] };
+export type LibraryRow = { sample: string; title: string; why: string };
+export type Assay = { assay: string; how: "named" | "inferred"; terms: string[]; evidence: Evidence[]; samples?: string[]; labels?: Record<string, number>; mislabelled: number; library_rows?: LibraryRow[] };
+export type Assays = { accession: string; source: string; assays: Assay[]; unassigned_samples: LibraryRow[]; split: Evidence | null; read_from: string[] };
 
 export async function assays(accession: string, signal?: AbortSignal): Promise<Assays> {
   const res = await fetch(`${API}/assay/${encodeURIComponent(accession)}`, { signal });
