@@ -21,9 +21,11 @@ export async function browser() {
   let id = 0;
   const pending = new Map();
   const errors = [];
+  const listeners = new Set();
   ws.addEventListener("message", (e) => {
     const m = JSON.parse(e.data);
     if (m.id) return pending.get(m.id)?.(m);
+    listeners.forEach((fn) => fn(m));
     if (m.method === "Runtime.exceptionThrown") errors.push(m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text);
     if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") errors.push(m.params.args.map((a) => a.value ?? a.description).join(" "));
     if (m.method === "Log.entryAdded" && m.params.entry.level === "error") errors.push(`${m.params.entry.text} ${m.params.entry.url ?? ""}`.trim());
@@ -40,6 +42,8 @@ export async function browser() {
   const page = {
     errors,
     send,
+    listen: (fn) => listeners.add(fn),
+    unlisten: (fn) => listeners.delete(fn),
     eval: async (expression) => {
       const m = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
       if (m.result?.exceptionDetails) throw new Error(m.result.exceptionDetails.exception?.description ?? m.result.exceptionDetails.text);
