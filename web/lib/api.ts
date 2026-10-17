@@ -163,8 +163,8 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
 
 export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; found_in: string; title?: string };
 
-// An identifier is one or two words (for "PMID: 123"); anything longer is a question and never leaves the browser.
-export const looksLikeIdentifier = (text: string) => text.length <= 120 && text.trim().split(/\s+/).length <= 2;
+// An identifier is one or two words with a digit (for "PMID: 123"); anything else is a question and never leaves the browser.
+export const looksLikeIdentifier = (text: string) => text.length <= 200 && text.trim().split(/\s+/).length <= 2 && /\d/.test(text);
 
 export async function resolve(text: string, signal?: AbortSignal): Promise<Resolved | null> {
   const res = await fetch(`${API}/resolve/${encodeURIComponent(text.trim())}`, { signal });
@@ -172,20 +172,29 @@ export async function resolve(text: string, signal?: AbortSignal): Promise<Resol
   return res.json();
 }
 
+export type PaperDataset = {
+  accession: string; source: string; title: string; modality: string; samples: number | null; url: string; path: string;
+  role: "deposited" | "reused" | "cited";
+};
 export type PaperRecord = {
   pmid: string | null; pmcid: string | null; doi: string | null; path: string;
   title: string; authors: string[]; journal: string; year: string; abstract: [string, string][];
-  data_availability: { status: "stated" | "not_stated" | "no_full_text"; section?: string; text?: string; note?: string };
-  supplementary: { zip: string; files: { name: string; caption: string; bytes: number | null; url: string }[] } | null;
-  datasets: { accession: string; source: string; title: string; modality: string; samples: number | null; url: string; path: string }[];
+  data_availability: {
+    status: "stated" | "not_stated" | "no_full_text" | "unavailable"; section?: string; text?: string; note?: string;
+    accessions: { accession: string; role: "deposited" | "reused" | "named"; in_locus: boolean }[];
+  };
+  supplementary: { zip: string | null; files: { name: string; caption: string; bytes: number | null; url: string }[]; note: string | null };
+  datasets: PaperDataset[]; cited_total: number; dataset_count: number;
   sources: { metadata: string; full_text: string | null; europe_pmc: string | null; doi: string | null };
 };
 
-export async function paperRecord(id: string, signal?: AbortSignal): Promise<PaperRecord> {
-  const res = await fetch(`${API}/paper/${id.split("/").map(encodeURIComponent).join("/")}`, { signal });
+export async function paperRecord(id: string, signal?: AbortSignal, offset = 0): Promise<PaperRecord> {
+  const res = await fetch(`${API}/paper/${id.split("/").map(encodeURIComponent).join("/")}?offset=${offset}`, { signal });
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
   return res.json();
 }
 
 // A record's paper ID ("pmid:…" or "doi:…") is the path of its locus paper page.
 export const paperPath = (id: string) => `/p/${id.replace(/^(pmid|doi):/, "")}`;
+// Harvested records carry placeholder PMIDs such as "pmid:1"; a real one has at least six digits.
+export const isPaperId = (id: string) => !/^pmid:\d{1,5}$/.test(id);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import { paperPath, type DatasetRecord } from "@/lib/api";
+import { isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 
@@ -32,7 +32,8 @@ function AsideSection({ title, children }: { title: string; children: React.Reac
   );
 }
 
-export function Aside({ rec }: { rec: DatasetRecord }) {
+export function Aside({ rec: full }: { rec: DatasetRecord }) {
+  const rec = { ...full, papers: full.papers.filter((p) => !p.id || isPaperId(p.id)) };
   const roles = [...new Set(rec.people.map((p) => p.role))];
   return (
     <aside className="grid content-start gap-10 lg:border-l lg:border-rule lg:pl-8">

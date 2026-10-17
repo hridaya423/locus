@@ -7,10 +7,11 @@ import { Wordmark } from "@/components/logo";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import { dataType } from "@/components/result-card";
-import { paperRecord, repositoryName, type PaperRecord } from "@/lib/api";
+import { paperRecord, repositoryName, type PaperDataset, type PaperRecord } from "@/lib/api";
 
 const AUTHORS_SHOWN = 8;
 const DATASETS_SHOWN = 10;
+const DATASETS_STEP = 25;
 
 export function PaperPage({ id }: { id: string }) {
   const [rec, setRec] = useState<PaperRecord | null>(null);
@@ -52,7 +53,7 @@ export function PaperPage({ id }: { id: string }) {
         <p className="text-sm">Europe PMC has no paper {id}. <Link href={`/?q=${encodeURIComponent(id)}`} className={LINK}>Search instead</Link>.</p>
       ) : error ? (
         <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
-          Europe PMC did not send the paper.
+          {error === "502" ? "Europe PMC did not answer." : "locus could not read this paper."}
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
         </p>
       ) : !rec ? (
@@ -61,7 +62,7 @@ export function PaperPage({ id }: { id: string }) {
         <>
           <Header rec={rec} />
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-16">
-            <Datasets rec={rec} />
+            <Datasets rec={rec} id={id} />
             <Availability rec={rec} />
             <Abstract rec={rec} />
             <Supplementary rec={rec} />
@@ -105,39 +106,103 @@ function Header({ rec }: { rec: PaperRecord }) {
   );
 }
 
-function Datasets({ rec }: { rec: PaperRecord }) {
-  const [all, setAll] = useState(false);
-  const shown = all ? rec.datasets : rec.datasets.slice(0, DATASETS_SHOWN);
+function DatasetRows({ rows }: { rows: PaperDataset[] }) {
+  return (
+    <ul className="grid border-t border-rule">
+      {rows.map((d) => (
+        <li key={d.accession} className="border-b border-rule">
+          <Link href={d.path} className="group/row grid gap-x-6 gap-y-1 py-3.5 sm:grid-cols-[11rem_minmax(0,1fr)_auto]">
+            <span className="grid content-start gap-0.5">
+              <span className="font-mono text-[13px] font-medium underline decoration-transparent underline-offset-4 transition-colors duration-150 group-hover/row:decoration-foreground">{d.accession}</span>
+              <span className="text-[12.5px] text-muted-foreground">{repositoryName(d.source)}</span>
+            </span>
+            <span className="min-w-0 break-words text-[14.5px] leading-snug">{d.title}</span>
+            <span className="text-[12.5px] text-muted-foreground sm:text-right">
+              {dataType(d.modality) || "data type not stated"}
+              <span className="tabular"> · {d.samples ? `${d.samples.toLocaleString()} ${d.samples === 1 ? "sample" : "samples"}` : "samples not stated"}</span>
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+const ROLE_HEADINGS = { deposited: "Deposited by the authors", reused: "Reused from other studies", cited: "Cite this paper" } as const;
+
+function Datasets({ rec, id }: { rec: PaperRecord; id: string }) {
+  const [more, setMore] = useState<PaperDataset[]>([]);
+  const [shown, setShown] = useState(DATASETS_SHOWN);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const all = [...rec.datasets, ...more];
+  const cited = all.filter((d) => d.role === "cited");
+  const left = rec.cited_total - cited.length;
+  const stated = rec.data_availability.status === "stated";
+
+  async function showMore() {
+    setFailed(false);
+    if (shown >= cited.length && left > 0) {
+      setBusy(true);
+      try {
+        const next = await paperRecord(id, undefined, cited.length);
+        setMore((m) => [...m, ...next.datasets]);
+      } catch {
+        setFailed(true);
+        return;
+      } finally {
+        setBusy(false);
+      }
+    }
+    setShown((n) => n + DATASETS_STEP);
+  }
+
   return (
     <section className="grid content-start gap-6">
-      <Heading id="datasets" count={rec.datasets.length || undefined}>Datasets in locus</Heading>
-      {rec.datasets.length === 0 ? (
+      <Heading id="datasets" count={rec.dataset_count ? rec.dataset_count.toLocaleString() : undefined}>Datasets in locus</Heading>
+      {rec.dataset_count === 0 ? (
         <p className="text-[13px] text-muted-foreground">No dataset in locus cites this paper.</p>
       ) : (
-        <ul className="grid border-t border-rule">
-          {shown.map((d) => (
-            <li key={d.accession} className="border-b border-rule">
-              <Link href={d.path} className="group/row grid gap-x-6 gap-y-1 py-3.5 sm:grid-cols-[11rem_minmax(0,1fr)_auto]">
-                <span className="grid content-start gap-0.5">
-                  <span className="font-mono text-[13px] font-medium underline decoration-transparent underline-offset-4 transition-colors duration-150 group-hover/row:decoration-foreground">{d.accession}</span>
-                  <span className="text-[12.5px] text-muted-foreground">{repositoryName(d.source)}</span>
-                </span>
-                <span className="min-w-0 break-words text-[14.5px] leading-snug">{d.title}</span>
-                <span className="text-[12.5px] text-muted-foreground sm:text-right">
-                  {dataType(d.modality) || "data type not stated"}
-                  <span className="tabular"> · {d.samples ? `${d.samples.toLocaleString()} ${d.samples === 1 ? "sample" : "samples"}` : "samples not stated"}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-      {rec.datasets.length > DATASETS_SHOWN && (
-        <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[13px]", MUTED_LINK)}>
-          {all ? "fewer" : `+${rec.datasets.length - DATASETS_SHOWN} more`}
-        </button>
+        (["deposited", "reused", "cited"] as const).map((role) => {
+          const rows = role === "cited" ? cited.slice(0, shown) : all.filter((d) => d.role === role);
+          return rows.length > 0 && (
+            <div key={role} className="grid gap-3">
+              {(stated || role !== "cited") && <h3 className="text-[13px] font-medium">{ROLE_HEADINGS[role]}</h3>}
+              <DatasetRows rows={rows} />
+              {role === "cited" && cited.length > 0 && (rec.cited_total > shown) && (
+                <p className="flex flex-wrap items-baseline gap-x-3 text-[13px]">
+                  <button type="button" disabled={busy} onClick={showMore} className={cn("w-fit", MUTED_LINK)}>
+                    {busy ? "Loading…" : `Show ${Math.min(DATASETS_STEP, rec.cited_total - shown).toLocaleString()} more`}
+                  </button>
+                  <span className="text-muted-foreground tabular">{(rec.cited_total - shown).toLocaleString()} not shown</span>
+                  {failed && <span>locus could not load more.</span>}
+                </p>
+              )}
+            </div>
+          );
+        })
       )}
     </section>
+  );
+}
+
+// The quoted statement with each accession it names linked to its locus page, or marked as not held.
+function Statement({ text, accessions }: { text: string; accessions: PaperRecord["data_availability"]["accessions"] }) {
+  if (accessions.length === 0) return <>{text}</>;
+  const known = new Map(accessions.map((a) => [a.accession, a]));
+  const parts = text.split(new RegExp(`(${[...known.keys()].map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`));
+  return (
+    <>
+      {parts.map((part, i) => {
+        const a = known.get(part);
+        if (!a) return part;
+        return a.in_locus ? (
+          <Link key={i} href={`/d/${encodeURIComponent(a.accession)}`} className={cn("font-mono text-[13.5px]", LINK)}>{part}</Link>
+        ) : (
+          <span key={i}><span className="font-mono text-[13.5px]">{part}</span> <span className="text-[12.5px] text-muted-foreground">(not in locus)</span></span>
+        );
+      })}
+    </>
   );
 }
 
@@ -149,7 +214,7 @@ function Availability({ rec }: { rec: PaperRecord }) {
       {a.status === "stated" ? (
         <figure className="grid max-w-[68ch] gap-3">
           <blockquote className="grid gap-2 [overflow-wrap:anywhere] border-l-2 border-foreground pl-4 text-[15px] leading-relaxed">
-            {a.text?.split("\n").map((line, i) => <p key={i}>{line}</p>)}
+            {a.text?.split("\n").map((line, i) => <p key={i}><Statement text={line} accessions={a.accessions} /></p>)}
           </blockquote>
           <figcaption className="text-[12.5px] text-muted-foreground">{/availab/i.test(a.section ?? "") ? "Quoted" : `${a.section}, quoted`} from the open-access full text at Europe PMC</figcaption>
         </figure>
@@ -184,11 +249,9 @@ function Supplementary({ rec }: { rec: PaperRecord }) {
   const s = rec.supplementary;
   return (
     <section className="grid content-start gap-6">
-      <Heading id="supplementary" count={s?.files.length || undefined}>Supplementary files</Heading>
-      {!s ? (
-        <p className="text-[13px] text-muted-foreground">Europe PMC lists none: the full text is not open access.</p>
-      ) : s.files.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground">The open-access full text lists no supplementary files.</p>
+      <Heading id="supplementary" count={s.files.length || undefined}>Supplementary files</Heading>
+      {s.files.length === 0 ? (
+        <p className="text-[13px] text-muted-foreground">{s.note ? `${s.note[0].toUpperCase()}${s.note.slice(1)}.` : "The open-access full text lists no supplementary files."}</p>
       ) : (
         <>
           <ul className="grid border-t border-rule">
@@ -202,7 +265,7 @@ function Supplementary({ rec }: { rec: PaperRecord }) {
               </li>
             ))}
           </ul>
-          <a href={s.zip} className={cn("w-fit text-[13px]", LINK)}>All files as one zip, from Europe PMC</a>
+          {s.zip && <a href={s.zip} className={cn("w-fit text-[13px]", LINK)}>All files as one zip, from Europe PMC</a>}
         </>
       )}
     </section>

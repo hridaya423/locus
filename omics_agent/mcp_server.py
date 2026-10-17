@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
 from dotenv import load_dotenv
+import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
@@ -130,24 +131,29 @@ def compare_datasets(a: str, b: str, topic: str) -> dict:
 
 @mcp.tool(annotations=READ_ONLY)
 def resolve_id(identifier: str) -> dict:
-    """The locus page for an accession, sample or run, PMID, PMCID or DOI (for example GSE36892, GSM2306940, SRR4216351,
-    PXD012345, E-MTAB-6149, PMID:33331123, 10.15252/msb.20209844). Returns the page path (/d/… for a dataset or sample,
-    /p/… for a paper), the kind of record, and where the match was read. Says so when locus does not have it."""
+    """The locus page for an accession, sample or run, study, PMID, PMCID or DOI, or a link to one (for example GSE36892,
+    GSM2306940, SRR4216351, SRP011987, PXD012345, E-MTAB-6149, PMID:33331123, 10.15252/msb.20209844). Returns the page
+    path (/d/… for a dataset or sample, /p/… for a paper), the kind of record, and where the match was read. A study
+    that came from a GEO series opens that series. Says so when locus does not have it."""
     try:
         return resolve.resolve(identifier) or {"error": f"{identifier} is not an identifier; use search_datasets or find_datasets"}
-    except LookupError as error:
-        return {"error": str(error)}
+    except (LookupError, httpx.HTTPError) as error:
+        return {"error": str(error) if isinstance(error, LookupError) else f"A repository did not answer: {error}"}
 
 
 @mcp.tool(annotations=READ_ONLY)
-def get_paper(id: str) -> dict:
+def get_paper(id: str, dataset_offset: int = 0) -> dict:
     """Facts about one paper from Europe PMC, by PMID, PMCID or DOI: title, authors, journal, year, abstract, the data
-    availability statement quoted from the open-access full text (or why none), supplementary files with sizes and
-    download links, and every locus dataset that cites the paper. `sources` holds the URL each fact came from."""
+    availability statement quoted from the open-access full text (or why none) with each accession in it marked deposited
+    or reused and whether locus holds it, supplementary files with sizes and download links, and the locus datasets of the
+    paper (deposited, reused, or citing it). Datasets that only cite the paper come 100 at a time from `dataset_offset`;
+    `cited_total` counts them. `sources` holds the URL each fact came from. Returns an error object when Europe PMC cannot answer."""
     try:
-        return paper.paper(id)
+        return paper.paper(id, dataset_offset)
     except LookupError as error:
         return {"error": str(error)}
+    except httpx.HTTPError as error:
+        return {"error": f"Europe PMC did not answer: {error}"}
 
 
 def main() -> None:

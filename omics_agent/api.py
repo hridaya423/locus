@@ -6,7 +6,7 @@ from dataclasses import asdict
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 import httpx
@@ -123,10 +123,11 @@ def resolve_identifier(identifier: str) -> dict | None:
 
 
 @app.get("/paper/{identifier:path}")
-def paper_page(identifier: str) -> dict:
-    """A paper's title, authors, abstract, data availability statement, supplementary files and the locus datasets that cite it."""
+def paper_page(identifier: str, offset: int = Query(0, ge=0)) -> dict:
+    """A paper's title, authors, abstract, data availability statement, supplementary files and the locus datasets that cite it,
+    `offset` datasets in."""
     try:
-        return paper.paper(identifier)
+        return paper.paper(identifier, offset)
     except LookupError as error:
         raise HTTPException(404, str(error))
     except httpx.HTTPError:

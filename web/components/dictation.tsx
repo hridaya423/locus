@@ -61,7 +61,7 @@ export function MicButton({ listening, onClick }: { listening: boolean; onClick:
       aria-pressed={listening}
       className={cn(
         "absolute bottom-2 right-[3.25rem] grid size-10 place-items-center rounded-md transition-colors duration-150 active:scale-[0.96]",
-        listening ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        listening ? "border border-foreground bg-card text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
       <Mic aria-hidden className={cn("size-4", listening && "animate-pulse")} strokeWidth={2} />
