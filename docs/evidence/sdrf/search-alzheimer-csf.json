@@ -1,0 +1,1046 @@
+{
+  "question": "proteomics of cerebrospinal fluid from Alzheimer's disease patients and healthy controls",
+  "plan": {
+    "terms": [
+      "Alzheimer disease",
+      "Alzheimer's disease",
+      "AD",
+      "cerebrospinal fluid",
+      "CSF"
+    ],
+    "organism": "Homo sapiens",
+    "assays": [
+      "DIA proteomics",
+      "TMT proteomics",
+      "LC-MS/MS"
+    ],
+    "repositories": [
+      "PRIDE",
+      "MassIVE",
+      "iProX",
+      "jPOST",
+      "PeptideAtlas",
+      "PanoramaPublic"
+    ],
+    "ideal_summary": "Proteomic analysis of cerebrospinal fluid (CSF) samples collected from patients diagnosed with Alzheimer's disease and age-matched healthy controls. The study utilized liquid chromatography-tandem mass spectrometry (LC-MS/MS) to quantify protein abundance differences between the two groups. The primary objective was to identify potential biomarkers for early diagnosis and progression of Alzheimer's disease by comparing the proteome of AD patients against healthy individuals.",
+    "method_notes": [
+      "CSF proteomics is limited by the low concentration of many proteins compared to plasma; depletion of high-abundance proteins (like albumin) is often required to detect low-abundance disease markers.",
+      "Standard bottom-up proteomics identifies peptides but may miss post-translational modifications (PTMs) like phosphorylation, which are critical in AD pathology; targeted PTM-enrichment or top-down approaches would be needed to study these specifically.",
+      "Batch effects between AD and control cohorts can be significant; datasets with internal standards or TMT labeling are preferred for accurate quantification across groups."
+    ],
+    "matched_assays": [],
+    "wants_controls": true,
+    "needs_patient_samples": true,
+    "geo_query": "(\"Alzheimer disease\"[Title] OR \"Alzheimer's disease\"[Title] OR \"AD\"[Title] OR \"Alzheimer\"[Title]) AND (\"cerebrospinal fluid\"[Description] OR \"CSF\"[Description] OR \"cerebrospinal\"[Description]) AND (\"healthy\"[Description] OR \"control\"[Description] OR \"normal\"[Description])",
+    "pride_keywords": [
+      "Alzheimer cerebrospinal fluid proteomics",
+      "CSF proteome Alzheimer disease",
+      "cerebrospinal fluid mass spectrometry AD",
+      "Alzheimer's disease CSF biomarkers"
+    ],
+    "cellxgene_diseases": [
+      "Alzheimer disease"
+    ]
+  },
+  "candidates": 50,
+  "datasets": [
+    {
+      "accession": "PXD064699",
+      "source": "PRIDE",
+      "modality": "Proteomics: Data-dependent acquisition, Bottom-up proteomics",
+      "title": "Down Syndrome and Alzheimer Disease CSF Proteome",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD064699",
+      "papers": [
+        "pmid:40595720",
+        "doi:10.1038/s41467-025-61054-z"
+      ],
+      "facts": null,
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes the protein makeup of spinal fluid from people with Down syndrome and Alzheimer's to see how the disease progresses differently in these groups compared to healthy individuals.",
+      "evidence": "",
+      "paper": {
+        "title": "Proteomic analysis of Down syndrome cerebrospinal fluid compared to late-onset and autosomal dominant Alzheimer\u00b4s disease",
+        "journal": "Nat Commun",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40595720"
+      },
+      "download_plan": "mkdir -p ~/omics-data/PXD064699 && cd ~/omics-data/PXD064699\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD064699 -o ."
+    },
+    {
+      "accession": "PXD057614",
+      "source": "PRIDE",
+      "modality": "Proteomics: Data-independent acquisition",
+      "title": "Human Cerebrospinal Fluid HDL-like proteome from Alzheimer Disease patients",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD057614",
+      "papers": [
+        "pmid:40701521",
+        "doi:10.1016/j.jlr.2025.100865"
+      ],
+      "facts": null,
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research looks at specific cholesterol-carrying particles in the spinal fluid of Alzheimer's patients to understand how they differ from those in healthy people.",
+      "evidence": "analysis of the HDL-like proteome in AD patients and controls",
+      "paper": {
+        "title": "Cerebrospinal fluid lipoprotein-mediated cholesterol delivery to neurons is impaired in Alzheimer's disease and involves APOE4",
+        "journal": "J Lipid Res",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40701521"
+      },
+      "download_plan": "mkdir -p ~/omics-data/PXD057614 && cd ~/omics-data/PXD057614\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD057614 -o ."
+    },
+    {
+      "accession": "PXD014557",
+      "source": "PRIDE",
+      "modality": "Proteomics: Shotgun proteomics",
+      "title": "Microdissected brain tissue Alzheimer's",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD014557",
+      "papers": [
+        "pmid:31699905",
+        "doi:10.1074/mcp.ra119.001737"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain | Hippocampus",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": 40,
+        "individuals_by_group": {},
+        "runs": 400,
+        "excluded_pooled": 0,
+        "labels": {
+          "TMT126 | TMT127C | TMT127N | TMT128C | TMT128N | TMT129C | TMT129N | TMT130C | TMT130N | TMT": {
+            "other": 400
+          }
+        },
+        "source": "40 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study focuses on a specific part of the brain tissue from a small number of subjects, not the spinal fluid of a broader group of patients and controls.",
+      "evidence": "microdissected from five subjects with Alzheimer disease and five non-demented controls",
+      "paper": {
+        "title": "The Proteome of the Dentate Terminal Zone of the Perforant Path Indicates Presynaptic Impairment in Alzheimer Disease",
+        "journal": "Mol Cell Proteomics",
+        "year": "2020",
+        "url": "https://europepmc.org/article/MED/31699905"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD014557 && cd ~/omics-data/PXD014557\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD014557 -o ."
+    },
+    {
+      "accession": "PXD012059",
+      "source": "PRIDE",
+      "modality": "Proteomics: Shotgun proteomics",
+      "title": "Ventriculomics analyses of autopsy AD tissue",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD012059",
+      "papers": [
+        "pmid:32854643",
+        "doi:10.1186/s12883-020-01849-3"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 6,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 6
+          }
+        },
+        "source": "6 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes proteins from the tissue lining the brain's fluid-filled spaces (ventricles) rather than the cerebrospinal fluid itself.",
+      "evidence": "isolated tissue from the walls of the ventricles",
+      "paper": {
+        "title": "Molecular abnormalities in autopsied brain tissue from the inferior horn of the lateral ventricles of nonagenarians and Alzheimer disease patients",
+        "journal": "BMC Neurol",
+        "year": "2020",
+        "url": "https://europepmc.org/article/MED/32854643"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD012059 && cd ~/omics-data/PXD012059\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD012059 -o ."
+    },
+    {
+      "accession": "PXD075438",
+      "source": "PRIDE",
+      "modality": "Proteomics: Bottom-up proteomics",
+      "title": "Glycoproteomics of Human and Mouse Brains in Alzheimer\u2019s Disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD075438",
+      "papers": [
+        "pmid:42265388",
+        "doi:10.1038/s42255-026-01538-4"
+      ],
+      "facts": {
+        "case": 2,
+        "control": 2,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 4,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "control": 2,
+            "case": 2
+          }
+        },
+        "source": "4 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study examines proteins in brain tissue samples, not the fluid that surrounds the brain and spinal cord.",
+      "evidence": "human frontal cortex",
+      "paper": {
+        "title": "Hyperglycosylation is a metabolic driver of Alzheimer's disease",
+        "journal": "Nat Metab",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/42265388"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD075438 && cd ~/omics-data/PXD075438\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD075438 -o ."
+    },
+    {
+      "accession": "PXD072063",
+      "source": "PRIDE",
+      "modality": "Proteomics: Data-dependent acquisition, Bottom-up proteomics",
+      "title": "Association of tear fluid glutathione synthetase and glutathione levels with amyloid positivity",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD072063",
+      "papers": [
+        "pmid:41927845",
+        "doi:10.1038/s41598-026-46738-w"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Cerebellum",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 60,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 60
+          }
+        },
+        "source": "60 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes proteins found in tears, which is a different body fluid than cerebrospinal fluid.",
+      "evidence": "Tear fluid is a promising source",
+      "paper": {
+        "title": "Association of tear fluid glutathione synthetase and glutathione levels with amyloid positivity",
+        "journal": "Sci Rep",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41927845"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD072063 && cd ~/omics-data/PXD072063\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD072063 -o ."
+    },
+    {
+      "accession": "PXD073336",
+      "source": "PRIDE",
+      "modality": "Proteomics: Bottom-up proteomics",
+      "title": "Retinal proteome changes mirror brain pathology and reveal synaptic and cytoskeletal dysfunction in Alzheimer\u2019s disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD073336",
+      "papers": [
+        "doi:10.1007/s00401-026-03054-x",
+        "doi:10.1007/s00401-026-03054-x"
+      ],
+      "facts": {
+        "case": 32,
+        "control": 30,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "patient_tissue",
+        "tissue": "Retina, Hippocampus",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": 16,
+        "individuals_by_group": {
+          "case": 8,
+          "control": 8
+        },
+        "runs": 62,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "case": 32,
+            "control": 30
+          }
+        },
+        "source": "62 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes proteins from the eyes and brain tissue, not the fluid surrounding the brain and spinal cord.",
+      "evidence": "paired retinal and hippocampal tissue",
+      "paper": {
+        "title": "Retinal proteome changes mirror brain pathology and reveal synaptic and cytoskeletal dysfunction in Alzheimer's disease",
+        "journal": "Acta Neuropathol",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/42525245"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD073336 && cd ~/omics-data/PXD073336\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD073336 -o ."
+    },
+    {
+      "accession": "PXD063590",
+      "source": "PRIDE",
+      "modality": "Proteomics: Bottom-up proteomics",
+      "title": "Single cell proteomic analysis of human prefrontal cortex in Alzheimer's Disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD063590",
+      "papers": [],
+      "facts": {
+        "case": 2000,
+        "control": 750,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "patient_tissue",
+        "tissue": "dorsolateral prefrontal cortex",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": 3,
+        "individuals_by_group": {
+          "case": 2,
+          "control": 1
+        },
+        "runs": 2928,
+        "excluded_pooled": 178,
+        "labels": {
+          "TMT127D": {
+            "case": 64,
+            "control": 18
+          },
+          "TMT": {
+            "control": 354,
+            "case": 950
+          },
+          "TMT128CD": {
+            "case": 64,
+            "control": 24
+          },
+          "TMT128ND": {
+            "control": 24,
+            "case": 58
+          },
+          "TMT129CD": {
+            "case": 64,
+            "control": 24
+          },
+          "TMT129ND": {
+            "control": 24,
+            "case": 64
+          },
+          "TMT130CD": {
+            "case": 64,
+            "control": 24
+          },
+          "TMT130ND": {
+            "control": 24,
+            "case": 64
+          },
+          "TMT131CD": {
+            "case": 64,
+            "control": 24
+          },
+          "TMT131ND": {
+            "control": 24,
+            "case": 59
+          },
+          "TMT132CD": {
+            "case": 59,
+            "control": 24
+          },
+          "TMT132ND": {
+            "control": 24,
+            "case": 64
+          },
+          "TMT133ND": {
+            "control": 24,
+            "case": 64
+          },
+          "TMT134CD": {
+            "case": 64,
+            "control": 24
+          },
+          "TMT134ND": {
+            "control": 24,
+            "case": 58
+          },
+          "TMT135CD": {
+            "control": 24,
+            "case": 64
+          },
+          "TMT135ND": {
+            "control": 24,
+            "case": 59
+          },
+          "TMT133CD": {
+            "case": 53,
+            "control": 18
+          }
+        },
+        "source": "2928 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study examines individual cells from brain tissue, not the liquid fluid surrounding the brain.",
+      "evidence": "human prefrontal cortex",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD063590 && cd ~/omics-data/PXD063590\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD063590 -o ."
+    },
+    {
+      "accession": "PXD042026",
+      "source": "PRIDE",
+      "modality": "Proteomics: Shotgun proteomics",
+      "title": "Targeting the Post-Synaptic Proteome in Alzheimer Disease with Psychosis",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD042026",
+      "papers": [
+        "pmid:37268664",
+        "doi:10.1038/s42003-023-04961-5"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 8,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 8
+          }
+        },
+        "source": "8 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes proteins from brain tissue samples rather than the fluid surrounding the brain and spinal cord.",
+      "evidence": "PSDs from dorsolateral prefrontal cortex",
+      "paper": {
+        "title": "Targeting the post-synaptic proteome has therapeutic potential for psychosis in Alzheimer Disease",
+        "journal": "Commun Biol",
+        "year": "2023",
+        "url": "https://europepmc.org/article/MED/37268664"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD042026 && cd ~/omics-data/PXD042026\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD042026 -o ."
+    },
+    {
+      "accession": "PXD028282",
+      "source": "PRIDE",
+      "modality": "Proteomics: Shotgun proteomics",
+      "title": "Microdissected pyramidal cell proteomics of Alzheimer brain reveals alterations in Creatine Kinase B, 14-3-3-g and Heat Shock Cognate 71",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD028282",
+      "papers": [
+        "pmid:34867272",
+        "doi:10.3389/fnagi.2021.735334"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Pyramidal neuron",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 10,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 10
+          }
+        },
+        "source": "10 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study analyzes proteins from brain cells rather than the fluid surrounding the brain, so it does not match the specific sample type requested.",
+      "evidence": "isolated pyramidal cells from the CA1 region of the hippocampus",
+      "paper": {
+        "title": "Microdissected Pyramidal Cell Proteomics of Alzheimer Brain Reveals Alterations in Creatine Kinase B-Type, 14-3-3-\u03b3, and Heat Shock Cognate 71",
+        "journal": "Front Aging Neurosci",
+        "year": "2021",
+        "url": "https://europepmc.org/article/MED/34867272"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD028282 && cd ~/omics-data/PXD028282\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD028282 -o ."
+    },
+    {
+      "accession": "PXD023340",
+      "source": "PRIDE",
+      "modality": "Proteomics: Top-down proteomics",
+      "title": "APOE-Dependent Molecular Abnormalities in the Cerebrovasculature of Autopsied Alzheimer Disease Brain Tissue",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD023340",
+      "papers": [
+        "pmid:34238312",
+        "doi:10.1186/s13041-021-00803-9",
+        "pmid:34079449",
+        "doi:10.3389/fnagi.2021.658605"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 9,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 9
+          }
+        },
+        "source": "9 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at proteins in the blood vessels of the brain, not in the cerebrospinal fluid itself.",
+      "evidence": "proteomic changes in cerebrovessels from AD and healthy control brains",
+      "paper": {
+        "title": "APOE genotype dependent molecular abnormalities in the cerebrovasculature of Alzheimer's disease and age-matched non-demented brains",
+        "journal": "Mol Brain",
+        "year": "2021",
+        "url": "https://europepmc.org/article/MED/34238312"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD023340 && cd ~/omics-data/PXD023340\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD023340 -o ."
+    },
+    {
+      "accession": "PXD021718",
+      "source": "PRIDE",
+      "modality": "Proteomics: Gel-based experiment",
+      "title": "Proteome of systemic extracellular vesicles from sporadic and familiar Alzheimer\u2019s disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD021718",
+      "papers": [
+        "pmid:33281599",
+        "doi:10.3389/fnagi.2020.587989"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Extracellular vesicle",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 15,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 15
+          }
+        },
+        "source": "15 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset examines proteins in blood plasma vesicles, not the cerebrospinal fluid found in the brain and spinal cord.",
+      "evidence": "protein profile of systemic EVs from postmortem SAD and FAD patients and compared them to postmortem controls",
+      "paper": {
+        "title": "Differential Profile of Systemic Extracellular Vesicles From Sporadic and Familial Alzheimer's Disease Leads to Neuroglial and Endothelial Cell Degeneration",
+        "journal": "Front Aging Neurosci",
+        "year": "2020",
+        "url": "https://europepmc.org/article/MED/33281599"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD021718 && cd ~/omics-data/PXD021718\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD021718 -o ."
+    },
+    {
+      "accession": "PXD020717",
+      "source": "PRIDE",
+      "modality": "Proteomics: Shotgun proteomics",
+      "title": "Quantitative PTM Maps of Human Pathologic Tau Identify Patient Heterogeneity and Define Critical Steps in Alzheimer\u2019s Disease Progression - frontal gyrus (sarkosyl soluble)",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD020717",
+      "papers": [
+        "pmid:33188775",
+        "doi:10.1016/j.cell.2020.10.029"
+      ],
+      "facts": {
+        "case": 10,
+        "control": 8,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 18,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "case": 10,
+            "control": 8
+          }
+        },
+        "source": "18 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research measures protein changes in brain tissue samples, not in the cerebrospinal fluid surrounding the brain.",
+      "evidence": "isolated from the post-mortem human tissue from 49 AD and 42 control subjects",
+      "paper": {
+        "title": "Tau PTM Profiles Identify Patient Heterogeneity and Stages of Alzheimer's Disease",
+        "journal": "Cell",
+        "year": "2020",
+        "url": "https://europepmc.org/article/MED/33188775"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD020717 && cd ~/omics-data/PXD020717\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD020717 -o ."
+    },
+    {
+      "accession": "PXD020482",
+      "source": "PRIDE",
+      "modality": "Proteomics: SRM/MRM, Shotgun proteomics",
+      "title": "Quantitative PTM Maps of Human Pathologic Tau Identify Patient Heterogeneity and Define Critical Steps in Alzheimer\u2019s Disease Progression - MC1-isolated Tau",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD020482",
+      "papers": [
+        "pmid:33188775",
+        "doi:10.1016/j.cell.2020.10.029"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 13,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 13
+          }
+        },
+        "source": "13 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset focuses on specific Tau proteins extracted from brain tissue, rather than the full protein profile of cerebrospinal fluid.",
+      "evidence": "isolated from the post-mortem human tissue from 49 AD and 42 control subjects",
+      "paper": {
+        "title": "Tau PTM Profiles Identify Patient Heterogeneity and Stages of Alzheimer's Disease",
+        "journal": "Cell",
+        "year": "2020",
+        "url": "https://europepmc.org/article/MED/33188775"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD020482 && cd ~/omics-data/PXD020482\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD020482 -o ."
+    },
+    {
+      "accession": "PXD072965",
+      "source": "PRIDE",
+      "modality": "Proteomics: SRM/MRM",
+      "title": "Post-translational regulation of human D-3-phosphoglycerate dehydrogenase in Alzheimer\u2019s disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD072965",
+      "papers": [
+        "pmid:41711160",
+        "doi:10.1002/pro.70505"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 8,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 8
+          }
+        },
+        "source": "8 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at specific chemical changes on a single protein in brain tissue, not the full list of proteins in cerebrospinal fluid.",
+      "evidence": "hippocampal tissue of healthy and AD-affected males and females",
+      "paper": {
+        "title": "Post-translational regulation of human D-3-phosphoglycerate dehydrogenase in Alzheimer's disease",
+        "journal": "Protein Sci",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41711160"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD072965 && cd ~/omics-data/PXD072965\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD072965 -o ."
+    },
+    {
+      "accession": "PXD061828",
+      "source": "PRIDE",
+      "modality": "Proteomics: Bottom-up proteomics",
+      "title": "Familial Alzheimer disease mutation in SORL1 impairs release of neurotrophic extracellular vesicles by microglia",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD061828",
+      "papers": [
+        "pmid:40928027",
+        "doi:10.1002/alz.70591"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Cell culture",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 7,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 7
+          }
+        },
+        "source": "7 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "unclear"
+      },
+      "reason": "This study looks at proteins in lab-grown brain cells rather than the fluid from the brains of actual patients.",
+      "evidence": "expression of SORLAN1358S in iPSC-derived human microglia",
+      "paper": {
+        "title": "Familial Alzheimer's disease mutation identifies novel role of SORLA in release of neurotrophic exosomes",
+        "journal": "Alzheimers Dement",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40928027"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD061828 && cd ~/omics-data/PXD061828\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD061828 -o ."
+    },
+    {
+      "accession": "PXD050457",
+      "source": "PRIDE",
+      "modality": "Proteomics: ",
+      "title": "Probing protein structural changes in Alzheimer's disease via quantitative crosslinking mass spectrometry",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD050457",
+      "papers": [],
+      "facts": null,
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "unclear",
+        "data_type": "yes",
+        "controls": "unclear"
+      },
+      "reason": "The text does not specify which body fluid or tissue was used for the protein analysis.",
+      "evidence": "investigate the changes in protein-protein interactions during the AD progression",
+      "paper": null,
+      "download_plan": "mkdir -p ~/omics-data/PXD050457 && cd ~/omics-data/PXD050457\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD050457 -o ."
+    },
+    {
+      "accession": "PXD032192",
+      "source": "PRIDE",
+      "modality": "Proteomics: SRM/MRM, Shotgun proteomics",
+      "title": "Proteopathic tau seeds contain key similarities to mature paired helical filaments in Alzheimer disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD032192",
+      "papers": [
+        "pmid:38236720",
+        "doi:10.1093/brain/awad378"
+      ],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "Brain",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": null,
+        "individuals_by_group": {},
+        "runs": 2,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 2
+          }
+        },
+        "source": "2 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "unclear"
+      },
+      "reason": "This dataset characterizes tau proteins isolated from brain tissue, which is distinct from cerebrospinal fluid samples.",
+      "evidence": "derived from human Alzheimer brain",
+      "paper": {
+        "title": "Alzheimer proteopathic tau seeds are biochemically a forme fruste of mature paired helical filaments",
+        "journal": "Brain",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38236720"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD032192 && cd ~/omics-data/PXD032192\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD032192 -o ."
+    },
+    {
+      "accession": "PXD079144",
+      "source": "PRIDE",
+      "modality": "Proteomics: Data-dependent acquisition",
+      "title": "Serine-65 phosphorylated ubiquitin associates with soluble Tau and seeding activity in Alzheimer\u2019s disease",
+      "organism": "Homo sapiens (human)",
+      "samples": null,
+      "url": "https://www.ebi.ac.uk/pride/archive/projects/PXD079144",
+      "papers": [],
+      "facts": {
+        "case": null,
+        "control": null,
+        "mixed": 0,
+        "has_control": null,
+        "sample_type": "patient_tissue",
+        "tissue": "frontal cortex",
+        "assays": [],
+        "library": {},
+        "libraries": {},
+        "grain": "samples",
+        "individuals": 5,
+        "individuals_by_group": {},
+        "runs": 10,
+        "excluded_pooled": 0,
+        "labels": {
+          "label free sample": {
+            "other": 10
+          }
+        },
+        "source": "5 SDRF samples (bigbio/sdrf-annotated-datasets)"
+      },
+      "published": null,
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "yes",
+        "data_type": "yes",
+        "controls": "unclear"
+      },
+      "reason": "This study focuses on protein modifications in brain tissue lysates, not in cerebrospinal fluid.",
+      "evidence": "pS65-Ub modified tau is elevated in AD frontal cortex",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/PXD079144 && cd ~/omics-data/PXD079144\n# raw files\nuv tool install pridepy\npridepy download-all-public-raw-files -a PXD079144 -o ."
+    }
+  ],
+  "same_paper": []
+}
