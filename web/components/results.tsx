@@ -5,7 +5,9 @@ import NumberFlow from "@number-flow/react";
 import { ArrowDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { datasetPath, repositoryName, type Hit, type Result } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { datasetPath, genePath, repositoryName, type Hit, type Result } from "@/lib/api";
+import { LINK as LINK_CLASS } from "@/components/page-kit";
 import { CompareDialog, Connector } from "@/components/compare";
 import { Checkbox, CountCell, DatasetRow, ROW, SEP, Stem, assayOf, materialOf, unfold } from "@/components/result-card";
 
@@ -153,22 +155,6 @@ function Tally({ value, label, className }: { value: number; label: string; clas
   );
 }
 
-function Toggle({ on, onClick, strike, children }: { on: boolean; onClick: () => void; strike?: boolean; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={cn(
-        "rounded-[4px] border px-2 py-[3px] text-xs transition-colors duration-150",
-        on ? "border-foreground/70 bg-card text-foreground" : cn("border-rule text-muted-foreground hover:text-foreground", strike && "line-through decoration-muted-foreground/50"),
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
 function SortHeader({ label, k, sort, setSort, className }: { label: string; k: SortKey; sort: SortKey; setSort: (k: SortKey) => void; className?: string }) {
   return (
     <th className={cn("py-2 pl-2 text-right font-normal", className)} aria-sort={sort === k ? "descending" : "none"}>
@@ -215,15 +201,16 @@ function Table({ hits, matched, topic, sort, setSort, selected, toggle, select }
 
 export function Results({ result }: { result: Result }) {
   const [sort, setSort] = useState<SortKey>("control");
-  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const router = useRouter();
+  const [gene, setGene] = useState("");
   const [showPartial, setShowPartial] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
   const [comparing, setComparing] = useState(false);
   const section = useRef<HTMLElement>(null);
 
-  const sources = [...new Set(result.datasets.map((d) => d.source))];
-  const visible = result.datasets.filter((d) => !hidden.has(d.source));
+  const visible = result.datasets;
+  const geo = result.datasets.filter((d) => d.source === "GEO" && d.fit === "strong").map((d) => d.accession);
   const strong = visible.filter((d) => d.fit === "strong");
   const partial = visible.filter((d) => d.fit === "partial");
   const picked = result.datasets.filter((d) => selected.has(d.accession));
@@ -260,14 +247,14 @@ export function Results({ result }: { result: Result }) {
         {strongCount !== result.datasets.length && <Tally value={result.datasets.length} label="relevant" />}
       </h2>
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="basis-full text-xs text-muted-foreground sm:basis-24">Show</span>
-        {sources.map((s) => (
-          <Toggle key={s} strike on={!hidden.has(s)} onClick={() => setHidden((h) => flip(h, s))}>
-            {repositoryName(s)} {result.datasets.filter((d) => d.source === s).length}
-          </Toggle>
-        ))}
-      </div>
+      {geo.length > 0 && (
+        <form onSubmit={(e) => { e.preventDefault(); if (gene.trim()) router.push(genePath(gene.trim(), geo, result.plan.terms.join(", "))); }} className="flex flex-wrap items-center gap-2 text-[13px]">
+          <label htmlFor="gene-across" className="text-muted-foreground">Your gene across the {geo.length} usable GEO datasets</label>
+          <input id="gene-across" value={gene} onChange={(e) => setGene(e.target.value)} placeholder="e.g. SPP1" autoComplete="off" spellCheck={false}
+            className="h-8 w-32 rounded-md border border-rule bg-card px-2 font-mono text-[16px] uppercase outline-none transition-colors duration-150 placeholder:normal-case placeholder:text-muted-foreground focus:border-foreground sm:text-[13px]" />
+          <button type="submit" className={cn("font-medium", LINK_CLASS)}>Show</button>
+        </form>
+      )}
 
       {strong.length > 0 && <Table hits={strong} matched={result.plan.matched_assays ?? []} topic={result.plan.terms.join(", ")} sort={sort} setSort={setSort} selected={selected} toggle={toggle} select={select} />}
 

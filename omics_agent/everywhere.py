@@ -18,7 +18,7 @@ def _pick(accession: str, hint: str) -> dict | None:
         if controls and cases:
             hinted = [lv for lv in cases if any(w in lv.lower() for w in words)]
             return {"factor": f["name"], "case": [hinted[0] if hinted else max(cases, key=f["levels"].get)], "control": controls}
-    return choice["default"]
+    return None
 
 
 def one(gene: str, accession: str, hint: str = "") -> dict:
