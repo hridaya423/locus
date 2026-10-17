@@ -176,7 +176,7 @@ export function Search() {
   }, [running]);
 
   // A pasted accession, PMID or DOI opens the page it names; anything else, or an identifier locus lacks, is offered as a search.
-  async function open(text: string, replace = false) {
+  async function open(text: string, fromUrl = false) {
     setMiss(null);
     voice.stop();
     if (!looksLikeIdentifier(text)) return run(text);
@@ -184,8 +184,8 @@ export function Search() {
     setLooking(true);
     try {
       const found = await resolve(text);
-      if (!found) return run(text);
-      if (replace) router.replace(found.path);
+      if (!found) return fromUrl ? undefined : run(text);
+      if (fromUrl) router.replace(found.path);
       else router.push(found.path);
     } catch (e) {
       setMiss(e instanceof Error ? e.message : String(e));
