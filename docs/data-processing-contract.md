@@ -81,3 +81,4 @@ Computed once per reference (GTF + genome FASTA), independent of any dataset, an
 - Whether nf-core/riboseq can run without STAR needs checking.
 - Which modalities marked "not offered" on the laptop tier deserve a reduced version.
 - How the processing step is surfaced in the GUI without cluttering the search view (next brainstorm step).
+- Metadata availability gates which analyses are valid per dataset; see `metadata-informed-analysis-plans.md` (17 Oct 2026).
