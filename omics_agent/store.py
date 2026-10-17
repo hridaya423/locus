@@ -70,6 +70,11 @@ def rebuild_fts(db: sqlite3.Connection) -> None:
 
 
 
+def has_index() -> bool:
+    """True once a harvest has stored datasets. The file alone is not enough: caching facts creates it empty."""
+    return DB.exists() and connect().execute("SELECT EXISTS (SELECT 1 FROM datasets)").fetchone()[0] == 1
+
+
 def cached_facts(accession: str, topic: str) -> dict | None:
     """Counted sample groups for a dataset and topic, from an earlier search."""
     row = connect().execute("SELECT data FROM facts WHERE accession = ? AND topic = ?", (accession, topic)).fetchone()

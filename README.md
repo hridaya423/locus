@@ -36,6 +36,8 @@ uv run omics "I work on lung fibrosis in humans and need single-cell and proteom
 uv run omics --json "..."    # machine-readable output
 ```
 
+Without an Anthropic key, locus can run on a local model served through an OpenAI-compatible API, such as vLLM. Set `LOCAL_LLM_URL` (for example `http://localhost:8000/v1`) and `LOCAL_LLM_MODEL` in `.env`. The server must support JSON-schema structured output. Results then depend on that model and have not been checked against the Claude runs in `docs/evidence/`.
+
 Without a local index, locus searches the live APIs of GEO, PRIDE and CELLxGENE only. To search all 18 repositories, build the index first.
 
 ### Build the index
@@ -67,6 +69,13 @@ cd web && npm ci && npm run dev     # http://localhost:3000
 ```
 
 The web app calls `/api` on its own origin, and Next.js forwards it to port 8000, so the app also works through a tunnel such as ngrok.
+
+If port 8000 is taken, set `OMICS_API_PORT` in `.env` and point the web app at it with `OMICS_API_URL`. To open the dev server from another machine by its IP address, list that address in `EXTRA_DEV_ORIGINS`:
+
+```sh
+OMICS_API_PORT=8010 uv run omics-api
+cd web && OMICS_API_URL=http://localhost:8010 EXTRA_DEV_ORIGINS=152.78.149.61 npm run dev
+```
 
 ### MCP server
 

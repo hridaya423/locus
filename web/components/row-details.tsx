@@ -75,22 +75,21 @@ export function Ready({ accession }: { accession: string }) {
   );
 }
 
+// Opened from its own toggle in the row header, which already names it, so the list needs no heading.
 export function Partners({ hit }: { hit: Hit }) {
   if (!hit.partners?.length) return null;
   return (
-    <Section label={hit.source === "PRIDE" ? "Gene data on the same tissue" : "Protein data on the same tissue"}>
-      <ul className="grid gap-1 text-[13px]">
-        {hit.partners.map((p) => (
-          <li key={p.accession} className="flex min-w-0 items-baseline gap-2">
-            <Link href={datasetPath(p.accession)} className="shrink-0 font-mono text-[12px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
-              {p.accession}
-            </Link>
-            <span className="min-w-0 truncate text-muted-foreground" title={p.title}>
-              {[repositoryName(p.source), p.assay, p.tissue].filter(Boolean).join(" · ")}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </Section>
+    <ul className="grid gap-1 border-l-2 border-foreground pl-3 text-[13px]">
+      {hit.partners.map((p) => (
+        <li key={p.accession} className="flex min-w-0 items-baseline gap-2">
+          <Link href={datasetPath(p.accession)} className="shrink-0 font-mono text-[12px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
+            {p.accession}
+          </Link>
+          <span className="min-w-0 truncate text-muted-foreground" title={p.title}>
+            {[repositoryName(p.source), p.assay, p.tissue].filter(Boolean).join(" · ")}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -201,6 +201,7 @@ type RowProps = {
 
 export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, counts }: RowProps) {
   const [expanded, setExpanded] = useState(false);
+  const [partnersOpen, setPartnersOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sheet, setSheet] = useState<"idle" | "writing" | "failed">("idle");
   useEffect(() => {
@@ -254,12 +255,18 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                 </span>
               )}
               {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
-              {!!hit.partners?.length && (
-                <span className="text-[12.5px] leading-snug text-muted-foreground">
-                  {hit.source === "PRIDE" ? "Gene" : "Protein"} data on the same tissue: {hit.partners.length}
-                </span>
-              )}
             </button>
+            {!!hit.partners?.length && (
+              <button
+                type="button"
+                onClick={() => setPartnersOpen((v) => !v)}
+                aria-expanded={partnersOpen}
+                className="mt-1 flex cursor-pointer items-center gap-1 text-left text-[12.5px] leading-snug text-muted-foreground transition-colors duration-150 hover:text-foreground"
+              >
+                {hit.source === "PRIDE" ? "Gene" : "Protein"} data on the same tissue: {hit.partners.length}
+                <ChevronDown aria-hidden className={cn("size-3.5 transition-transform duration-200", partnersOpen && "rotate-180")} />
+              </button>
+            )}
           </div>
         </td>
         {counts && <CountCell value={facts?.case} tone="signal" href={`${page}#samples`} />}
@@ -302,15 +309,15 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                   <p className="border-l-2 border-foreground pl-3 font-mono text-[12.5px] leading-relaxed">
                     &quot;{hit.evidence}&quot;
                     {facts?.case != null && (
-                      <span className="label block pt-1.5 text-muted-foreground">
-                        counts from {facts.source}
+                      // Only the sample count is shown; the full provenance (e.g. which curators grouped the samples) stays on hover.
+                      <span className="label block pt-1.5 text-muted-foreground" title={facts.source}>
+                        counts from {facts.source.split(",")[0]}
                       </span>
                     )}
                   </p>
                 )}
                 {facts?.methods && <Methods methods={facts.methods} />}
                 {hit.source === "PRIDE" && <Ready accession={hit.accession} />}
-                <Partners hit={hit} />
                 <DesignView accession={hit.accession} source={hit.source} />
                 <details className="group/plan">
                   <summary className={cn(ACTION, "w-fit cursor-pointer list-none")}>
@@ -342,6 +349,20 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     </span>
                   </span>
                 )}
+                </div>
+              </motion.div>
+            </td>
+          </tr>
+        )}
+      </AnimatePresence>
+      <AnimatePresence initial={false}>
+        {partnersOpen && (
+          <tr>
+            <td />
+            <td colSpan={counts ? 5 : 3} className="pr-2">
+              <motion.div {...unfold} className="overflow-hidden">
+                <div className="pb-4">
+                  <Partners hit={hit} />
                 </div>
               </motion.div>
             </td>
