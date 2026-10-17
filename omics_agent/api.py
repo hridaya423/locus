@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, record, sources, subset  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -82,6 +82,23 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
 def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
     return design.design(accession, source) or {}
+
+
+class SubsetIn(BaseModel):
+    filters: dict[str, list[str]] = {}
+    text: str = ""
+
+
+@app.post("/subset/{accession}")
+def sample_subset(body: SubsetIn, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """The samples matching levels chosen in the dataset's factors and a text, as row indexes into its sample table, with the
+    sample count of every level inside that selection and the commands that download just those samples."""
+    try:
+        return subset.select(accession, body.filters, body.text)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except ValueError as error:
+        raise HTTPException(422, str(error))
 
 
 @app.get("/record/{accession}")

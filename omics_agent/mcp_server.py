@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, subset  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -20,7 +20,8 @@ mcp = MCPServer(
         "To check one dataset, use get_dataset, then geo_sample_groups for counted case/control samples and "
         "libraries per assay, and get_methods for the paper's methods text (assay identity, how samples were "
         "matched, the authors' QC). get_download_plan and get_samplesheet prepare the data for download and for an "
-        "nf-core/riboseq run. Accessions come only from the repositories; never invent one."
+        "nf-core/riboseq run. To pick samples by experimental factor (disease, tissue, treatment) and download only those, "
+        "use filter_samples. Accessions come only from the repositories; never invent one."
     ),
 )
 
@@ -113,6 +114,26 @@ def get_samplesheet(accession: str, topic: str) -> dict:
     sample's FASTQ links from ENA, the contrasts between conditions, and a README that says which samples were paired
     or left out and why. `topic` is the condition that counts as a case, for example "Torin1 mTOR inhibition"."""
     return {"accession": accession, "files": agent.samplesheet_files(accession, topic)}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def filter_samples(accession: str, filters: dict[str, list[str]], text: str = "", limit: int = 200) -> dict:
+    """Pick samples of one GEO, ENA or ArrayExpress dataset by the levels of its experimental factors. `filters` maps a
+    factor to the levels wanted, for example {"diagnosis": ["IPF", "Control"], "Sex": ["female"]}: levels of one factor
+    combine with OR, factors with AND. `text` keeps rows with that text in any cell. Call it with empty `filters` to list
+    the factors and their levels. Returns the matching sample rows (at most `limit`), the count of every level of every
+    factor inside the selection (a factor's own filter is left out of its counts), and the commands that download only
+    those samples' files with a note on what they leave out and the record fields they were read from."""
+    try:
+        found = subset.select(accession, filters, text)
+    except (LookupError, ValueError) as error:
+        return {"accession": accession, "error": str(error)}
+    sheet = subset.table(accession)
+    return {
+        "accession": accession, "samples": found["samples"], "total": found["total"], "columns": sheet["columns"],
+        "rows": [sheet["rows"][i] for i in found["rows"][:limit]],
+        "counts": found["counts"], "downloads": found["downloads"],
+    }
 
 
 @mcp.tool(annotations=READ_ONLY)

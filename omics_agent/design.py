@@ -42,11 +42,11 @@ def from_rows(rows: list[dict[str, str]], source: str) -> dict | None:
     """Factors are columns that split the samples into 2 to 12 groups; columns with one value are shared context."""
     if len(rows) < 2:
         return None
-    columns: dict[str, list[str]] = {}
-    for row in rows:
-        for name, value in row.items():
-            if name and not NOT_A_FACTOR.search(name):
-                columns.setdefault(_clean(name), []).append(str(value).strip() if value is not None else "")
+    # A sample without a value for a column still takes a place in it, so every column lines up with the rows.
+    column_of: dict[str, str] = {}
+    for name in dict.fromkeys(k for row in rows for k in row if k and not NOT_A_FACTOR.search(k)):
+        column_of.setdefault(_clean(name), name)
+    columns = {name: [str(row.get(column) or "").strip() for row in rows] for name, column in column_of.items()}
     factors, shared = [], {}
     for name, values in columns.items():
         stated = [v for v in values if not NOT_STATED.match(v)]
@@ -54,7 +54,7 @@ def from_rows(rows: list[dict[str, str]], source: str) -> dict | None:
         if len(levels) == 1 and len(stated) == len(rows):
             shared[name] = stated[0]
         elif 2 <= len(levels) <= MAX_LEVELS and len(levels) < len(rows):
-            factors.append({"name": name, "levels": dict(levels.most_common())})
+            factors.append({"name": name, "column": column_of[name], "levels": dict(levels.most_common())})
     # Submitters often record one grouping under several names, or join two factors into a combined column
     # ("IPF.Base"); either adds nothing, so duplicates become aliases and combinations are dropped.
     unique: dict[tuple, dict] = {}
@@ -169,4 +169,8 @@ if __name__ == "__main__":
     assert minimal["factors"] == [] and minimal["shared"] == {"organism": "Homo sapiens", "disease": "normal"}, minimal
     twice = from_rows([r | {"Treatment": r["Condition"], "Group": r["Condition"] + "." + r["Duration, hours"]} for r in rows], "sheet")
     assert [f["name"] for f in twice["factors"]] == ["Condition", "Duration, hours", "Donor"] and twice["factors"][0]["aliases"] == ["Treatment"], twice
+    uneven = from_rows([{"Condition": "a", "Dose": "1"}, {"Condition": "b"}, {"Condition": "a", "Dose": "2"}, {"Condition": "b", "Dose": "1"}], "sheet")
+    assert uneven["samples"] == 4 and all(sum(f["levels"].values()) <= 4 for f in uneven["factors"]), uneven
+    for accession, factors in (("GSE179525", ["genotype", "age", "library strategy"]), ("GSE149204", ["library strategy", "cell type", "molecule"])):
+        assert [f["name"] for f in design(accession, "GEO")["factors"]] == factors, accession
     print("ok")

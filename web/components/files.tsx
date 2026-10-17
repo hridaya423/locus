@@ -4,6 +4,7 @@ import { ChevronDown, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
+import type { Selection } from "@/components/design";
 import { repositoryName, type DatasetRecord, type RecordFile } from "@/lib/api";
 
 type Group = { name: string; files: RecordFile[]; bytes: number; processed: number };
@@ -21,10 +22,12 @@ function groups(files: RecordFile[]): Group[] {
     .sort((a, b) => Number(b.processed > 0) - Number(a.processed > 0));
 }
 
-export function Files({ rec }: { rec: DatasetRecord }) {
+export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Selection }) {
   const list = useMemo(() => groups(rec.files), [rec.files]);
   const total = list.reduce((n, g) => n + g.bytes, 0);
   const [copied, setCopied] = useState(false);
+  const picked = selection?.result?.downloads;
+  const plan = picked?.commands ?? rec.download_plan;
   useEffect(() => {
     if (!copied) return;
     const t = setTimeout(() => setCopied(false), 1600);
@@ -55,12 +58,13 @@ export function Files({ rec }: { rec: DatasetRecord }) {
       {rec.download_plan && (
         <details className="group/plan">
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
-            Commands to download everything
+            {picked?.commands ? `Commands to download the ${selection?.result?.samples.toLocaleString()} selected samples` : "Commands to download everything"}
             <ChevronDown aria-hidden className="size-3.5 transition-transform duration-200 group-open/plan:rotate-180" />
           </summary>
           <div className="mt-3 grid min-w-0 gap-1.5 border-l-2 border-foreground pl-3">
-            <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed">{rec.download_plan}</pre>
-            <button type="button" onClick={() => navigator.clipboard.writeText(rec.download_plan).then(() => setCopied(true))} className={cn("w-fit text-xs font-medium", LINK)}>
+            {picked?.note && <p className="text-[12.5px] text-muted-foreground">{picked.note}</p>}
+            <pre className="max-h-96 overflow-auto font-mono text-[12px] leading-relaxed">{plan}</pre>
+            <button type="button" onClick={() => navigator.clipboard.writeText(plan).then(() => setCopied(true))} className={cn("w-fit text-xs font-medium", LINK)}>
               {copied ? "copied" : "copy"}
             </button>
           </div>

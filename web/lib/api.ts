@@ -65,7 +65,7 @@ export async function samplesheet(accession: string, topic: string): Promise<Blo
 
 export type Design = {
   source: string; samples: number; shared: Record<string, string>;
-  factors: { name: string; levels: Record<string, number>; aliases?: string[] }[];
+  factors: { name: string; column: string; levels: Record<string, number>; aliases?: string[] }[];
   crossed?: { rows: string; columns: string; counts: [string, string, number][] };
 };
 
@@ -158,5 +158,17 @@ export type SampleRecord = DatasetRecord & {
 export async function sampleRecord(dataset: string, sample: string, signal?: AbortSignal): Promise<SampleRecord> {
   const res = await fetch(`${API}/record/${encodeURIComponent(dataset)}/samples/${encodeURIComponent(sample)}`, { signal });
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
+  return res.json();
+}
+
+export type Filters = Record<string, string[]>;
+export type Subset = {
+  samples: number; total: number; rows: number[]; counts: Record<string, Record<string, number>>;
+  crossed?: [string, string, number][]; downloads: { commands: string | null; note: string | null } | null;
+};
+
+export async function subset(accession: string, filters: Filters, text: string, signal?: AbortSignal): Promise<Subset> {
+  const res = await fetch(`${API}/subset/${accession}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ filters, text }), signal });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   return res.json();
 }
