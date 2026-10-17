@@ -35,6 +35,8 @@ Show the panel:
 - Volcano and MA: 84 genes with padj < 0.05 out of 6,471 tested (44 up, 40 down).
 - Top genes: DDIT4 and SCD go down. Both are transcripts whose expression depends on mTORC1 (SCD through SREBP, DDIT4
   through ATF4), so their fall after rapamycin is the expected direction. CCN2, CCN1 and THBS1 rise.
+- The paragraph under "Written by the model from the numbers above": the model wrote it from the computed numbers,
+  and code checked every number in it against the pipeline's output before it was shown.
 - Downloads: `GSM….count`, `counts.tsv`, `deseq2_results.tsv`, the PNGs and `manifest.json`.
 
 ## 2:20 – 2:50 Honesty

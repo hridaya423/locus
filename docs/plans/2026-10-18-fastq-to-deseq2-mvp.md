@@ -100,3 +100,4 @@ If time runs short, deliver in this order: 2 → 3 → 4 → PNGs → 5 → 6. A
 | 8 | committed and pushed to `origin/juri-processing-pipeline`, clean tree | pass (see the final commit) |
 
 Known limits: one run per sample (the first ENA run), human and mouse only, mouse index not yet built, the triage stage of the search is not cached so a repeated question can rank differently; the web search on the local model takes 4–8 minutes.
+- 2026-10-18 00:40 BST: Phase 2 (explanation with a number guard, SDRF counts for PRIDE) followed in `2026-10-18-phase2-explain-and-sdrf.md`; the `process` run now has an `explain` stage and `explanation.md`.
