@@ -190,7 +190,7 @@ export async function firstLook(accession: string, pick: { factor: string; case:
 
 export type PaperGene = { gene: string; sentence: string | null; where: string; says: "higher" | "lower" | null; log2fc: number; q: number; significant: boolean; agrees: boolean | null };
 export type PaperCheck = { available: boolean; reason?: string; paper?: string; title?: string; journal?: string; year?: string; url?: string; read?: string;
-  genes: PaperGene[]; named: number; significant: number; agree: number; disagree: number };
+  genes: PaperGene[]; named: number; significant: number; agree: number; disagree: number; by_chance: number };
 
 export async function paperCheck(accession: string, pick: { factor: string; case: string[]; control: string[] }, signal?: AbortSignal): Promise<PaperCheck> {
   const q = new URLSearchParams({ factor: pick.factor });

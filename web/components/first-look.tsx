@@ -137,7 +137,7 @@ function PaperLine({ check, ringOn, onRing }: { check: PaperCheck; ringOn: boole
     <details className="group/p grid gap-2">
       <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px] [&::-webkit-details-marker]:hidden">
         <span>
-          The paper names <span className="font-medium">{check.named}</span> of the tested genes; <span className="font-medium">{check.significant}</span> are among the coloured genes here
+          The paper names <span className="font-medium">{check.named}</span> of the tested genes; <span className="font-medium">{check.significant}</span> are among the coloured genes here <span className="text-muted-foreground">(about {check.by_chance} by chance)</span>
           {check.agree + check.disagree > 0 && <>, {check.agree} in the direction its text states{check.disagree > 0 && `, ${check.disagree} opposite`}</>}.
         </span>
         <button type="button" aria-pressed={ringOn} onClick={(e) => { e.preventDefault(); onRing(); }} className={cn("text-[12.5px]", MUTED_LINK)}>

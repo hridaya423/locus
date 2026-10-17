@@ -155,7 +155,8 @@ def paper_genes(accession: str, look: dict) -> dict:
                     named[symbol] = {"gene": symbol, "sentence": sentence if sentence != symbol else None, "where": where, "says": says, "log2fc": g[1], "q": g[3], "significant": significant, "agrees": agrees}
     genes = sorted(named.values(), key=lambda n: n["q"])
     return {"available": True, **head, "genes": genes, "named": len(genes), "significant": sum(n["significant"] for n in genes),
-            "agree": sum(n["agrees"] is True for n in genes), "disagree": sum(n["agrees"] is False for n in genes)}
+            "agree": sum(n["agrees"] is True for n in genes), "disagree": sum(n["agrees"] is False for n in genes),
+            "by_chance": round(len(genes) * (look["up"] + look["down"]) / look["tested"], 1)}
 
 
 if __name__ == "__main__":
