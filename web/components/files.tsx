@@ -28,6 +28,7 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
   const [copied, setCopied] = useState(false);
   const picked = selection?.result?.downloads;
   const plan = picked?.commands ?? rec.download_plan;
+  const nothing = selection?.active && selection.result?.rows.length === 0;
   useEffect(() => {
     if (!copied) return;
     const t = setTimeout(() => setCopied(false), 1600);
@@ -55,8 +56,8 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
         </figure>
       )}
       {list.map((g) => <FileGroup key={g.name} group={g} />)}
-      {rec.download_plan && (
-        <details className="group/plan">
+      {rec.download_plan && !nothing && (
+        <details id="download-commands" className="group/plan scroll-mt-16">
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
             {picked?.commands ? `Commands to download the ${selection?.result?.samples.toLocaleString()} selected samples` : "Commands to download everything"}
             <ChevronDown aria-hidden className="size-3.5 transition-transform duration-200 group-open/plan:rotate-180" />

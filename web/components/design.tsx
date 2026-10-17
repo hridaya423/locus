@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { design, subset, type DatasetRecord, type Design, type Filters, type Subset } from "@/lib/api";
 import { MUTED_LINK } from "@/components/page-kit";
@@ -51,15 +50,18 @@ export function useSelection(rec: DatasetRecord, designed: boolean) {
       const next = chosen.includes(level) ? chosen.filter((l) => l !== level) : [...chosen, level];
       return next.length ? { ...others, [factor]: next } : others;
     });
+  const result = active ? fetched?.data ?? null : null;
+  const kept = useMemo(() => (result ? result.rows.map((i) => rec.samples!.rows[i]) : rec.samples?.rows ?? []), [result, rec.samples]);
   return {
     design: state.design, failed: state.failed, filters, text, active, toggle, setText,
+    rows: active && !result ? [] : kept,
     clear: () => {
       setFilters({});
       setText("");
       setFetched(null);
     },
     retry: () => setAttempt((n) => n + 1),
-    result: active ? fetched?.data ?? null : null,
+    result,
     pending: active && fetched?.key !== key,
     error: active && fetched?.key === key && !fetched.data,
   };
@@ -127,24 +129,12 @@ export function DesignBars({ rec, selection }: { rec: DatasetRecord; selection: 
   if (!d) return <p className="text-[13px] text-muted-foreground">Reading the sample table…</p>;
   const shared = Object.entries(d.shared);
   const columns = rec.samples?.columns ?? [];
-  const chosen = Object.entries(filters).flatMap(([factor, levels]) => levels.map((level) => [factor, level] as const));
   return (
     <div className="grid gap-6">
-      {chosen.length > 0 && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-          {chosen.map(([factor, level]) => (
-            <button key={`${factor}\n${level}`} type="button" onClick={() => selection.toggle(factor, level)} aria-label={`Remove ${factor}: ${level}`} className="flex max-w-full items-center gap-1.5 rounded-[4px] border border-foreground px-1.5 py-px text-[13px]">
-              <span className="truncate"><span className="text-muted-foreground">{factor}</span> {level}</span>
-              <X aria-hidden className="size-3 shrink-0" />
-            </button>
-          ))}
-          <button type="button" onClick={selection.clear} className={cn("text-[13px]", MUTED_LINK)}>Clear</button>
-        </div>
-      )}
       {d.factors.length > 0 ? (
         <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
           {(all ? d.factors : d.factors.slice(0, FACTORS_SHOWN)).map((f) => (
-            <Factor key={f.name} factor={f} counts={result?.counts[f.name]} chosen={filters[f.name]} selectable={columns.includes(f.column)} onToggle={(level) => selection.toggle(f.name, level)} />
+            <Factor key={f.name} factor={f} counts={result?.counts[f.name]} unstated={result ? result.unstated[f.name] : f.unstated} chosen={filters[f.name]} selectable={columns.includes(f.column)} onToggle={(level) => selection.toggle(f.name, level)} />
           ))}
         </div>
       ) : (
@@ -170,10 +160,11 @@ export function DesignBars({ rec, selection }: { rec: DatasetRecord; selection: 
 }
 
 type FactorProps = {
-  factor: Design["factors"][number]; counts?: Record<string, number>; chosen?: string[]; selectable: boolean; onToggle: (level: string) => void;
+  factor: Design["factors"][number]; counts?: Record<string, number>; unstated?: number; chosen?: string[]; selectable: boolean; onToggle: (level: string) => void;
 };
 
-function Factor({ factor, counts, chosen = [], selectable, onToggle }: FactorProps) {
+// Levels of a factor with a choice show what adding them would bring (+n); the chosen ones show what they hold.
+function Factor({ factor, counts, unstated, chosen = [], selectable, onToggle }: FactorProps) {
   const [open, setOpen] = useState(false);
   const levels = Object.entries(factor.levels);
   const most = Math.max(...levels.map(([, n]) => n));
@@ -189,8 +180,10 @@ function Factor({ factor, counts, chosen = [], selectable, onToggle }: FactorPro
           const on = chosen.includes(level);
           const row = (
             <>
-              <span className={cn("truncate", on && "font-medium", n === 0 && "text-muted-foreground")} title={level}>{level}</span>
-              <span className="text-right font-mono text-[12px] tabular text-muted-foreground">{n.toLocaleString()}</span>
+              <span className={cn("[overflow-wrap:anywhere]", on && "font-medium", n === 0 && "text-muted-foreground")}>{level}</span>
+              <span className="text-right font-mono text-[12px] tabular text-muted-foreground" title={chosen.length && !on ? `${n.toLocaleString()} more if ${level} is added` : undefined}>
+                {chosen.length && !on ? `+${n.toLocaleString()}` : n.toLocaleString()}
+              </span>
               <span aria-hidden className="col-span-2 h-1">
                 <span className="block h-full rounded-full bg-rule" style={{ width: `${(total / most) * 100}%` }}>
                   <span className={cn("block h-full rounded-full transition-[width] duration-200 motion-reduce:transition-none", chosen.length && !on ? "bg-foreground/35" : "bg-foreground/75")} style={{ width: `${(n / total) * 100}%` }} />
@@ -212,6 +205,7 @@ function Factor({ factor, counts, chosen = [], selectable, onToggle }: FactorPro
           );
         })}
       </ul>
+      {!!unstated && <span className="font-mono text-[12px] tabular text-muted-foreground">{unstated.toLocaleString()} not stated</span>}
       {levels.length > LEVELS_SHOWN && (
         <button type="button" onClick={() => setOpen((v) => !v)} className={cn("w-fit text-[12.5px]", MUTED_LINK)}>
           {open ? "Fewer levels" : `+${levels.length - shown.length} more`}

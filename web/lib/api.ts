@@ -65,7 +65,7 @@ export async function samplesheet(accession: string, topic: string): Promise<Blo
 
 export type Design = {
   source: string; samples: number; shared: Record<string, string>;
-  factors: { name: string; column: string; levels: Record<string, number>; aliases?: string[] }[];
+  factors: { name: string; column: string; levels: Record<string, number>; unstated?: number; aliases?: string[] }[];
   crossed?: { rows: string; columns: string; counts: [string, string, number][] };
 };
 
@@ -163,7 +163,7 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
 
 export type Filters = Record<string, string[]>;
 export type Subset = {
-  samples: number; total: number; rows: number[]; counts: Record<string, Record<string, number>>;
+  samples: number; total: number; rows: number[]; counts: Record<string, Record<string, number>>; unstated: Record<string, number>;
   crossed?: [string, string, number][]; downloads: { commands: string | null; note: string | null } | null;
 };
 

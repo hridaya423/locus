@@ -8,7 +8,7 @@ import { Wordmark } from "@/components/logo";
 import { DesignBars, useSelection, type Selection } from "@/components/design";
 import { size } from "@/components/row-details";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
-import { SampleTable } from "@/components/sample-table";
+import { SampleTable, SelectionBar } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
 import { dataType } from "@/components/result-card";
@@ -194,6 +194,7 @@ function Samples({ rec, designed, selection }: { rec: DatasetRecord; designed: b
   return (
     <section className="grid content-start gap-8">
       <Heading id="samples" count={rec.samples ? rec.samples.rows.length.toLocaleString() : undefined}>Samples</Heading>
+      {rec.samples && <SelectionBar rec={rec} selection={selection} />}
       {designed && <DesignBars rec={rec} selection={selection} />}
       {rec.samples ? (
         <SampleTable dataset={rec.accession} samples={rec.samples} selection={selection} />

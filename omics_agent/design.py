@@ -54,7 +54,8 @@ def from_rows(rows: list[dict[str, str]], source: str) -> dict | None:
         if len(levels) == 1 and len(stated) == len(rows):
             shared[name] = stated[0]
         elif 2 <= len(levels) <= MAX_LEVELS and len(levels) < len(rows):
-            factors.append({"name": name, "column": column_of[name], "levels": dict(levels.most_common())})
+            factors.append({"name": name, "column": column_of[name], "levels": dict(levels.most_common()),
+                            **({"unstated": len(rows) - len(stated)} if len(stated) < len(rows) else {})})
     # Submitters often record one grouping under several names, or join two factors into a combined column
     # ("IPF.Base"); either adds nothing, so duplicates become aliases and combinations are dropped.
     unique: dict[tuple, dict] = {}

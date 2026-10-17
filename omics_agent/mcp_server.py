@@ -122,8 +122,10 @@ def filter_samples(accession: str, filters: dict[str, list[str]], text: str = ""
     factor to the levels wanted, for example {"diagnosis": ["IPF", "Control"], "Sex": ["female"]}: levels of one factor
     combine with OR, factors with AND. `text` keeps rows with that text in any cell. Call it with empty `filters` to list
     the factors and their levels. Returns the matching sample rows (at most `limit`), the count of every level of every
-    factor inside the selection (a factor's own filter is left out of its counts), and the commands that download only
-    those samples' files with a note on what they leave out and the record fields they were read from."""
+    factor inside the selection (a factor's own filter is left out of its counts; `unstated` counts samples with no value
+    for the factor), and the commands that download only those samples' files, with a note on what they leave out and the
+    record fields they were read from. `commands` is null when the repository does not link samples to files; use
+    get_download_plan then. `truncated` says that `rows` holds fewer rows than `samples`."""
     try:
         found = subset.select(accession, filters, text)
     except (LookupError, ValueError) as error:
@@ -131,7 +133,7 @@ def filter_samples(accession: str, filters: dict[str, list[str]], text: str = ""
     sheet = subset.table(accession)
     return {
         "accession": accession, "samples": found["samples"], "total": found["total"], "columns": sheet["columns"],
-        "rows": [sheet["rows"][i] for i in found["rows"][:limit]],
+        "rows": [sheet["rows"][i] for i in found["rows"][:limit]], "truncated": len(found["rows"]) > limit,
         "counts": found["counts"], "downloads": found["downloads"],
     }
 

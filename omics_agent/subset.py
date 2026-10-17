@@ -74,9 +74,7 @@ def downloads(accession: str, rec: record.Record, chosen: list[list[str]]) -> di
         parts += _block(f"raw reads of the {len(chosen):,} runs", "reads-urls.txt", [u for r in chosen for u in reads.get(r[run_column], [])])
         basis.append("raw reads: ENA read_run files of each run in the Run column")
     else:
-        notes.append(f"{sources.REPOSITORY_NAMES.get(rec.source, rec.source)} does not say which file belongs to which sample.")
-    if not parts:
-        notes.append("Only the download plan for the whole dataset applies.")
+        notes.append(f"{sources.REPOSITORY_NAMES.get(rec.source, rec.source)} does not link samples to files.")
     commands = "\n".join([f"mkdir -p ~/omics-data/{accession}/selection && cd ~/omics-data/{accession}/selection", *parts]) if parts else None
     return {"commands": commands, "note": " ".join(notes) or None, "basis": basis}
 
@@ -101,17 +99,18 @@ def select(accession: str, filters: dict[str, list[str]], text: str = "") -> dic
     count = lambda r: int(r[weight]) if weight is not None and r[weight].isdigit() else 1
     keeps = lambda r, skip="": all(r[at[n]].strip() in levels for n, levels in chosen.items() if n != skip) and (not needle or any(needle in v.lower() for v in r))
     matched = [i for i, r in enumerate(rows) if keeps(r)]
-    counts = {}
+    counts, unstated = {}, {}
     for f in factors:
         tally: Counter = Counter()
         for r in rows:
             if keeps(r, f["name"]):
                 tally[r[at[f["name"]]].strip()] += count(r)
         counts[f["name"]] = {level: tally[level] for level in f["levels"]}
+        unstated[f["name"]] = sum(n for level, n in tally.items() if level not in f["levels"])
     narrowed = bool(chosen or needle)
     found = {
-        "samples": sum(count(rows[i]) for i in matched), "total": sum(count(r) for r in rows), "rows": matched, "counts": counts,
-        "downloads": downloads(accession, rec, [rows[i] for i in matched]) if narrowed else None,
+        "samples": sum(count(rows[i]) for i in matched), "total": sum(count(r) for r in rows), "rows": matched, "counts": counts, "unstated": unstated,
+        "downloads": (downloads(accession, rec, [rows[i] for i in matched]) if matched else {"commands": None, "note": "No samples are selected.", "basis": []}) if narrowed else None,
     }
     if crossed := built.get("crossed"):
         a, b = at[crossed["rows"]], at[crossed["columns"]]
@@ -146,6 +145,14 @@ if __name__ == "__main__":
     except ValueError:
         pass
 
+    assert not select("GSE86618", {name: [first]}, "no such text")["downloads"]["commands"]
+    assert select("GSE86618", {name: [first]}, "no such text")["downloads"]["note"] == "No samples are selected."
+
+    sex = next(f for f in design.design("GSE188464", "GEO")["factors"] if f["name"].lower() == "gender")
+    sexes = select("GSE188464", {})
+    assert sexes["unstated"][sex["name"]] == sex["unstated"] > 0, sex
+    assert sum(sexes["counts"][sex["name"]].values()) + sexes["unstated"][sex["name"]] == sexes["total"] == 48, sexes["counts"]
+
     ae = select("E-TABM-937", {})
     built = design.design("E-TABM-937", "ArrayExpress")
     assert ae["total"] == built["samples"] == 181 and len(ae["rows"]) == 19, (ae["total"], len(ae["rows"]))
@@ -153,7 +160,7 @@ if __name__ == "__main__":
     first = built["factors"][0]
     level = next(iter(first["levels"]))
     picked = select("E-TABM-937", {first["name"]: [level]})
-    assert picked["samples"] == first["levels"][level] and picked["downloads"]["commands"] is None and "whole dataset" in picked["downloads"]["note"]
+    assert picked["samples"] == first["levels"][level] and picked["downloads"]["commands"] is None and "does not link samples" in picked["downloads"]["note"]
 
     ena = select("PRJEB2016", {})
     factor = design.design("PRJEB2016", "ENA")["factors"][0]
