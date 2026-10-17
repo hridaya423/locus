@@ -5,9 +5,8 @@ absent or marked as not stated.
 
 import html
 import re
-import tempfile
+import struct
 import xml.etree.ElementTree as ET
-import zipfile
 from functools import lru_cache
 from urllib.parse import quote
 
@@ -30,7 +29,7 @@ NOT_SENT = "Europe PMC did not send the full text"
 REUSED = re.compile(r"downloaded|obtained from|retrieved|previously (published|reported|generated)|external|re-?analy[sz]|published (data|dataset)|public(ly)? (data|dataset)", re.I)
 DEPOSITED_SENTENCE = re.compile(r"deposited|submitted|uploaded|generated in this study|available (in|at|from|under|through|via)|accession (code|number)|can be (found|accessed)", re.I)
 PEER_REVIEW = re.compile(r"peer.?review|review process|reviewer|rebuttal|decision letter", re.I)
-ZIP_LIMIT = 200 << 20
+ZIP_TAIL = 65536
 DATASET_PAGE = 100
 
 
@@ -88,19 +87,50 @@ def _availability(xml: str) -> dict:
     return {"status": "not_stated", "note": NOT_STATED}
 
 
+def _range(url: str, header: str) -> tuple[bytes, int] | None:
+    """The bytes of a Range request and the size of the whole file; None when the server answers anything but 206, so a
+    server that ignores Range is never read to the end."""
+    with httpx.stream("GET", url, headers={"Range": header}, timeout=60) as response:
+        if response.status_code != 206 or "/" not in response.headers.get("content-range", ""):
+            return None
+        return response.read(), int(response.headers["content-range"].rpartition("/")[2])
+
+
+def directory_sizes(read, tail: int = ZIP_TAIL) -> dict[str, int]:
+    """File names and sizes from a zip's central directory, read through `read(header)` Range requests: the last `tail` bytes,
+    then the directory itself when it starts before them. Empty for a zip64 archive or a server without Range."""
+    if not (end := read(f"bytes=-{tail}")):
+        return {}
+    data, total = end
+    if (found := data.rfind(b"PK\x05\x06")) < 0:
+        return {}
+    entries, size, offset = struct.unpack_from("<HII", data, found + 10)
+    if 0xFFFFFFFF in (size, offset):
+        return {}
+    first = total - len(data)
+    if offset >= first:
+        directory = data[offset - first:]
+    elif more := read(f"bytes={offset}-{first - 1}"):
+        directory = more[0] + data
+    else:
+        return {}
+    sizes, at = {}, 0
+    for _ in range(entries):
+        if directory[at:at + 4] != b"PK\x01\x02":
+            return {}
+        uncompressed, name, extra, comment = struct.unpack_from("<I3H", directory, at + 24)
+        if uncompressed != 0xFFFFFFFF and not (key := directory[at + 46:at + 46 + name].decode()).endswith("/"):
+            sizes[key.rsplit("/", 1)[-1]] = uncompressed
+        at += 46 + name + extra + comment
+    return sizes
+
+
 @lru_cache(maxsize=32)
 def _zip_sizes(pmcid: str) -> dict[str, int]:
-    """File sizes read from the directory of Europe PMC's zip of supplementary files; the zip is streamed through a temporary
-    file and discarded, and skipped above ZIP_LIMIT."""
+    url = f"{EPMC}/{pmcid}/supplementaryFiles"
     try:
-        with tempfile.SpooledTemporaryFile(max_size=16 << 20) as spool, httpx.stream("GET", f"{EPMC}/{pmcid}/supplementaryFiles", timeout=120) as response:
-            response.raise_for_status()
-            for chunk in response.iter_bytes():
-                spool.write(chunk)
-                if spool.tell() > ZIP_LIMIT:
-                    return {}
-            return {i.filename.rsplit("/", 1)[-1]: i.file_size for i in zipfile.ZipFile(spool).infolist() if not i.is_dir()}
-    except (httpx.HTTPError, zipfile.BadZipFile):
+        return directory_sizes(lambda header: _range(url, header))
+    except (httpx.HTTPError, struct.error, UnicodeDecodeError):
         return {}
 
 
@@ -231,8 +261,29 @@ if __name__ == "__main__":
     assert {d["accession"]: d["role"] for d in deposit["datasets"]} == {"GSE184894": "deposited", "GSE169049": "reused", "GSE94086": "reused"}
     assert not {a["accession"]: a["in_locus"] for a in deposit["data_availability"]["accessions"]}["MSV000089303"]
 
-    sizes = paper("36439880")["supplementary"]["files"]
-    assert sizes and all(f["bytes"] for f in sizes) and not any(PEER_REVIEW.search(f["name"] + f["caption"]) for f in sizes), sizes
+    import io
+    import time
+    import zipfile
+
+    archive = io.BytesIO()
+    with zipfile.ZipFile(archive, "w") as z:
+        for n in range(300):
+            z.writestr(f"supplement/file{n}.txt", "x" * n)
+    blob = archive.getvalue()
+
+    def ranged(header: str):
+        first, _, last = header.removeprefix("bytes=").partition("-")
+        part = blob[-int(last):] if not first else blob[int(first):int(last) + 1]
+        return part, len(blob)
+
+    assert directory_sizes(ranged, tail=200) == directory_sizes(ranged) == {f"file{n}.txt": n for n in range(300)}
+    assert directory_sizes(lambda header: None) == {}
+
+    started = time.time()
+    files = paper("36439880")["supplementary"]["files"]
+    assert files and time.time() - started < 15 and all(f["bytes"] is None or f["bytes"] > 0 for f in files), files
+    assert not any(PEER_REVIEW.search(f["name"] + f["caption"]) for f in files)
+    print("36439880 sizes:", [f["bytes"] for f in files], "(Europe PMC ignores Range, so a size missing from the XML stays unstated)")
 
     big = paper("22955616")
     assert big["data_availability"]["status"] in ("stated", "not_stated", "unavailable") and big["cited_total"] > 1000
