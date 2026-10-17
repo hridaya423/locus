@@ -21,6 +21,12 @@ omics = "omics_agent.cli:main"
 omics-api = "omics_agent.api:main"
 omics-mcp = "omics_agent.mcp_server:main"
 
+[dependency-groups]
+dev = ["pytest"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
