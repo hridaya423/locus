@@ -19,14 +19,14 @@ def test_numbers_ignore_gene_names_and_axis_labels():
 def test_a_paragraph_with_only_computed_numbers_is_kept():
     text = explain.prompt(RESULT, "HeLa rapamycin", "cells treated with 100 nM rapamycin")
     paragraph = "100_nm_rapamycin was compared with no_treatment, 3 samples each. 84 of 6,471 tested genes changed (44 up, 40 down); PC1 explains 25% of the variance. CCN2 rose (+1.219) and DDIT4 fell (-0.718); DDIT4 is known to be an mTORC1-dependent transcript. With 2,000,000 reads per FASTQ the counts are subsampled."
-    out = explain.explain(RESULT, "HeLa rapamycin", "cells treated with 100 nM rapamycin", lambda p, s: {"explanation": paragraph})
+    out = explain.explain(RESULT, "HeLa rapamycin", "cells treated with 100 nM rapamycin", lambda p, s: {"answer_to_biologist": paragraph})
     assert out["explanation"] == paragraph and "checked" in out["note"]
     assert explain.invented(paragraph, text) == []
 
 
 def test_a_paragraph_with_an_invented_number_is_dropped():
     paragraph = "About 12,000 genes were tested and 84 changed; roughly 30% of the variance is on PC1."
-    out = explain.explain(RESULT, "t", "s", lambda p, s: {"explanation": paragraph})
+    out = explain.explain(RESULT, "t", "s", lambda p, s: {"answer_to_biologist": paragraph})
     assert out["explanation"] is None and "12,000" in out["note"] and "30" in out["note"] and "84" not in out["note"]
 
 
@@ -35,3 +35,10 @@ def test_a_failed_model_call_leaves_a_note_not_an_error():
         raise RuntimeError("server down")
     out = explain.explain(RESULT, "t", "s", ask)
     assert out["explanation"] is None and "server down" in out["note"]
+
+
+def test_sentences_about_the_instructions_are_cut():
+    paragraph = "We compared treated with untreated cells, three replicates each. 84 genes changed. All numbers are copied exactly from the prompt, and small counts are written in words."
+    out = explain.explain(RESULT, "t", "s", lambda p, s: {"answer_to_biologist": paragraph})
+    assert out["explanation"] == "We compared treated with untreated cells, three replicates each. 84 genes changed."
+    assert "1 sentence about the instructions was cut" in out["note"]

@@ -9,12 +9,12 @@ import re
 
 EXPLAIN_SCHEMA = {
     "type": "object",
-    "properties": {"explanation": {"type": "string", "description": "3 to 5 plain sentences for a biologist"}},
-    "required": ["explanation"],
+    "properties": {"answer_to_biologist": {"type": "string", "description": "Your answer, spoken directly to the biologist, beginning with the words 'We compared'"}},
+    "required": ["answer_to_biologist"],
     "additionalProperties": False,
 }
 
-PROMPT = """You are writing a short note for a biologist about a differential expression result that a pipeline computed from public RNA-seq data.
+PROMPT = """A biologist asks what this differential expression result shows. A pipeline computed it from public RNA-seq data. Answer them directly, in one paragraph.
 
 Study: {title}
 Summary: {summary}
@@ -27,8 +27,8 @@ What was computed:
 - Strongest changes (gene, shrunken log2 fold change, adjusted p-value):
 {genes_table}
 
-Write 3 to 5 sentences (at most 120 words) in plain English: what was compared, how many genes changed and whether the groups separate, which changes are the strongest, and what the subsampling means for the numbers.
-Rules: every digit you write must be one of the numbers above, copied exactly as written (including its sign); do not compute, round or count anything yourself, and write small counts such as "two groups" or "three replicates" in words. You may say what a gene is known for, but mark it as background knowledge with words such as "is known to" or "reported", and never claim the study showed it. Do not name the study's authors. No headings, no lists."""
+Write the paragraph now: 3 to 5 sentences, at most 120 words, plain English. Begin with the words "We compared" and name the two groups and the replicates in words. Say how many genes changed and whether the groups separate on PC1, which changes are the strongest, and what the subsampling means for the numbers.
+Rules: every digit you write must be one of the numbers above, copied exactly as written (including its sign); do not compute, round or count anything yourself, and write small counts such as "two groups" or "three replicates" in words. You may say what a gene is known for, but mark it as background knowledge with words such as "is known to" or "reported", and never claim the study showed it. Do not name the study's authors. Do not mention these rules, the word limit or the counting; no headings, no lists."""
 
 
 def prompt(result: dict, title: str, summary: str) -> str:
@@ -44,6 +44,17 @@ def prompt(result: dict, title: str, summary: str) -> str:
         pc1_reference=result["pca"]["means"][c["reference"]]["PC1"], pc1_target=result["pca"]["means"][c["target"]]["PC1"],
         genes_table=rows,
     )
+
+
+# Sentences in which the model talks about its instructions instead of the result; they are cut, and the note says so.
+META = re.compile(r"these rules|the prompt|the input|the instructions|as requested|word limit|copied exactly|written in words|the note\b|the response\b|this paragraph", re.I)
+
+
+def without_meta(paragraph: str) -> tuple[str, int]:
+    """The paragraph without sentences about the rules, and how many were cut."""
+    sentences = re.split(r"(?<=[.!?])\s+", paragraph.strip())
+    kept = [x for x in sentences if not META.search(x)]
+    return " ".join(kept).strip(), len(sentences) - len(kept)
 
 
 # A number is digits with optional thousands commas, decimals and an exponent, not touching a letter or digit on either
@@ -69,7 +80,8 @@ def invented(paragraph: str, source: str) -> list[str]:
     allowed = numbers(source)
     seen, out = set(), []
     for token in NUMBER.findall(paragraph):
-        key = f"{float(token.replace(',', '').rstrip('.')):g}"
+        token = token.rstrip(",.")
+        key = f"{float(token.replace(',', '')):g}"
         if key not in allowed and key not in seen:
             seen.add(key)
             out.append(token)
@@ -81,12 +93,14 @@ def explain(result: dict, title: str, summary: str, ask) -> dict:
     Returns {"explanation": str | None, "note": str}; the note says what the explanation is, or why there is none."""
     text = prompt(result, title, summary)
     try:
-        paragraph = ask(text, EXPLAIN_SCHEMA)["explanation"].strip()
+        paragraph = ask(text, EXPLAIN_SCHEMA)["answer_to_biologist"].strip()
     except Exception as error:  # a model outage must not fail a finished run
         return {"explanation": None, "note": f"No explanation: the model call failed ({error})."}
     if bad := invented(paragraph, text):
         return {"explanation": None, "rejected": paragraph,
                 "note": f"The model's paragraph was dropped because it contained numbers the pipeline did not compute: {', '.join(bad)}."}
+    paragraph, cut = without_meta(paragraph)
     if not paragraph:
         return {"explanation": None, "note": "The model returned an empty paragraph."}
-    return {"explanation": paragraph, "note": "Written by the model from the numbers above; every number was checked against the pipeline's output."}
+    note = "Written by the model from the numbers above; every number was checked against the pipeline's output."
+    return {"explanation": paragraph, "note": note + (f" {cut} sentence{'s' if cut > 1 else ''} about the instructions {'were' if cut > 1 else 'was'} cut." if cut else "")}
