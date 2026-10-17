@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, replace
@@ -50,7 +51,7 @@ PLAN_SCHEMA = {
         },
         "organism": {
             "type": "string",
-            "description": "Latin species name such as 'Homo sapiens', or empty if the question does not restrict species",
+            "description": "One Latin species name such as 'Homo sapiens', or empty if the question does not restrict species or accepts more than one",
         },
         "assays": {
             "type": "array",
@@ -132,10 +133,40 @@ SCREEN_SCHEMA = _numbered({"reason": {"type": "string"}} | CHECKS | {"evidence":
 
 client = anthropic.Anthropic()
 
+# Set LOCAL_LLM_URL (an OpenAI-compatible base URL such as a vLLM server's http://localhost:8000/v1) to run every
+# search call on a local model instead of Claude. LOCAL_LLM_MODEL names the served model. Thinking is off unless
+# LOCAL_LLM_THINK=1, because a local model is far slower than the API and the calls run in parallel batches.
+LOCAL_LLM_URL = os.environ.get("LOCAL_LLM_URL", "").rstrip("/")
+LOCAL_LLM_MODEL = os.environ.get("LOCAL_LLM_MODEL", "")
+LOCAL_LLM_THINK = os.environ.get("LOCAL_LLM_THINK") == "1"
+
+
+def _ask_local(prompt: str, schema: dict, cached: str, think: bool) -> dict:
+    """The same contract as `_ask`, on a local model; the server constrains decoding to the JSON schema."""
+    response = httpx.post(
+        f"{LOCAL_LLM_URL}/chat/completions",
+        json={
+            "model": LOCAL_LLM_MODEL,
+            "max_tokens": 16000,
+            "temperature": 0,
+            "messages": [{"role": "user", "content": "\n\n".join(filter(None, (cached, prompt)))}],
+            "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema}},
+            "chat_template_kwargs": {"enable_thinking": think and LOCAL_LLM_THINK},
+        },
+        timeout=1800,
+    )
+    response.raise_for_status()
+    choice = response.json()["choices"][0]
+    if choice["finish_reason"] == "length":
+        raise RuntimeError("The local model ran out of tokens before finishing its answer.")
+    return json.loads(choice["message"]["content"])
+
 
 def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: str = "", think: bool = True) -> dict:
     """`cached` is a fixed prompt prefix, cached across calls so only the varying part is billed in full.
     `think=False` skips the thinking pass, for coarse scoring where speed matters more than reasoning."""
+    if LOCAL_LLM_URL:
+        return _ask_local(prompt, schema, cached, think)
     # Sonnet can route a safety decline to a fallback model; Haiku has no server-side fallback.
     fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if model == PLANNER else {}
     response = client.beta.messages.create(
@@ -162,6 +193,9 @@ def plan(question: str) -> dict:
     key = f"{version} {' '.join(question.lower().split())}"
     if key not in plans:
         plans[key] = _plan(question)
+        # Every search filters on one species; a list such as 'Homo sapiens, Mus musculus' would match nothing.
+        if re.search(r",|;|/|\band\b|\bor\b", plans[key]["organism"]):
+            plans[key]["organism"] = ""
         PLANS.parent.mkdir(parents=True, exist_ok=True)
         PLANS.write_text(json.dumps(plans, indent=1))
     return plans[key]
@@ -206,7 +240,7 @@ def _plan(question: str) -> dict:
 def gather(search_plan: dict, question: str) -> list[Dataset]:
     """Hybrid search over the whole local index; falls back to live repository search if no index exists."""
     repositories = search_plan["repositories"]
-    if store.DB.exists():
+    if store.has_index():
         terms = search_plan["terms"] + search_plan.get("pride_keywords", [])
         # Embedding search matches study summaries best against summary-like text, so it uses the plan's ideal summary.
         meaning = search_plan.get("ideal_summary") or question

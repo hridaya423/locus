@@ -36,6 +36,8 @@ uv run omics "I work on lung fibrosis in humans and need single-cell and proteom
 uv run omics --json "..."    # machine-readable output
 ```
 
+Without an Anthropic key, locus can run on a local model served through an OpenAI-compatible API, such as vLLM. Set `LOCAL_LLM_URL` (for example `http://localhost:8000/v1`) and `LOCAL_LLM_MODEL` in `.env`. The server must support JSON-schema structured output. Results then depend on that model and have not been checked against the Claude runs in `docs/evidence/`.
+
 Without a local index, locus searches the live APIs of GEO, PRIDE and CELLxGENE only. To search all 18 repositories, build the index first.
 
 ### Build the index
