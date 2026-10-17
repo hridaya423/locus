@@ -139,5 +139,16 @@ def resolve_id(identifier: str) -> dict:
         return {"error": str(error)}
 
 
+@mcp.tool(annotations=READ_ONLY)
+def get_paper(id: str) -> dict:
+    """Facts about one paper from Europe PMC, by PMID, PMCID or DOI: title, authors, journal, year, abstract, the data
+    availability statement quoted from the open-access full text (or why none), supplementary files with sizes and
+    download links, and every locus dataset that cites the paper. `sources` holds the URL each fact came from."""
+    try:
+        return paper.paper(id)
+    except LookupError as error:
+        return {"error": str(error)}
+
+
 def main() -> None:
     mcp.run()

@@ -74,19 +74,19 @@ def _availability(xml: str) -> dict:
         return {"status": "stated", "section": " ".join((section.findtext("title") or "Data availability").split()), "text": "\n".join(p for p in paragraphs if p)}
     sentences = [s for p in root.iter("p") for s in re.split(r"(?<=[.!?])\s+(?=[A-Z])", _text(p)) if ACCESSION.search(s) and DEPOSITED.search(s)]
     if sentences:
-        return {"status": "stated", "section": "Sentences of the full text that name an accession", "text": "\n".join(dict.fromkeys(sentences))}
+        return {"status": "stated", "section": "Sentences naming an accession", "text": "\n".join(dict.fromkeys(sentences))}
     return {"status": "not_stated", "note": NOT_STATED}
 
 
 def _supplementary(xml: str, pmcid: str) -> dict:
-    files = []
+    files = {}
     for block in re.findall(r"<supplementary-material\b[^>]*[^/]>.*?</supplementary-material>", xml, re.S):
         caption = html.unescape(" ".join(re.sub(r"<[^>]+>", " ", block.split("<media", 1)[0]).split()))
         for media in re.findall(r"<media\b.*?</media>", block, re.S):
             name = re.search(r'xlink:href="([^"]+)"', media)[1]
             size = re.search(r"<\?size (\d+)\?>", media)
-            files.append({"name": name, "caption": caption, "bytes": int(size[1]) if size else None, "url": PMC_FILE.format(pmcid[3:], quote(name))})
-    return {"zip": f"{EPMC}/{pmcid}/supplementaryFiles", "files": files}
+            files[name] = {"name": name, "caption": caption, "bytes": int(size[1]) if size else None, "url": PMC_FILE.format(pmcid[3:], quote(name))}
+    return {"zip": f"{EPMC}/{pmcid}/supplementaryFiles", "files": list(files.values())}
 
 
 def _abstract(raw: str) -> list[list[str]]:

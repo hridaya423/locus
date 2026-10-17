@@ -171,3 +171,21 @@ export async function resolve(text: string, signal?: AbortSignal): Promise<Resol
   if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`);
   return res.json();
 }
+
+export type PaperRecord = {
+  pmid: string | null; pmcid: string | null; doi: string | null; path: string;
+  title: string; authors: string[]; journal: string; year: string; abstract: [string, string][];
+  data_availability: { status: "stated" | "not_stated" | "no_full_text"; section?: string; text?: string; note?: string };
+  supplementary: { zip: string; files: { name: string; caption: string; bytes: number | null; url: string }[] } | null;
+  datasets: { accession: string; source: string; title: string; modality: string; samples: number | null; url: string; path: string }[];
+  sources: { metadata: string; full_text: string | null; europe_pmc: string | null; doi: string | null };
+};
+
+export async function paperRecord(id: string, signal?: AbortSignal): Promise<PaperRecord> {
+  const res = await fetch(`${API}/paper/${id.split("/").map(encodeURIComponent).join("/")}`, { signal });
+  if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
+  return res.json();
+}
+
+// A record's paper ID ("pmid:…" or "doi:…") is the path of its locus paper page.
+export const paperPath = (id: string) => `/p/${id.replace(/^(pmid|doi):/, "")}`;

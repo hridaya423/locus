@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import type { DatasetRecord } from "@/lib/api";
+import { paperPath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 
@@ -50,8 +51,9 @@ export function Aside({ rec }: { rec: DatasetRecord }) {
           <ul className="grid gap-3">
             {rec.papers.map((p) => (
               <li key={p.url || p.title} className="grid gap-0.5 text-[13.5px] leading-snug">
-                {p.url ? <a href={p.url} target="_blank" rel="noreferrer" className={LINK}>{p.title}</a> : <span>{p.title}</span>}
+                {p.id ? <Link href={paperPath(p.id)} className={LINK}>{p.title}</Link> : p.url ? <a href={p.url} target="_blank" rel="noreferrer" className={LINK}>{p.title}</a> : <span>{p.title}</span>}
                 {(p.journal || p.year) && <span className="text-[12.5px] text-muted-foreground"><span className="italic">{p.journal}</span> {p.year}</span>}
+                {p.id && p.url && <a href={p.url} target="_blank" rel="noreferrer" className={cn("w-fit text-[12.5px]", MUTED_LINK)}>{new URL(p.url).hostname}</a>}
               </li>
             ))}
           </ul>

@@ -122,6 +122,17 @@ def resolve_identifier(identifier: str) -> dict | None:
         raise HTTPException(502, "A repository did not answer. Please try again.")
 
 
+@app.get("/paper/{identifier:path}")
+def paper_page(identifier: str) -> dict:
+    """A paper's title, authors, abstract, data availability statement, supplementary files and the locus datasets that cite it."""
+    try:
+        return paper.paper(identifier)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except httpx.HTTPError:
+        raise HTTPException(502, "Europe PMC did not answer. Please try again.")
+
+
 def main() -> None:
     import uvicorn
 
