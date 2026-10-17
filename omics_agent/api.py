@@ -9,11 +9,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
+import httpx
 from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, paper, record, resolve, sources  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -108,6 +109,17 @@ def sample_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,3
 def files(accession: str = Path(pattern=r"^PXD\d{6}$")) -> dict:
     """The author-processed files of a PRIDE project and a summary of its raw files."""
     return sources.pride_files(accession)
+
+
+@app.get("/resolve/{identifier:path}")
+def resolve_identifier(identifier: str) -> dict | None:
+    """The locus page an accession, sample or run, PMID, PMCID or DOI names; null when the text is not an identifier."""
+    try:
+        return resolve.resolve(identifier)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except httpx.HTTPError:
+        raise HTTPException(502, "A repository did not answer. Please try again.")
 
 
 def main() -> None:

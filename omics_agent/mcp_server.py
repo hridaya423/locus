@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, paper, resolve  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -124,6 +124,17 @@ def compare_datasets(a: str, b: str, topic: str) -> dict:
     counts as a case, for example "Torin1 mTOR inhibition"."""
     try:
         return asdict(agent.compare_datasets(a, b, topic))
+    except LookupError as error:
+        return {"error": str(error)}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def resolve_id(identifier: str) -> dict:
+    """The locus page for an accession, sample or run, PMID, PMCID or DOI (for example GSE36892, GSM2306940, SRR4216351,
+    PXD012345, E-MTAB-6149, PMID:33331123, 10.15252/msb.20209844). Returns the page path (/d/… for a dataset or sample,
+    /p/… for a paper), the kind of record, and where the match was read. Says so when locus does not have it."""
+    try:
+        return resolve.resolve(identifier) or {"error": f"{identifier} is not an identifier; use search_datasets or find_datasets"}
     except LookupError as error:
         return {"error": str(error)}
 

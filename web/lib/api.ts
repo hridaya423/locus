@@ -160,3 +160,14 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
   return res.json();
 }
+
+export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; found_in: string; title?: string };
+
+// An identifier is one or two words (for "PMID: 123"); anything longer is a question and never leaves the browser.
+export const looksLikeIdentifier = (text: string) => text.length <= 120 && text.trim().split(/\s+/).length <= 2;
+
+export async function resolve(text: string, signal?: AbortSignal): Promise<Resolved | null> {
+  const res = await fetch(`${API}/resolve/${encodeURIComponent(text.trim())}`, { signal });
+  if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`);
+  return res.json();
+}

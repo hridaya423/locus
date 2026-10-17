@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { flushSync } from "react-dom";
 import { ArrowUp, Check, LoaderCircle } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { rememberFound, search, type Plan, type Result } from "@/lib/api";
+import { looksLikeIdentifier, rememberFound, resolve, search, type Plan, type Result } from "@/lib/api";
+import { LINK } from "@/components/page-kit";
 import { SCROLL } from "@/components/result-card";
 import { Results } from "@/components/results";
 import { Reticle, Wordmark } from "@/components/logo";
@@ -118,7 +120,10 @@ function PlanChips({ plan }: { plan: Plan }) {
 }
 
 export function Search() {
+  const router = useRouter();
   const [q, setQ] = useState("");
+  const [looking, setLooking] = useState(false);
+  const [miss, setMiss] = useState<string | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [reached, setReached] = useState<StepKey[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -131,16 +136,23 @@ export function Search() {
 
   // A search is kept for the tab's session, so coming back from a dataset page lands on the same results and row.
   useLayoutEffect(() => {
+    const asked = new URLSearchParams(location.search).get("q")?.trim();
+    if (asked) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setQ(asked);
+      if (looksLikeIdentifier(asked)) open(asked, true);
+      return;
+    }
     const saved = sessionStorage.getItem(LAST);
     if (!saved) return;
     const last: Result = JSON.parse(saved);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQ(last.question);
     setPlan(last.plan);
     setResult(last);
     const y = Number(sessionStorage.getItem(SCROLL));
     sessionStorage.removeItem(SCROLL);
     if (y) requestAnimationFrame(() => window.scrollTo(0, y));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Grow the field so the whole question stays readable after a search.
@@ -161,8 +173,27 @@ export function Search() {
     return () => clearInterval(timer);
   }, [running]);
 
+  // A pasted accession, PMID or DOI opens the page it names; anything else, or an identifier locus lacks, is offered as a search.
+  async function open(text: string, replace = false) {
+    setMiss(null);
+    if (!looksLikeIdentifier(text)) return run(text);
+    current.current?.abort();
+    setLooking(true);
+    try {
+      const found = await resolve(text);
+      if (!found) return run(text);
+      if (replace) router.replace(found.path);
+      else router.push(found.path);
+    } catch (e) {
+      setMiss(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLooking(false);
+    }
+  }
+
   async function run(question: string) {
     if (!question.trim()) return;
+    setMiss(null);
     // A new search replaces the one in flight, so a stalled stream can never lock the page.
     current.current?.abort();
     const controller = new AbortController();
@@ -211,14 +242,14 @@ export function Search() {
           <Bands />
         </div>
       )}
-      <form onSubmit={(e) => { e.preventDefault(); run(q); }} className="relative [view-transition-name:search-bar]">
+      <form onSubmit={(e) => { e.preventDefault(); open(q); }} className="relative [view-transition-name:search-bar]">
         <textarea
           ref={field}
           rows={1}
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => { setQ(e.target.value); setMiss(null); }}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); run(q); }
+            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); open(q); }
           }}
           aria-label="Describe your research"
           placeholder="Lung fibrosis in humans, single-cell and proteomics, patients and controls"
@@ -231,16 +262,22 @@ export function Search() {
           className="absolute bottom-2 right-2 grid size-10 place-items-center rounded-md bg-foreground text-background transition-[transform,opacity,background-color] duration-150 hover:bg-foreground/85 active:scale-[0.96] disabled:opacity-25"
         >
           <span className="grid">
-            <motion.span className="col-start-1 row-start-1 flex" initial={false} animate={running ? HIDDEN : SHOWN} transition={iconSwap}>
+            <motion.span className="col-start-1 row-start-1 flex" initial={false} animate={running || looking ? HIDDEN : SHOWN} transition={iconSwap}>
               <ArrowUp className="size-4" strokeWidth={2} />
             </motion.span>
-            <motion.span className="col-start-1 row-start-1 flex" initial={false} animate={running ? SHOWN : HIDDEN} transition={iconSwap}>
+            <motion.span className="col-start-1 row-start-1 flex" initial={false} animate={running || looking ? SHOWN : HIDDEN} transition={iconSwap}>
               <LoaderCircle className="size-4 animate-spin [animation-duration:.65s]" strokeWidth={2} />
             </motion.span>
           </span>
         </button>
       </form>
 
+      {miss && (
+        <p className="flex flex-wrap items-baseline gap-x-3 text-sm" role="status">
+          {miss}
+          <button type="button" onClick={() => run(q)} className={LINK}>Search for “{q.trim()}” instead</button>
+        </p>
+      )}
       {plan && <PlanChips plan={plan} />}
       <AnimatePresence>{running && <Progress key="progress" reached={reached} counts={counts} seconds={seconds} />}</AnimatePresence>
       {error && <p className="rounded-lg border border-foreground/30 bg-card p-4 text-sm text-foreground">{error}</p>}
