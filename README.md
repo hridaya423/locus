@@ -131,6 +131,7 @@ uv run omics process GSE273888 --topic "mTOR inhibitor, rapamycin"
 | `deseq2_results.tsv`, `top_genes.tsv` | Shrunken log2 fold changes, p-values and adjusted p-values for the chosen contrast |
 | `pca.png`, `volcano.png`, `ma.png` and the same as JSON | The three plots |
 | `manifest.json` | Tool versions, reference release, samples, runs, read cap, timings and the samples left out, with the reason |
+| `explanation.md` | A short paragraph the model wrote from the numbers above. Code checks every number in it against the pipeline's output and drops the paragraph if one was invented; the note under it says what happened |
 
 The contrast is one two-level comparison: the most frequent control value of the labelled field against the most frequent case value, up to 4 samples per side, at least 2. Samples with other values, other assays or no FASTQ in ENA are listed in the manifest with the reason. Only human and mouse have a pinned reference.
 
