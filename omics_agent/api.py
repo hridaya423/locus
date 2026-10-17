@@ -15,6 +15,8 @@ load_dotenv()
 
 from . import agent, process, sources  # noqa: E402  (needs the API key loaded first)
 
+HEARTBEAT = 10
+
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://localhost:3020"], allow_methods=["*"], allow_headers=["*"])
 
@@ -39,8 +41,13 @@ def search(body: SearchIn) -> StreamingResponse:
     threading.Thread(target=work, daemon=True).start()
 
     def stream():
+        # A stage on a local model can take minutes; a heartbeat line keeps proxies from closing the idle stream.
         while True:
-            event = events.get()
+            try:
+                event = events.get(timeout=HEARTBEAT)
+            except queue.Empty:
+                yield json.dumps({"stage": "working"}) + "\n"
+                continue
             yield json.dumps(event) + "\n"
             if event["stage"] in ("done", "error"):
                 return

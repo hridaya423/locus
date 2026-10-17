@@ -43,7 +43,8 @@ export async function search(question: string, onStage: (s: Stage) => void, sign
     const lines = buffer.split("\n");
     buffer = lines.pop() ?? "";
     for (const line of lines.filter(Boolean)) {
-      const stage: Stage = JSON.parse(line);
+      const stage: Stage | { stage: "working" } = JSON.parse(line);
+      if (stage.stage === "working") continue; // heartbeat while a slow stage runs
       finished ||= stage.stage === "done" || stage.stage === "error";
       onStage(stage);
     }
