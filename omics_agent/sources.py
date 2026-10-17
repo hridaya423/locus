@@ -109,9 +109,12 @@ def _pride_papers(references: list[str]) -> list[str]:
 
 
 def search_pride(plan: dict, limit: int) -> list[Dataset]:
+    """PRIDE's keyword search matches a phrase of one or two words; a longer phrase returns nothing, so every planned
+    keyword is tried and then each search term on its own."""
     found: dict[str, Dataset] = {}
     organism = plan["organism"]
-    for keyword in plan.get("pride_keywords") or plan["terms"]:
+    keywords = list(dict.fromkeys([*(plan.get("pride_keywords") or []), *plan["terms"]]))
+    for keyword in keywords:
         projects = httpx.get(PRIDE, params={"keyword": keyword, "pageSize": limit}, timeout=30).json()
         for p in projects:
             organisms = ", ".join(p.get("organisms") or [])
