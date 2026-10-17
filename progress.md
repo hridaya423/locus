@@ -202,14 +202,17 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - Assistant bar (00:05): Opus 5.5 + web search answered all 8 harness questions, $3.91 of the $5 cap (`scripts/assistant_bar.py`, answers in /tmp/locus-night/assistant/). Haiku spend: harness searches were cached; not metered separately.
 - `dataset.tsx` split into `page-kit.tsx`, `sample-table.tsx`, `files.tsx`, `aside.tsx` so parallel builders never share a file.
 
-### Pieces in flight (00:05)
-- A samples filter each other — builder t3/a92a90b9, critic A: FIX (summary line, zero-sample CSV, cap message, focus, truncation, not-stated counts); fix round running.
-- B file preview — t3/d788bbfb, critic B: FIX (preview only where it works, space/comment/quoted tables, mapping honesty, 390 px, list_files tool); fix round running.
-- C paste anything + paper page + mic — t3/7a65981b, critic C: FIX (URLs, SRP/BioProject, punctuation, numeric guard, ENCODE crash, deposited vs reused, sizes, pmid:1, mic state); fix round running.
-- D assays from the methods (lead) — feat/assay, critic D: FIX (36 RPF typed TIS in GSE157490, false positives); round 2 committed 25608cf, critic D2 running.
-- E table + first look + paper genes + gene everywhere (lead) — feat/first-look, critic E running (round started before gene-everywhere commit 389b95b).
-- F quality from the records (lead) — feat/qc 938deca, critic F running.
-- G why it matched — builder running.
+### Pieces in flight (00:30)
+- A samples filter each other — t3/a92a90b9 ad8864d; critic A FIX → fixed; critic A2 running.
+- B file preview — t3/d788bbfb fe14605; critic B FIX → fixed; critic B2 running.
+- C paste anything + paper page + mic — t3/7a65981b 8c58bb3; critic C FIX → fixed; one more fix asked (read zip listings by Range, no whole-zip download).
+- D assays from the methods (lead) — feat/assay 51089a2; critics D FIX (36 RPF typed TIS), D2 FIX (10.1% libraries wrong: RNA words beat titles); round 3 title-first, self-check sweeps 3,226 cached titles; critic D3 running.
+- E table + first look + paper genes + gene everywhere (lead) — feat/gene-entry 5fddd5d; critic E FIX (page crash on unavailable default, nuisance defaults, paper direction noise); round 2 done; critic E2 running.
+- F quality (lead) — feat/qc 0bb6d34; critic F FIX (top-ups flagged as outliers, 62% of QC quotes not QC); round 2 done; critic F2 running.
+- G why it matched — t3/why-matched-highlights 2b71f7e; critic G running.
+- H the answer, "Start with" (lead) — feat/answer a05bd32; no critic yet.
+- Trial integration of A–G on integrate/trial: merges resolve (union for append-only files, by hand for dataset.tsx); all 14 self-checks pass; harness 36 pages, 0 problems, median 341 ms.
+- Rule learned: union-merging two appended functions can drop a shared closing tail; after any union merge run tsc and list every route and tool.
 
 ### Moments
 (one line each: source · page · dataset · moment)
