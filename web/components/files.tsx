@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, Download } from "lucide-react";
+import { ChevronDown, Download, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
+import { Preview } from "@/components/preview";
 import { size } from "@/components/row-details";
 import { repositoryName, type DatasetRecord, type RecordFile } from "@/lib/api";
 
@@ -51,7 +52,7 @@ export function Files({ rec }: { rec: DatasetRecord }) {
           </figcaption>
         </figure>
       )}
-      {list.map((g) => <FileGroup key={g.name} group={g} />)}
+      {list.map((g) => <FileGroup key={g.name} group={g} accession={rec.accession} />)}
       {rec.download_plan && (
         <details className="group/plan">
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
@@ -72,7 +73,7 @@ export function Files({ rec }: { rec: DatasetRecord }) {
 
 const FILES_SHOWN = 6;
 
-function FileGroup({ group }: { group: Group }) {
+function FileGroup({ group, accession }: { group: Group; accession: string }) {
   const [all, setAll] = useState(false);
   const shown = all ? group.files : group.files.slice(0, FILES_SHOWN);
   return (
@@ -87,16 +88,7 @@ function FileGroup({ group }: { group: Group }) {
         </span>
       </h3>
       <ul className="grid">
-        {shown.map((f) => (
-          <li key={f.url} className="group/file grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 border-b border-rule/60 py-1.5 text-[13px] last:border-b-0 sm:grid-cols-[minmax(0,1fr)_9rem_4.5rem]">
-            <a href={f.url} download className="flex min-w-0 items-baseline gap-1.5 hover:text-foreground" title={f.name}>
-              <Download aria-hidden className="size-3 shrink-0 translate-y-[1px] text-muted-foreground group-hover/file:text-foreground" />
-              <span className="truncate underline decoration-transparent underline-offset-4 group-hover/file:decoration-foreground">{f.name}</span>
-            </a>
-            <span className="truncate text-[12.5px] text-muted-foreground max-sm:hidden">{f.kind}</span>
-            <span className="text-right font-mono text-[12px] tabular text-muted-foreground">{f.bytes != null ? size(f.bytes) : "–"}</span>
-          </li>
-        ))}
+        {shown.map((f) => <FileRow key={f.url} file={f} accession={accession} />)}
       </ul>
       {group.files.length > FILES_SHOWN && (
         <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[13px]", MUTED_LINK)}>
@@ -104,5 +96,26 @@ function FileGroup({ group }: { group: Group }) {
         </button>
       )}
     </div>
+  );
+}
+
+function FileRow({ file: f, accession }: { file: RecordFile; accession: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <li className="group/file grid grid-cols-[minmax(0,1fr)_auto_5.5rem] items-baseline gap-x-4 border-b border-rule/60 py-1.5 text-[13px] last:border-b-0 sm:grid-cols-[minmax(0,1fr)_9rem_4.5rem_5.5rem]">
+      <a href={f.url} download className="flex min-w-0 items-baseline gap-1.5 hover:text-foreground" title={f.name}>
+        <Download aria-hidden className="size-3 shrink-0 translate-y-[1px] text-muted-foreground group-hover/file:text-foreground" />
+        <span className="truncate underline decoration-transparent underline-offset-4 group-hover/file:decoration-foreground">{f.name}</span>
+      </a>
+      <span className="truncate text-[12.5px] text-muted-foreground max-sm:hidden">{f.kind}</span>
+      <span className="text-right font-mono text-[12px] tabular text-muted-foreground">{f.bytes != null ? size(f.bytes) : "–"}</span>
+      {f.preview ? (
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className={cn("flex items-center justify-end gap-1 text-[12.5px]", MUTED_LINK)}>
+          <Table2 aria-hidden className="size-3" />
+          {open ? "Hide" : "Preview"}
+        </button>
+      ) : <span />}
+      {open && <div className="col-span-full mt-2 min-w-0 pb-2"><Preview accession={accession} file={f.name} /></div>}
+    </li>
   );
 }

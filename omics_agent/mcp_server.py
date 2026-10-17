@@ -1,12 +1,13 @@
 from dataclasses import asdict
 
+import httpx
 from dotenv import load_dotenv
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, preview  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -126,6 +127,22 @@ def compare_datasets(a: str, b: str, topic: str) -> dict:
         return asdict(agent.compare_datasets(a, b, topic))
     except LookupError as error:
         return {"error": str(error)}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def preview_file(accession: str, file_name: str) -> dict:
+    """Look inside one processed file of a dataset without downloading it: the columns with their inferred types and
+    numeric ranges, the first 20 rows, and the column count. Works for tab or comma separated tables (gzipped or not),
+    GEO series matrices, mzTab, and small xlsx files. Reads only the first 256 KB of the file; `bytes_read`, `size` and
+    `url` say what was read, and `total_rows` is null unless the whole file was read. When the columns are samples, each
+    column carries its group (for example diagnosis: IPF or Control) from the dataset's sample table. `file_name` is a
+    name from the dataset's files, for example "GSE86618_34816genes-540cells-tpm.txt.gz"."""
+    try:
+        return preview.preview(accession, file_name)
+    except (LookupError, ValueError) as error:
+        return {"accession": accession, "file": file_name, "error": str(error)}
+    except httpx.HTTPError as error:
+        return {"accession": accession, "file": file_name, "error": f"The repository did not answer: {error}"}
 
 
 def main() -> None:

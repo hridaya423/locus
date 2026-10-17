@@ -108,7 +108,7 @@ export const SAMPLE_TYPE: Record<string, string> = {
   cell_line: "cell line", animal_or_organoid_model: "model system", unknown: "",
 };
 
-export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string };
+export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string; preview: boolean };
 export type DatasetRecord = {
   accession: string; source: string; url: string; title: string;
   texts: [string, string][]; facts: [string, string[]][];
@@ -158,5 +158,18 @@ export type SampleRecord = DatasetRecord & {
 export async function sampleRecord(dataset: string, sample: string, signal?: AbortSignal): Promise<SampleRecord> {
   const res = await fetch(`${API}/record/${encodeURIComponent(dataset)}/samples/${encodeURIComponent(sample)}`, { signal });
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
+  return res.json();
+}
+
+export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
+export type FilePreview = {
+  file: string; url: string; format: string; sheet: string | null; bytes_read: number; size: number | null; complete: boolean;
+  rows_read: number; total_rows: number | null; column_count: number; columns: PreviewColumn[]; rows: string[][];
+  samples: { by: string; matched: number; of: number; factor: string | null; levels: Record<string, number> } | null;
+};
+
+export async function filePreview(accession: string, file: string, signal?: AbortSignal): Promise<FilePreview> {
+  const res = await fetch(`${API}/preview/${encodeURIComponent(accession)}?file=${encodeURIComponent(file)}`, { signal });
+  if (!res.ok) throw Object.assign(new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`), { retry: res.status >= 500 });
   return res.json();
 }
