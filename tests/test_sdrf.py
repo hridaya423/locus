@@ -85,3 +85,38 @@ def test_the_table_decides_the_sample_type_when_it_can():
     assert sdrf.material_of({}, "Homo sapiens") is None
     facts = sdrf.count(table("PXD042101"), labels("disease", ["endometriosis"], ["normal"]), "SDRF samples")
     assert facts["sample_type"] == "patient_biofluid"
+
+
+def test_the_pride_listed_sdrf_is_the_fallback(tmp_path: Path, monkeypatch):
+    """Without a corpus table, the SDRF the project lists in PRIDE is fetched once; a project without one is remembered."""
+    monkeypatch.setattr(sdrf, "SDRF_DIR", tmp_path / "corpus")
+    monkeypatch.setattr(sdrf, "CACHE", tmp_path / "cache")
+    listing = [{"fileName": "PXD1_community_annotated.sdrf.tsv", "fileCategory": {"value": "EXPERIMENTAL DESIGN"}, "publicFileLocations": [{"value": "ftp://x/long.sdrf.tsv"}]},
+               {"fileName": "sdrf.tsv", "fileCategory": {"value": "EXPERIMENTAL DESIGN"}, "publicFileLocations": [{"value": "ftp://x/sdrf.tsv"}]},
+               {"fileName": "a.raw", "fileCategory": {"value": "RAW"}, "publicFileLocations": []}]
+    table = (FIXTURES / "PXD028392.sdrf.tsv").read_text()
+    calls = []
+
+    class Response:
+        def __init__(self, url):
+            self.url = url
+        def raise_for_status(self):
+            return self
+        def json(self):
+            return listing if "PXD1" in self.url else []
+        @property
+        def text(self):
+            return table
+
+    def get(url, **kwargs):
+        calls.append(url)
+        return Response(url)
+
+    monkeypatch.setattr(sdrf.httpx, "get", get)
+    t = sdrf.sdrf_for("PXD1")
+    assert t and len(t["rows"]) == 6 and calls[-1] == "https://x/sdrf.tsv"   # the shorter, original name wins
+    sdrf.sdrf_for("PXD1")
+    assert len(calls) == 2                                                    # cached: no second listing or download
+    assert sdrf.sdrf_for("PXD2") is None and (tmp_path / "cache" / "PXD2.none").exists()
+    sdrf.sdrf_for("PXD2")
+    assert len(calls) == 3                                                    # the missing listing is remembered too

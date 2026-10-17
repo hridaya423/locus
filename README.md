@@ -174,7 +174,7 @@ For controlled-access data (EGA, dbGaP), locus links to the access request. It d
 ## Limits
 
 - Sample counts are counts of sample records, not of patients. One patient can have several libraries.
-- Counts exist for GEO, CELLxGENE and the PRIDE projects with a curated SDRF in [bigbio/sdrf-annotated-datasets](https://github.com/bigbio/sdrf-annotated-datasets) (about 28% of PRIDE; clone it into `data/sdrf/`). For those, locus counts individuals, samples and runs separately and leaves pooled, QC and reference channels out; a missing individual column shows as "unknown", never as a sample count. Other PRIDE projects have no counts.
+- Counts exist for GEO, CELLxGENE and the PRIDE projects with a curated SDRF in [bigbio/sdrf-annotated-datasets](https://github.com/bigbio/sdrf-annotated-datasets) (about 28% of PRIDE; clone it shallow into `data/sdrf/`), or an SDRF the project itself lists in PRIDE. For those, locus counts individuals, samples and runs separately and leaves pooled, QC and reference channels out; a missing individual column shows as "unknown", never as a sample count. Other PRIDE projects have no counts.
 - The model labels can change between runs, so a count can appear in one run and be missing in the next.
 - A broad search term can count related diseases as cases.
 - Most ENA, EGA, MetaboLights, NODE and dbGaP records have no species, so they pass every species filter.

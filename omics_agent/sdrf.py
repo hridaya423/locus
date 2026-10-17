@@ -8,14 +8,19 @@ marks case and control, through the same label prompt the GEO path uses; code co
 """
 
 import csv
+import json
 import os
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import httpx
+
 from .samples import group_of
 
 SDRF_DIR = Path(os.environ.get("OMICS_SDRF_DIR") or "data/sdrf/datasets")
+PRIDE_FILES = "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/{}/files"
+CACHE = Path.home() / ".cache" / "omics-agent" / "sdrf"
 MISSING = {"", "not available", "not applicable", "n/a", "na", "none", "unknown", "-"}
 POOLED = re.compile(r"\b(pool|pooled|reference|bridge|qc|blank|boost|carrier)\b", re.I)
 KEEP_COMMENTS = {"comment[label]": "label", "comment[instrument]": "instrument", "comment[proteomics data acquisition method]": "acquisition"}
@@ -49,8 +54,36 @@ def parse(path: Path) -> dict:
     return {"columns": columns, "rows": rows}
 
 
+def pride_sdrf(accession: str) -> Path | None:
+    """The SDRF the project itself lists in PRIDE (file category EXPERIMENTAL DESIGN or a name ending in .sdrf.tsv),
+    downloaded once into the cache. None when the project lists none or PRIDE cannot be reached. A missing listing is
+    remembered too, so a project without an SDRF costs one request, not one per search."""
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path, missing = CACHE / f"{accession}.sdrf.tsv", CACHE / f"{accession}.none"
+    if path.exists():
+        return path
+    if missing.exists():
+        return None
+    try:
+        files = httpx.get(PRIDE_FILES.format(accession), params={"pageSize": 1000}, timeout=60).raise_for_status().json()
+        listed = [f for f in files if f["fileCategory"]["value"] == "EXPERIMENTAL DESIGN" or f["fileName"].lower().endswith(".sdrf.tsv")]
+        # A community-annotated table comes after the authors' own; prefer the shorter, original name.
+        for f in sorted(listed, key=lambda f: (len(f["fileName"]), f["fileName"])):
+            url = next((loc["value"] for loc in f.get("publicFileLocations", []) if loc["value"].startswith("ftp://")), None)
+            if url:
+                text = httpx.get(url.replace("ftp://", "https://", 1), timeout=120, follow_redirects=True).raise_for_status().text
+                if "source name" in text.split("\n", 1)[0].lower():
+                    path.write_text(text)
+                    return path
+    except (httpx.HTTPError, KeyError, ValueError):
+        return None
+    missing.write_text(json.dumps({"files": len(files), "listed": [f["fileName"] for f in listed]}))
+    return None
+
+
 def sdrf_for(accession: str) -> dict | None:
-    path = sdrf_path(accession)
+    """The curated corpus table first, else the SDRF the project lists in PRIDE."""
+    path = sdrf_path(accession) or pride_sdrf(accession)
     return parse(path) if path else None
 
 
