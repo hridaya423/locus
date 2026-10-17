@@ -11,6 +11,7 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { SampleTable } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
+import { AssayList } from "@/components/assay";
 import { dataType } from "@/components/result-card";
 import { datasetRecord, found, repositoryName, type DatasetRecord, type Found, type Hit } from "@/lib/api";
 
@@ -122,6 +123,7 @@ function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord
           </div>
         ))}
       </dl>
+      {rec && <AssayList accession={accession} />}
       {rec && (
         <nav aria-label="Sections" className="flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
           {[["about", "About"], ["samples", "Samples"], ["files", processed ? `Files · ${processed} ready to use` : "Files"]].map(([id, label]) => (

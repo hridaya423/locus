@@ -9,7 +9,7 @@ from pathlib import Path
 import anthropic
 import httpx
 
-from . import compare, index, methods, samples, samplesheet, store
+from . import assay, compare, index, methods, samples, samplesheet, store
 from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
 PLANNER = "claude-sonnet-5-5"
@@ -279,7 +279,7 @@ def samplesheet_files(accession: str, topic: str) -> dict[str, str]:
     records = samples.geo_records(accession)
     labels = geo_labels(topic, accession, store.summary(accession))
     runs = samplesheet.ena_runs(sorted({r["srx"] for r in records if r["srx"]}))
-    return samplesheet.build(accession, records, labels, runs)
+    return samplesheet.build(accession, records, labels, runs, assay.library_types(accession))
 
 
 def export_samplesheet(accession: str, topic: str) -> bytes:

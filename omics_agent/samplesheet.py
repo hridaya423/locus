@@ -117,12 +117,17 @@ def _pairs(samples: list[dict], factors: list[str], assay_words: set[str]) -> di
     return {s["gsm"]: n for n, group in enumerate(matched, 1) for s in group}
 
 
-def build(accession: str, records: list[dict], labels: dict, runs: dict[str, list[dict]]) -> dict[str, str]:
-    """samplesheet.csv, contrasts.csv (only if a contrast can run) and README.txt for one GEO series."""
-    kept, left_out = [], []
+def build(accession: str, records: list[dict], labels: dict, runs: dict[str, list[dict]], methods: tuple[dict[str, str], str] = ({}, "")) -> dict[str, str]:
+    """samplesheet.csv, contrasts.csv (only if a contrast can run) and README.txt for one GEO series. `methods` is
+    assay.library_types: where the methods show a library's type, it overrides the model's label."""
+    kept, left_out, retyped = [], [], []
     for r in records:
         assay = _assay(r["fields"], labels)
         kind = TYPES.get(_norm(assay))
+        shown = TYPES.get(_norm(methods[0].get(r["gsm"], "").split(" (")[0]))
+        if shown and shown != kind:
+            retyped.append(f"{r['gsm']} {kind or 'unknown'} -> {shown}")
+            kind = shown
         reason = (
             f"assay '{assay or 'unknown'}' is not Ribo-seq, RNA-seq or TIS-seq" if not kind
             else "no SRA experiment in the GEO record" if not r["srx"]
@@ -203,6 +208,8 @@ def build(accession: str, records: list[dict], labels: dict, runs: dict[str, lis
         writer.writerows(contrasts)
         files["contrasts.csv"] = out.getvalue()
     files["README.txt"] = _readme(accession, labels, kept, left_out, pair_of, crossed, levels, parts, contrasts, skipped)
+    if retyped:
+        files["README.txt"] += f"\nLibrary types corrected from the methods ({'; '.join(retyped)})" + (f", which say: \"{methods[1]}\"" if methods[1] else "") + "\n"
     return files
 
 

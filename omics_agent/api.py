@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, design, record, sources  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -82,6 +82,14 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
 def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
     return design.design(accession, source) or {}
+
+
+@app.get("/assay/{accession}")
+def assays(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """What was measured, read from the methods text with the sentence for each call, and the author's label beside it."""
+    if not (found := assay.classify(accession)):
+        raise HTTPException(404, f"{accession} is not in the index.")
+    return found
 
 
 @app.get("/record/{accession}")

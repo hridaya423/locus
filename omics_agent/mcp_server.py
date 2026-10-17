@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, index  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -96,6 +96,16 @@ def get_methods(accession: str) -> dict:
     if not d or not d.papers:
         return {"accession": accession, "available": False, "reason": "no linked paper"}
     return {"accession": accession} | paper_methods(d.papers[0])
+
+
+@mcp.tool(annotations=READ_ONLY)
+def classify_assays(accession: str) -> dict:
+    """What a dataset really measured, read from its protocols, reagents, antibodies and instruments rather than the
+    author's label: droplet vs plate single-cell, Ribo-seq vs TIS-seq (harringtonine/lactimidomycin), TMT, DIA,
+    phospho enrichment, immunopeptidomics (W6/32), organelle IP and more. Each call quotes the sentence and record field
+    it came from; for GEO footprint studies it lists which samples are which library, how the authors labelled them,
+    and the methods sentence saying where matched RNA-seq and Ribo-seq samples were split."""
+    return assay.classify(accession) or {"accession": accession, "error": "not in the index"}
 
 
 @mcp.tool(annotations=READ_ONLY)
