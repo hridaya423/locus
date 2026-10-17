@@ -164,7 +164,9 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
 export type Evidence = { text: string; term?: string; field: string; samples: string[] };
 export type LibraryRow = { sample: string; title: string; why: string };
 export type Assay = { assay: string; how: "named" | "inferred"; terms: string[]; evidence: Evidence[]; samples?: string[]; stated?: Record<string, number>; strategy?: Record<string, number>; mislabelled: number; library_rows?: LibraryRow[] };
-export type Assays = { accession: string; source: string; assays: Assay[]; unassigned_samples: LibraryRow[]; split: Evidence | null; read_from: string[] };
+export type PairedLibrary = LibraryRow & { assay: string };
+export type Matched = { pairs: { key: string; footprint: PairedLibrary; rna: PairedLibrary; tis?: PairedLibrary }[]; unpaired: PairedLibrary[]; top_ups: PairedLibrary[] };
+export type Assays = { accession: string; source: string; assays: Assay[]; unassigned_samples: LibraryRow[]; split: Evidence | null; read_from: string[]; matched?: Matched };
 
 export async function assays(accession: string, signal?: AbortSignal): Promise<Assays> {
   const res = await fetch(`${API}/assay/${encodeURIComponent(accession)}`, { signal });

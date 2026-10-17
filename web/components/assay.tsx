@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK } from "@/components/page-kit";
-import { assays as fetchAssays, samplePath, type Assay, type Assays, type Evidence, type LibraryRow } from "@/lib/api";
+import { assays as fetchAssays, samplePath, type Assay, type Assays, type Evidence, type LibraryRow, type Matched, type PairedLibrary } from "@/lib/api";
 
 const SAMPLES_SHOWN = 8;
 
@@ -95,6 +95,53 @@ function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
   );
 }
 
+const short = (assay: string) => assay.replace(/ \(.*\)$/, "");
+
+function Library({ dataset, lib }: { dataset: string; lib: PairedLibrary }) {
+  return (
+    <span className="grid min-w-0">
+      <Link href={samplePath(dataset, lib.sample)} className={cn("w-fit font-mono text-[12px]", LINK)}>{lib.sample}</Link>
+      <span className="truncate text-muted-foreground" title={lib.title}>{lib.title}</span>
+    </span>
+  );
+}
+
+function MatchedLibraries({ dataset, matched }: { dataset: string; matched: Matched }) {
+  const tis = matched.pairs.some((p) => p.tis);
+  const kinds = [...new Set(matched.pairs.map((p) => short(p.footprint.assay)))].join(" or ");
+  return (
+    <details className="group/m">
+      <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-3 py-1 text-[13px] [&::-webkit-details-marker]:hidden">
+        <span className="font-medium">Matched libraries</span>
+        <span className="font-mono text-[12px] tabular text-muted-foreground">
+          {matched.pairs.length} {kinds || "footprint"}/RNA-seq pairs by title{matched.unpaired.length > 0 && ` · ${matched.unpaired.length} without a partner`}{matched.top_ups.length > 0 && ` · ${matched.top_ups.length} re-sequencing top-ups`}
+        </span>
+        <ChevronDown aria-hidden className="size-3.5 self-center text-muted-foreground transition-transform duration-200 group-open/m:rotate-180" />
+      </summary>
+      <div className="grid gap-3 pt-2 text-[12.5px]">
+        {matched.pairs.length > 0 && (
+          <ul className="grid">
+            <li className={cn("grid gap-x-4 border-b border-rule pb-1 text-muted-foreground", tis ? "grid-cols-3" : "grid-cols-2")}>
+              <span>Footprints</span><span>RNA-seq</span>{tis && <span>TIS-seq, same sample</span>}
+            </li>
+            {matched.pairs.map((p) => (
+              <li key={p.key} className={cn("grid gap-x-4 border-b border-rule/50 py-1", tis ? "grid-cols-3" : "grid-cols-2")}>
+                <Library dataset={dataset} lib={p.footprint} />
+                <Library dataset={dataset} lib={p.rna} />
+                {tis && (p.tis ? <Library dataset={dataset} lib={p.tis} /> : <span className="text-muted-foreground">–</span>)}
+              </li>
+            ))}
+          </ul>
+        )}
+        {matched.unpaired.length > 0 && (
+          <p className="text-muted-foreground">Without a partner: {matched.unpaired.map((u) => `${u.sample} (${short(u.assay)})`).join(", ")}</p>
+        )}
+        {matched.top_ups.length > 0 && <p className="text-muted-foreground">Re-sequencing top-ups, not separate samples: {matched.top_ups.map((u) => u.sample).join(", ")}</p>}
+      </div>
+    </details>
+  );
+}
+
 export type AssayState = { data?: Assays; failed?: boolean; slow?: boolean };
 
 export function useAssays(accession: string, enabled: boolean): AssayState {
@@ -139,6 +186,7 @@ export function AssayList({ accession, state }: { accession: string; state: Assa
           <LibraryRows dataset={accession} rows={data.unassigned_samples} />
         </details>
       )}
+      {data?.matched && <MatchedLibraries dataset={accession} matched={data.matched} />}
       {data?.split && (
         <div className="grid gap-2 pt-2">
           <h3 className="text-[13px] font-medium">Where the matched libraries were split</h3>

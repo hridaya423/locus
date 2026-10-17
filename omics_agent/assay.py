@@ -241,7 +241,7 @@ def classify(accession: str) -> dict | None:
         picks = [next((e for e in ranked if e.get("how") == how), None) for how in ("named", "inferred")]
         entry["evidence"] = [e for e in picks if e] or ranked[:2]
         entry.setdefault("mislabelled", 0)
-    return {
+    out = {
         "accession": accession,
         "source": rec["source"],
         "assays": [e for e in found.values() if e["evidence"] or e.get("samples")],
@@ -249,6 +249,47 @@ def classify(accession: str) -> dict | None:
         "split": split,
         "read_from": sorted({f for f, _, _ in texts}),
     }
+    if any(a["assay"] in (RIBO, TIS) and a.get("library_rows") for a in out["assays"]) and any(a["assay"] == RNA for a in out["assays"]):
+        out["matched"] = pairs(out)
+    return out
+
+
+def _pair_key(title: str) -> str:
+    """A title without its library words and lab prefix: the biological sample a library was made from."""
+    t = title.split(":")[-1]
+    for rx in (TIS_WORDS, FOOT_WORDS, CHX_WORDS, SMALL_WORDS, RNA_WORDS):
+        t = rx.sub(" ", t)
+    t = re.sub(r"(?<![A-Za-z])(?:seq|library|libraries|reseq|lib)(?![A-Za-z])", " ", t, flags=re.I)
+    return " ".join(re.findall(r"[a-z0-9]+", t.lower()))
+
+
+TOP_UP = re.compile(r"(?<![A-Za-z])(?:re-?seq|top-?up|re-?run|resequenc\w*)(?![A-Za-z])", re.I)
+
+
+def pairs(result: dict) -> dict:
+    """Footprint and RNA-seq libraries of the same biological sample, matched by title: one elongating (else
+    initiating) footprint library and one RNA-seq library per key; a TIS library of the same key rides along.
+    Re-sequencing top-ups and keys shared by two libraries of one kind stay out of pairs."""
+    rows = {a["assay"]: a.get("library_rows", []) for a in result["assays"]}
+    by_key: dict[str, dict[str, list]] = {}
+    top_ups = []
+    for kind in (RIBO, TIS, RNA):
+        for r in rows.get(kind, []):
+            if TOP_UP.search(r["title"]):
+                top_ups.append({**r, "assay": kind})
+                continue
+            by_key.setdefault(_pair_key(r["title"]), {RIBO: [], TIS: [], RNA: []})[kind].append({**r, "assay": kind})
+    matched, paired = [], set()
+    for key, v in by_key.items():
+        foot = v[RIBO] if v[RIBO] else v[TIS]
+        if key and len(foot) == 1 and len(v[RNA]) == 1:
+            pair = {"key": key, "footprint": foot[0], "rna": v[RNA][0]}
+            if v[RIBO] and len(v[TIS]) == 1:
+                pair["tis"] = v[TIS][0]
+            matched.append(pair)
+            paired |= {foot[0]["sample"], v[RNA][0]["sample"], *([pair["tis"]["sample"]] if "tis" in pair else [])}
+    unpaired = [r for v in by_key.values() for kind in (RIBO, TIS, RNA) for r in v[kind] if r["sample"] not in paired]
+    return {"pairs": sorted(matched, key=lambda m: m["key"]), "unpaired": unpaired, "top_ups": top_ups}
 
 
 def library_types(accession: str) -> tuple[dict[str, str], str]:
@@ -315,4 +356,8 @@ if __name__ == "__main__":
     assert "ChIP-seq" not in assays("GSE25958") and not any(a.startswith("Targeted") for a in assays("PRJNA1013390"))
     assert "Data-dependent acquisition (DDA)" not in assays("PXD066697") and "Phosphoproteomics" not in assays("PXD012401")
     assert "Single-cell RNA-seq, plate" not in assays("GSE276671")
+    mtor = classify("GSE36892")["matched"]
+    assert len(mtor["pairs"]) == 4 and len(mtor["unpaired"]) == 4, (len(mtor["pairs"]), [u["title"] for u in mtor["unpaired"]])
+    larp = classify("GSE132703")["matched"]
+    assert len(larp["pairs"]) == 12 and not larp["unpaired"] and len(larp["top_ups"]) == 4, (len(larp["pairs"]), larp["unpaired"])
     print(f"assay self-check passed; title rule held on {checked} footprint-study titles")
