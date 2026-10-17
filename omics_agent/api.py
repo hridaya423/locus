@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -20,7 +20,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allo
 
 class SearchIn(BaseModel):
     question: str
-    limit: int = 40
+    limit: int = agent.KEEP
 
 
 @app.post("/search")
@@ -75,6 +75,32 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
         media_type="application/zip",
         headers={"Content-Disposition": f'attachment; filename="{accession}-riboseq.zip"'},
     )
+
+
+@app.get("/design/{accession}")
+def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
+    return design.design(accession, source) or {}
+
+
+@app.get("/record/{accession}")
+def dataset_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """Everything the repository's own page shows for one dataset: texts, facts, people, papers, links, samples and files."""
+    if not (found := record.record(accession)):
+        raise HTTPException(404, f"{accession} is not in the index.")
+    return found
+
+
+@app.get("/record/{accession}/samples/{sample}")
+def sample_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$"), sample: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """One sample as its repository's sample page shows it: characteristics, protocols, facts, links and files."""
+    try:
+        found = record.sample(accession, sample)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    if not found:
+        raise HTTPException(404, f"locus has no sample pages for {accession}.")
+    return found
 
 
 @app.get("/files/{accession}")

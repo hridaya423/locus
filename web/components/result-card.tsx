@@ -1,17 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, ChevronDown, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DesignView } from "@/components/design";
 import { EASE_OUT } from "@/lib/springs";
-import { SAMPLE_TYPE, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
+import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
 import { Methods, Partners, Ready } from "@/components/row-details";
-
-const WARNING: Record<string, Partial<Record<Check, string>>> = {
-  patient_material: { no: "not patient material", unclear: "sample source not confirmed" },
-  data_type: { no: "different data type" },
-  controls: { no: "no healthy controls", unclear: "controls not confirmed" },
-};
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -59,9 +55,13 @@ export const ROW = "border-b border-rule transition-colors duration-150 last:bor
 export const ACTION =
   "flex items-center gap-1 text-[13px] text-muted-foreground underline decoration-rule underline-offset-4 transition-colors duration-150 hover:text-foreground hover:decoration-foreground";
 
+// Back from a dataset page, the search restores its results; this puts the reader back on the row they opened.
+export const SCROLL = "locus:scroll";
+export const rememberScroll = () => sessionStorage.setItem(SCROLL, String(window.scrollY));
+
 const TONE = { signal: "text-signal", control: "text-control" } as const;
 
-export function CountCell({ value, tone, pooled, href }: { value: number | null | undefined; tone: keyof typeof TONE; pooled?: number; href?: string }) {
+export function CountCell({ value, tone, pooled, href }: { value: number | null | undefined; tone: keyof typeof TONE; pooled?: number; href: string }) {
   if (value === null || value === undefined) {
     return (
       <td className="py-3 pl-2 text-right align-top font-mono text-[13px] text-muted-foreground" title="Not counted from sample records">
@@ -71,15 +71,14 @@ export function CountCell({ value, tone, pooled, href }: { value: number | null 
   }
   return (
     <td className="py-3 pl-2 text-right align-top">
-      <a
+      <Link
         href={href}
-        target="_blank"
-        rel="noreferrer"
+        onClick={rememberScroll}
         title="Open the sample records"
         className={cn("font-mono text-[13px] font-medium tabular underline decoration-transparent underline-offset-4 transition-colors duration-150 hover:decoration-current", value === 0 ? "text-muted-foreground" : TONE[tone])}
       >
         {value}
-      </a>
+      </Link>
       {pooled ? (
         <div className="mt-0.5 whitespace-nowrap font-mono text-[11px] text-muted-foreground" title="Libraries that pool patient and control cells, for example a multiplexed single-cell run">
           +{pooled} pooled
@@ -184,6 +183,12 @@ function Branch({ index, last, below, selected }: Branch & { selected: boolean }
   );
 }
 
+const WARNING: Record<string, Partial<Record<Check, string>>> = {
+  patient_material: { no: "not patient material", unclear: "sample source not confirmed" },
+  data_type: { no: "different data type" },
+  controls: { no: "no healthy controls", unclear: "controls not confirmed" },
+};
+
 type RowProps = {
   hit: Hit;
   matched: string[];
@@ -205,6 +210,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   }, [copied]);
   const facts = hit.facts;
   const plan = hit.download_plan;
+  const page = datasetPath(hit.accession);
   const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
 
   async function exportSamplesheet() {
@@ -220,10 +226,10 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
       setSheet("failed");
     }
   }
-  const samplesUrl = hit.source === "GEO" ? `https://www.ncbi.nlm.nih.gov/geo/browse/?view=samples&series=${hit.accession.slice(3)}` : hit.url;
   const reason = hit.fit === "partial" ? hit.reason : "";
   const warnings = Object.entries(WARNING).map(([k, text]) => text[hit.checks[k as keyof Hit["checks"]]]).filter(Boolean);
   const meta = [repositoryName(hit.source), hit.published?.slice(0, 4), assayOf(hit), materialOf(hit)].filter(Boolean).join(SEP);
+  const toggle = () => setExpanded((v) => !v);
 
   return (
     <tbody data-accession={hit.accession} className={cn(ROW, (selected || expanded) && "bg-card hover:bg-card")}>
@@ -233,35 +239,36 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
           <Checkbox checked={selected} onChange={() => onSelect(hit.accession)} label={`Select ${hit.accession}`} />
         </td>
         <td className="min-w-0 py-3 pr-2 align-top">
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            aria-expanded={expanded}
-            className="grid w-full min-w-0 cursor-pointer gap-1 text-left"
-          >
-            <span className="text-sm leading-snug text-foreground">{hit.title}</span>
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2" title={meta}>
-              <span className="shrink-0 font-mono text-[12px] font-medium text-foreground/80">{shortAccession(hit)}</span>
-              <span className="label line-clamp-2 min-w-0 basis-full text-muted-foreground sm:line-clamp-1 sm:basis-0 sm:grow">{meta}</span>
-            </span>
-            {!branch && hit.paper && (
-              <span className="text-[12.5px] leading-snug text-muted-foreground">
-                <span className="italic">{hit.paper.journal}</span> {hit.paper.year}
+          <div className="grid min-w-0 gap-1">
+            <Link href={page} onClick={rememberScroll} className="w-fit text-sm leading-snug text-foreground underline decoration-transparent underline-offset-4 transition-colors duration-150 hover:decoration-foreground">
+              {hit.title}
+            </Link>
+            <button type="button" onClick={toggle} aria-expanded={expanded} aria-label={`Details of ${hit.accession}`} className="grid w-full min-w-0 cursor-pointer gap-1 text-left">
+              <span className="flex min-w-0 flex-wrap items-baseline gap-x-2" title={meta}>
+                <span className="shrink-0 font-mono text-[12px] font-medium text-foreground/80">{shortAccession(hit)}</span>
+                <span className="label line-clamp-2 min-w-0 basis-full text-muted-foreground sm:line-clamp-1 sm:basis-0 sm:grow">{meta}</span>
               </span>
-            )}
-            {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
-            {!!hit.partners?.length && (
-              <span className="text-[12.5px] leading-snug text-muted-foreground">
-                {hit.source === "PRIDE" ? "Gene" : "Protein"} data on the same tissue: {hit.partners.length}
-              </span>
-            )}
-          </button>
+              {!branch && hit.paper && (
+                <span className="text-[12.5px] leading-snug text-muted-foreground">
+                  <span className="italic">{hit.paper.journal}</span> {hit.paper.year}
+                </span>
+              )}
+              {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
+              {!!hit.partners?.length && (
+                <span className="text-[12.5px] leading-snug text-muted-foreground">
+                  {hit.source === "PRIDE" ? "Gene" : "Protein"} data on the same tissue: {hit.partners.length}
+                </span>
+              )}
+            </button>
+          </div>
         </td>
-        {counts && <CountCell value={facts?.case} tone="signal" href={samplesUrl} />}
-        {counts && <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} href={samplesUrl} />}
+        {counts && <CountCell value={facts?.case} tone="signal" href={`${page}#samples`} />}
+        {counts && <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} href={`${page}#samples`} />}
         <td className="overflow-hidden py-3 pl-2 text-right align-top font-mono text-[13px] tabular text-muted-foreground max-sm:invisible max-sm:p-0">{hit.samples ?? "–"}</td>
         <td className="py-3 pl-1 align-top">
-          <ChevronDown aria-hidden className={cn("mt-[2px] size-4 text-muted-foreground transition-transform duration-200", expanded && "rotate-180")} />
+          <button type="button" onClick={toggle} aria-expanded={expanded} aria-label={`${expanded ? "Hide" : "Show"} details of ${hit.accession}`} className="relative grid cursor-pointer place-items-center before:absolute before:-inset-2 before:content-['']">
+            <ChevronDown aria-hidden className={cn("mt-[2px] size-4 text-muted-foreground transition-transform duration-200", expanded && "rotate-180")} />
+          </button>
         </td>
       </tr>
       <AnimatePresence initial={false}>
@@ -272,10 +279,10 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
               <motion.div {...unfold} className="overflow-hidden">
                 <div className="grid gap-3 pb-4">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-                  <a href={hit.url} target="_blank" rel="noreferrer" className="group/link flex items-center gap-1 font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
-                    Open in {repositoryName(hit.source)}
-                    <ArrowUpRight aria-hidden className="size-3.5 text-muted-foreground group-hover/link:text-foreground" />
-                  </a>
+                  <Link href={page} onClick={rememberScroll} className="group/link flex items-center gap-1 font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
+                    Open dataset
+                    <ArrowRight aria-hidden className="size-3.5 text-muted-foreground transition-transform duration-150 group-hover/link:translate-x-0.5 group-hover/link:text-foreground" />
+                  </Link>
                   {hit.paper && (
                     <a href={hit.paper.url} target="_blank" rel="noreferrer" className="group/link flex items-center gap-1 text-muted-foreground underline decoration-rule underline-offset-4 hover:text-foreground hover:decoration-foreground">
                       Open paper
@@ -304,6 +311,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                 {facts?.methods && <Methods methods={facts.methods} />}
                 {hit.source === "PRIDE" && <Ready accession={hit.accession} />}
                 <Partners hit={hit} />
+                <DesignView accession={hit.accession} source={hit.source} />
                 <details className="group/plan">
                   <summary className={cn(ACTION, "w-fit cursor-pointer list-none")}>
                     Download data

@@ -39,6 +39,7 @@ class Profile:
     sex: str | None = None  # share of women in each group, when the sample records state sex
     sex_split: dict[str, dict[str, int]] | None = None  # women and men per group, for display
     files: tuple[str, ...] = ()  # download links for the processed files
+    diseases: str | None = None  # diseases the repository records for the dataset; never a case/control split
     shared: int | None = None  # samples that also appear in the other dataset; None when not checked
 
 
@@ -142,10 +143,13 @@ def _tagged(facts: dict) -> tuple[str, str | None, str | None]:
     return facts["assays"][0].split(" (")[0], technology, stated.get("instrument_family")
 
 
-def build_profile(row: dict, records: list[dict], labels: dict | None, facts: dict | None, files: list[str] | None = None) -> Profile:
+def build_profile(row: dict, records: list[dict], labels: dict | None, facts: dict | None, files: list[str] | None = None,
+                  meta: dict | None = None) -> Profile:
     """`row` is the store row (accession, source, title, organism, modality), `records` the GEO sample records,
     `labels` the case/control labelling, `facts` the counted facts and `files` the series' processed files;
-    the last four are empty for non-GEO rows."""
+    the last four are empty for non-GEO rows. `meta` is the structured metadata read from the repository's own API
+    (store.metadata); it only fills values the records and trusted method tags leave empty."""
+    meta = meta or {}
     facts, labels = facts or {}, labels or {}
     layer, technology = _assay(facts.get("assays") or [])
     if layer is None:
@@ -153,6 +157,9 @@ def build_profile(row: dict, records: list[dict], labels: dict | None, facts: di
     platform = _joined({r["instrument"] or r["platform"] for r in records})
     if facts.get("methods"):
         layer, technology, platform = _tagged(facts)
+    if layer is None:
+        layer, technology = _assay(meta.get("technologies", []) + meta.get("experiment_types", []))
+    platform = platform or _joined(set(meta.get("instruments", [])))
     case, control = labels.get("case_values"), labels.get("control_values")
     known = facts.get("has_control") is not None
     return Profile(
@@ -164,7 +171,7 @@ def build_profile(row: dict, records: list[dict], labels: dict | None, facts: di
         technology=technology,
         platform=platform,
         material=None if facts.get("sample_type") in (None, "unknown") else facts["sample_type"].replace("_", " "),
-        tissue=facts.get("tissue") or None,
+        tissue=facts.get("tissue") or _joined(set(meta.get("tissues") or meta.get("cell_types") or [])),
         case=facts.get("case") if known else None,
         control=facts["control"] + facts["mixed"] if known else None,
         contrast=f"{'; '.join(case)} vs {'; '.join(control)}" if case and control else None,
@@ -173,6 +180,7 @@ def build_profile(row: dict, records: list[dict], labels: dict | None, facts: di
         sex=_sex(split := _sex_split(records, labels)),
         sex_split=split,
         files=tuple(files or ()),
+        diseases=_joined(set(meta.get("diseases", []))),
     )
 
 
@@ -221,6 +229,8 @@ RULES = (
          "GEO sample counts", lambda a, b: a == b == BOTH),
     Rule("contrast", "Contrast", lambda p: p.contrast_name or p.contrast, ("same",), ("same", "related"),
          "", "case and control labels"),
+    Rule("disease", "Disease", lambda p: p.diseases, (), (),
+         "The repositories record different diseases for these datasets; check they study the condition you mean.", "repository metadata"),
     Rule("shared", "Shared samples", lambda p: None if p.shared is None else "none" if p.shared == 0 else f"{p.shared} in both", (), (),
          "Some samples appear in both datasets: pooled they count twice, and the two results are not independent. Remove the duplicates first.",
          "GEO sample accessions", lambda a, b: a == b == "none"),
@@ -376,4 +386,10 @@ if __name__ == "__main__":
                           "acquisition": {"value": "DDA", "label": "DDA", "trusted": False}, "instrument_family": {"value": "orbitrap", "label": "Orbitrap", "trusted": True}}}
     phospho = build_profile(pride, [], None, tagged)
     assert (phospho.layer, phospho.technology, phospho.platform) == ("phosphoproteome", "TMT", "Orbitrap"), "untrusted DDA is left out"
+    meta = {"instruments": ["Q Exactive HF"], "tissues": ["urine"], "diseases": ["type 2 diabetes mellitus"], "sample_count": 40,
+            "technologies": ["proteomics"]}
+    rich = build_profile(pride, [], None, None, meta=meta)
+    assert (rich.platform, rich.tissue, rich.diseases, rich.layer) == ("Q Exactive HF", "urine", "type 2 diabetes mellitus", "proteome"), rich
+    assert (rich.case, rich.control, rich.contrast) == (None, None, None), "metadata never becomes a case/control split"
+    assert build_profile(row, records, labels, facts, meta=meta).platform == "Illumina HiSeq 4000", "records win over metadata"
     print("ok")

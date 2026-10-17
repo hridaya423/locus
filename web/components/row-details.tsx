@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { readyFiles, repositoryName, type Facts, type Hit, type ReadyFiles } from "@/lib/api";
+import { datasetPath, readyFiles, repositoryName, type Facts, type Hit, type ReadyFiles } from "@/lib/api";
 
 const METHOD_ORDER = ["acquisition", "labelling", "enrichment", "instrument_family", "search_engine", "fractionation"];
 
-const size = (bytes: number) => {
+export const size = (bytes: number) => {
   const units = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.min(units.length - 1, Math.floor(Math.log10(Math.max(bytes, 1)) / 3));
   return `${(bytes / 1000 ** i).toFixed(i > 1 && bytes / 1000 ** i < 10 ? 1 : 0)} ${units[i]}`;
@@ -82,10 +82,9 @@ export function Partners({ hit }: { hit: Hit }) {
       <ul className="grid gap-1 text-[13px]">
         {hit.partners.map((p) => (
           <li key={p.accession} className="flex min-w-0 items-baseline gap-2">
-            <a href={p.url} target="_blank" rel="noreferrer" className="group/link flex shrink-0 items-center gap-1 font-mono text-[12px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
+            <Link href={datasetPath(p.accession)} className="shrink-0 font-mono text-[12px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
               {p.accession}
-              <ArrowUpRight aria-hidden className="size-3 text-muted-foreground group-hover/link:text-foreground" />
-            </a>
+            </Link>
             <span className="min-w-0 truncate text-muted-foreground" title={p.title}>
               {[repositoryName(p.source), p.assay, p.tissue].filter(Boolean).join(" · ")}
             </span>

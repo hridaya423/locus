@@ -13,7 +13,11 @@ from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgen
 
 PLANNER = "claude-sonnet-5-5"
 WORKER = "claude-haiku-5-5"
-MAX_FACTS = 40
+# How many triaged candidates are screened, and how many GEO datasets get their samples counted. In tests on five
+# questions, ranks 41-60 still passed the screen at close to the rate of ranks 1-40 on rich topics (IPF: 12 of 20,
+# including classic datasets), and added little but cost nothing in time on sparse ones.
+KEEP = 60
+MAX_FACTS = 60
 POOL = {"GEO": 300, "PRIDE": 50, "CELLxGENE": 50}
 INDEX_POOL = 300
 REPOSITORIES = {"GEO": search_geo, "PRIDE": search_pride, "CELLxGENE": search_cellxgene}
@@ -135,7 +139,8 @@ client = anthropic.Anthropic()
 
 def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: str = "", think: bool = True) -> dict:
     """`cached` is a fixed prompt prefix, cached across calls so only the varying part is billed in full.
-    `think=False` skips the thinking pass, for coarse scoring where speed matters more than reasoning."""
+    `think=False` skips the thinking pass, for coarse scoring where speed matters more than reasoning.
+    Haiku 5.5 rejects sampling settings such as temperature 0, so repeatability comes from remembering answers."""
     # Sonnet can route a safety decline to a fallback model; Haiku has no server-side fallback.
     fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if model == PLANNER else {}
     response = client.beta.messages.create(
@@ -292,7 +297,7 @@ def _profile(accession: str, topic: str) -> compare.Profile:
         labels = geo_labels(topic, accession, dataset.text)
         facts = samples.count(samples.geo_fields(accession), labels, "GEO sample records", [r["fields"] for r in records])
         files = samples.geo_files(accession)
-    return compare.build_profile(asdict(dataset), records, labels, facts, files)
+    return compare.build_profile(asdict(dataset), records, labels, facts, files, store.metadata([accession]).get(accession))
 
 
 def _contrast(a: compare.Profile, b: compare.Profile, topic: str) -> dict:
@@ -402,29 +407,39 @@ def _listing(batch: list[Dataset], chars: int) -> str:
     return "\n\n".join(f"{n}. {d.accession} | {d.source} | {d.modality} | {d.organism}\n{d.text[:chars]}" for n, d in enumerate(batch))
 
 
-def _answers(template: str, question: str, schema: dict, batches: list[list[Dataset]], chars: int, effort: str, think: bool = True) -> dict[str, dict]:
-    """Each batch in its own parallel call; answers are matched back to datasets by their number in the batch."""
+def _answers(name: str, template: str, question: str, schema: dict, candidates: list[Dataset], size: int, chars: int, effort: str, think: bool = True) -> dict[str, dict]:
+    """Each batch in its own parallel call; answers are matched back to datasets by their number in the batch.
+    Answers are remembered per question, so a repeated search reuses them and only new candidates are asked about;
+    a changed prompt or schema starts afresh."""
+    version = hashlib.sha1((template + json.dumps(schema)).encode()).hexdigest()[:8]
+    slot = "question " + hashlib.sha1(" ".join(question.lower().split()).encode()).hexdigest()[:16]
+    kind = f"{name} answers #{version}"
+    known = store.cached_facts(slot, kind) or {}
+    missing = [d for d in candidates if d.accession not in known]
+    batches = [missing[i:i + size] for i in range(0, len(missing), size)]
+
     def ask(batch: list[Dataset]) -> dict[str, dict]:
         prompt = template.replace("{question}", question).replace("{listing}", _listing(batch, chars))
         return {batch[a["n"]].accession: a for a in _ask(prompt, schema, effort=effort, think=think)["answers"] if 0 <= a["n"] < len(batch)}
 
     with ThreadPoolExecutor(max_workers=len(batches) or 1) as workers:
-        return {k: v for part in workers.map(ask, batches) for k, v in part.items()}
+        known |= {k: v for part in workers.map(ask, batches) for k, v in part.items()}
+    if missing:
+        store.cache_facts(slot, kind, known)
+    return {d.accession: known[d.accession] for d in candidates if d.accession in known}
 
 
 def triage(question: str, candidates: list[Dataset], keep: int) -> list[Dataset]:
     """A cheap first ranking over the whole pool: Haiku scores titles and summary openings in parallel batches."""
-    batches = [candidates[i:i + TRIAGE_BATCH] for i in range(0, len(candidates), TRIAGE_BATCH)]
     # Thinking off: in tests it changed the top 40 about as much as two thinking runs differ, at a third of the time.
-    scores = {k: v["score"] for k, v in _answers(TRIAGE_PROMPT, question, TRIAGE_SCHEMA, batches, 250, "low", think=False).items()}
+    scores = {k: v["score"] for k, v in _answers("triage", TRIAGE_PROMPT, question, TRIAGE_SCHEMA, candidates, TRIAGE_BATCH, 250, "low", think=False).items()}
     ranked = sorted(candidates, key=lambda d: scores.get(d.accession, 0), reverse=True)
     return [d for d in ranked if scores.get(d.accession, 0) > 0][:keep]
 
 
 def screen(question: str, candidates: list[Dataset]) -> dict[str, dict]:
     """Haiku answers the four checks for every candidate, with a reason and a quoted phrase, in small parallel batches."""
-    batches = [candidates[i:i + SCREEN_BATCH] for i in range(0, len(candidates), SCREEN_BATCH)]
-    return _answers(SCREEN_PROMPT, question, SCREEN_SCHEMA, batches, 1500, "medium")
+    return _answers("screen", SCREEN_PROMPT, question, SCREEN_SCHEMA, candidates, SCREEN_BATCH, 1500, "medium")
 
 
 def relevant(candidates: list[Dataset], verdicts: dict[str, dict]) -> list[Dataset]:
@@ -528,10 +543,9 @@ def add_partners(search_plan: dict, hits: list[dict]) -> None:
         hit["partners"] = [o for o in others if o["accession"] != hit["accession"] and _species(o["organism"]) == species][:3]
 
 
-def add_papers(hits: list[dict]) -> None:
-    """Attach the linked paper (title, journal, year) to each hit, from one Europe PMC query per 25 IDs."""
-    first = {h["accession"]: next(iter(h["papers"]), None) for h in hits}
-    ids = sorted({p for p in first.values() if p})
+def paper_details(ids: list[str]) -> dict[str, dict]:
+    """Title, journal, year and link for each `pmid:` or `doi:` ID that Europe PMC knows, from one query per 25 IDs."""
+    ids = sorted(set(ids))
     found: dict[str, dict] = {}
     for start in range(0, len(ids), 25):
         chunk = ids[start:start + 25]
@@ -555,6 +569,13 @@ def add_papers(hits: list[dict]) -> None:
                 found[f"pmid:{r['pmid']}"] = paper
             if r.get("doi"):
                 found[f"doi:{r['doi'].lower()}"] = paper
+    return found
+
+
+def add_papers(hits: list[dict]) -> None:
+    """Attach the linked paper (title, journal, year) to each hit."""
+    first = {h["accession"]: next(iter(h["papers"]), None) for h in hits}
+    found = paper_details([p for p in first.values() if p])
     for h in hits:
         h["paper"] = found.get(first[h["accession"]])
 
@@ -582,7 +603,7 @@ def bundles(hits: list[dict]) -> list[list[dict]]:
     return [g for i, g in enumerate(groups) if g not in groups[:i]]
 
 
-def run(question: str, limit: int = 40, progress=lambda stage, data: None) -> dict:
+def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> dict:
     """The whole search: plan, gather wide, screen, count samples for survivors, grade, bundle.
     Shared by the CLI, API, and MCP server."""
     search_plan = plan(question)

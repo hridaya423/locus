@@ -5,7 +5,7 @@ import NumberFlow from "@number-flow/react";
 import { ArrowDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { repositoryName, type Hit, type Result } from "@/lib/api";
+import { datasetPath, repositoryName, type Hit, type Result } from "@/lib/api";
 import { CompareDialog, Connector } from "@/components/compare";
 import { Checkbox, CountCell, DatasetRow, ROW, SEP, Stem, assayOf, materialOf, unfold } from "@/components/result-card";
 
@@ -59,7 +59,7 @@ function StudyRow({ hits, counts, matched, topic, selected, toggle, select }: Gr
   const best = hits.filter(counted).sort((a, b) => b.facts!.case! + (b.facts!.control ?? 0) - a.facts!.case! - (a.facts!.control ?? 0))[0];
   const samples = hits.reduce((n, h) => n + (h.samples ?? 0), 0);
   const picked = hits.filter((h) => selected.has(h.accession)).length;
-  const href = best?.source === "GEO" ? `https://www.ncbi.nlm.nih.gov/geo/browse/?view=samples&series=${best.accession.slice(3)}` : best?.url;
+  const href = `${datasetPath((best ?? hits[0]).accession)}#samples`;
   return (
     <>
       <tbody data-accession={hits.map((h) => h.accession).join(" ")} className={cn(ROW, (open || picked > 0) && "bg-card hover:bg-card", open && "border-b-0")}>

@@ -20,7 +20,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="omics", description="Find public omics datasets with a plain-English question.")
     parser.add_argument("question")
     parser.add_argument("--json", action="store_true", help="print machine-readable results")
-    parser.add_argument("--limit", type=int, default=40, help="max candidates per repository")
+    parser.add_argument("--limit", type=int, default=agent.KEEP, help="how many triaged candidates to screen")
     args = parser.parse_args()
 
     load_dotenv()

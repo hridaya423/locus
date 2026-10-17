@@ -35,7 +35,7 @@ def _record(d: Dataset) -> dict:
 
 
 @mcp.tool(annotations=READ_ONLY)
-def search_datasets(question: str, limit_per_repository: int = 40) -> dict:
+def search_datasets(question: str, limit_per_repository: int = 60) -> dict:
     """Find public omics datasets for a research question in plain English, graded and checked. Takes about a minute.
 
     Searches GEO, ArrayExpress, ENA, PRIDE, MassIVE, MetaboLights, CELLxGENE and more. Returns the search plan and

@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EASE_OUT, motionTier } from "@/lib/springs";
-import { compare, repositoryName, type Comparison, type Facet, type FacetStatus, type Hit, type Profile, type Verdict } from "@/lib/api";
+import { compare, datasetPath, repositoryName, type Comparison, type Facet, type FacetStatus, type Hit, type Profile, type Verdict } from "@/lib/api";
 import { ACTION, SEP, draw, shortAccession, tone } from "@/components/result-card";
 import { Reticle } from "@/components/logo";
 
@@ -100,7 +101,7 @@ const GAP: Record<Lane, number> = { joined: 0, near: 6, apart: 18 };
 const DRAW = 0.9;
 const GRID = "relative grid grid-cols-[1fr_2.75rem_1fr] sm:grid-cols-[7.5rem_1fr_4rem_1fr]";
 // Each dataset's contrast is named in its own words, so both sides show even when the two are judged the same.
-const SHOWN_BOTH = new Set(["groups", "sizes", "contrast", "shared", "access", "sex"]);
+const SHOWN_BOTH = new Set(["groups", "sizes", "contrast", "shared", "access", "sex", "disease"]);
 const WARN_ONLY = new Set(["sizes", "shared"]);
 // One-line labels keep every row a single line tall, so the whole comparison fits on a laptop screen.
 const SHORT: Record<string, string> = { layer: "Layer", groups: "Groups", tissue: "Tissue", build: "Genome", access: "Data", sex: "Sex", shared: "Shared", sizes: "Group size" };
@@ -162,7 +163,7 @@ function Access({ profile, hit }: { profile: Profile; hit: Hit }) {
       {files.slice(0, 2).map((url) => (
         <a key={url} href={url} className={CHIP} title={url}><span className="truncate">{fileLabel(url, hit.accession)}</span><ArrowDown aria-hidden className="size-3 shrink-0" /></a>
       ))}
-      {files.length > 2 && <a href={`https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=${hit.accession}`} target="_blank" rel="noreferrer" className={cn(CHIP, "text-muted-foreground")}>+{files.length - 2}</a>}
+      {files.length > 2 && <Link href={`${datasetPath(hit.accession)}#files`} className={cn(CHIP, "text-muted-foreground")}>+{files.length - 2}</Link>}
       {!profile.access?.includes("raw reads") && !files.length && <span className="text-muted-foreground">none listed</span>}
     </span>
   );
@@ -286,11 +287,9 @@ function Dataset({ hit, letter }: { hit: Hit; letter: string }) {
         <span className="label truncate text-muted-foreground">{letter}{SEP}{repositoryName(hit.source)}</span>
       </span>
       <span className="line-clamp-2 text-sm leading-snug">{hit.title}</span>
-      {hit.source === "GEO" && (
-        <a href={`https://www.ncbi.nlm.nih.gov/geo/browse/?view=samples&series=${hit.accession.slice(3)}`} target="_blank" rel="noreferrer" className={cn(ACTION, "w-fit")}>
-          Sample records
-        </a>
-      )}
+      <Link href={`${datasetPath(hit.accession)}#samples`} className={cn(ACTION, "w-fit")}>
+        Samples
+      </Link>
     </div>
   );
 }

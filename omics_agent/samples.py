@@ -139,7 +139,8 @@ def gemma_fields(accession: str) -> dict[str, Counter] | None:
         factors = [item for factor in sample.get("fvbasicVOs") or [] for item in factor.get("characteristics") or []]
         for prefix, items in (("curated ", factors), ("", sample.get("characteristics") or [])):
             for item in items:
-                if item["category"] not in GEMMA_SKIP and item.get("value"):
+                # Gemma leaves the category empty on some curated values; without a name they cannot be a field.
+                if item.get("category") and item["category"] not in GEMMA_SKIP and item.get("value"):
                     fields[prefix + item["category"]][item["value"]] += 1
     return fields or None
 

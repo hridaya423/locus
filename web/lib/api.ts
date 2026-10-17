@@ -63,13 +63,26 @@ export async function samplesheet(accession: string, topic: string): Promise<Blo
   return res.blob();
 }
 
+export type Design = {
+  source: string; samples: number; shared: Record<string, string>;
+  factors: { name: string; levels: Record<string, number>; aliases?: string[] }[];
+  crossed?: { rows: string; columns: string; counts: [string, string, number][] };
+};
+
+export async function design(accession: string, source: string): Promise<Design | null> {
+  const res = await fetch(`${API}/design/${accession}?source=${encodeURIComponent(source)}`);
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  const body = await res.json();
+  return body.factors ? body : null;
+}
+
 export type Verdict = "pool" | "effects" | "no" | "unclear";
 export type FacetStatus = "same" | "related" | "differs" | "unknown";
 export type Profile = {
   accession: string; source: string; title: string; organism: string | null; layer: string | null; technology: string | null;
   platform: string | null; material: string | null; tissue: string | null; case: number | null; control: number | null;
   contrast: string | null; build: string | null; contrast_name?: string | null; access?: string | null; sex?: string | null; shared?: number | null;
-  sex_split?: Record<"cases" | "controls", { female: number; male: number }> | null; files?: string[];
+  sex_split?: Record<"cases" | "controls", { female: number; male: number }> | null; files?: string[]; diseases?: string | null;
 };
 export type Facet = { key: string; label: string; a: string | null; b: string | null; status: FacetStatus; note: string; source: string; required: boolean };
 export type Comparison = { a: Profile; b: Profile; verdict: Verdict; reason: string; facets: Facet[]; steps: string[] };
@@ -94,3 +107,56 @@ export const SAMPLE_TYPE: Record<string, string> = {
   patient_tissue: "patient tissue", patient_biofluid: "patient fluid", primary_cells: "primary cells",
   cell_line: "cell line", animal_or_organoid_model: "model system", unknown: "",
 };
+
+export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string };
+export type DatasetRecord = {
+  accession: string; source: string; url: string; title: string;
+  texts: [string, string][]; facts: [string, string[]][];
+  people: { role: string; name: string; affiliation?: string; email?: string; phone?: string; web?: string }[];
+  papers: { title: string; journal: string; year: string; url: string; id?: string }[];
+  links: [string, string][];
+  samples: { columns: string[]; rows: string[][]; link: string; pages?: boolean } | null;
+  files: RecordFile[]; unmapped: string[];
+  modality: string; organism: string; published: string | null; sample_count: number | null; download_plan: string;
+};
+
+export async function datasetRecord(accession: string, signal?: AbortSignal): Promise<DatasetRecord> {
+  const res = await fetch(`${API}/record/${encodeURIComponent(accession)}`, { signal });
+  if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
+  return res.json();
+}
+
+// What a search found out about each dataset, kept so the dataset page can show it, also in a new tab.
+export type Found = { hit: Hit; topic: string; matched: string[] };
+const FOUND = "locus:found";
+
+export function rememberFound(result: Result) {
+  const topic = result.plan.terms.join(", ");
+  const matched = result.plan.matched_assays ?? [];
+  const found = Object.fromEntries(result.datasets.map((hit) => [hit.accession, { hit, topic, matched }]));
+  try {
+    localStorage.setItem(FOUND, JSON.stringify(found));
+  } catch {}
+}
+
+export function found(accession: string): Found | null {
+  try {
+    return JSON.parse(localStorage.getItem(FOUND) ?? "{}")[accession] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export const datasetPath = (accession: string) => `/d/${encodeURIComponent(accession)}`;
+export const samplePath = (dataset: string, sample: string) => `${datasetPath(dataset)}/${encodeURIComponent(sample)}`;
+
+export type SampleRecord = DatasetRecord & {
+  dataset: { accession: string; title: string; source: string };
+  position: { index: number; total: number; previous: string | null; next: string | null };
+};
+
+export async function sampleRecord(dataset: string, sample: string, signal?: AbortSignal): Promise<SampleRecord> {
+  const res = await fetch(`${API}/record/${encodeURIComponent(dataset)}/samples/${encodeURIComponent(sample)}`, { signal });
+  if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
+  return res.json();
+}

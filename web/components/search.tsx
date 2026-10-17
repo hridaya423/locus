@@ -6,13 +6,15 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { search, type Plan, type Result } from "@/lib/api";
+import { rememberFound, search, type Plan, type Result } from "@/lib/api";
+import { SCROLL } from "@/components/result-card";
 import { Results } from "@/components/results";
 import { Reticle, Wordmark } from "@/components/logo";
 
 const SHOWN = { opacity: 1, scale: 1, filter: "blur(0px)" };
 const HIDDEN = { opacity: 0, scale: 0.9, filter: "blur(4px)" };
 const iconSwap = motionTier.micro;
+const LAST = "locus:last-search";
 
 const STEPS = [
   { key: "plan", label: "Understanding the question" },
@@ -127,6 +129,20 @@ export function Search() {
   const field = useRef<HTMLTextAreaElement>(null);
   const current = useRef<AbortController | null>(null);
 
+  // A search is kept for the tab's session, so coming back from a dataset page lands on the same results and row.
+  useLayoutEffect(() => {
+    const saved = sessionStorage.getItem(LAST);
+    if (!saved) return;
+    const last: Result = JSON.parse(saved);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQ(last.question);
+    setPlan(last.plan);
+    setResult(last);
+    const y = Number(sessionStorage.getItem(SCROLL));
+    sessionStorage.removeItem(SCROLL);
+    if (y) requestAnimationFrame(() => window.scrollTo(0, y));
+  }, []);
+
   // Grow the field so the whole question stays readable after a search.
   useLayoutEffect(() => {
     const el = field.current;
@@ -167,7 +183,13 @@ export function Search() {
         setReached((r) => [...r, s.stage]);
         if (s.stage === "plan") setPlan(s.data);
         if (s.stage === "facts") setCounts((c) => ({ ...c, facts: s.data.count }));
-        if (s.stage === "done") setResult(s.data);
+        if (s.stage === "done") {
+          setResult(s.data);
+          rememberFound(s.data);
+          try {
+            sessionStorage.setItem(LAST, JSON.stringify(s.data));
+          } catch {}
+        }
       }, controller.signal);
     } catch (e) {
       if (!controller.signal.aborted) setError(e instanceof Error ? e.message : String(e));
