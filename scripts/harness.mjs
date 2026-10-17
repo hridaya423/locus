@@ -62,7 +62,9 @@ for (const [n, question] of QUESTIONS.entries()) {
     const before = page.errors.length;
     await page.width(1280);
     await page.goto(`${WEB}/`);
-    await page.until("document.querySelector('textarea')", 20000);
+    await page.eval("sessionStorage.clear()");
+    await page.goto(`${WEB}/`);
+    await page.until("!!document.querySelector('textarea') && !document.querySelector('tbody[data-accession]')", 20000);
     const t0 = Date.now();
     await page.eval(`(() => {
       const ta = document.querySelector('textarea');
