@@ -160,3 +160,14 @@ export async function sampleRecord(dataset: string, sample: string, signal?: Abo
   if (!res.ok) throw new Error(res.status === 404 ? "missing" : `${res.status}`);
   return res.json();
 }
+
+export type Browse = { field: string; value: string; phrase: string; matched_in: string; source: string; total: number; offset: number; by_source: Record<string, number>;
+  datasets: { accession: string; source: string; title: string; samples: number | null; published: string | null; modality: string }[] };
+
+export async function browseValue(field: string, value: string, source: string, offset: number, signal?: AbortSignal): Promise<Browse> {
+  const res = await fetch(`${API}/browse?${new URLSearchParams({ field, value, source, offset: String(offset) })}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export const browsePath = (field: string, value: string) => `/browse?${new URLSearchParams({ field, value })}`;

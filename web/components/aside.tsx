@@ -3,16 +3,25 @@ import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import type { DatasetRecord } from "@/lib/api";
+import Link from "next/link";
+import { browsePath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 
-function FactValues({ values }: { values: string[] }) {
+const BROWSABLE = /^(organisms?|species|instruments?|platforms?|experiment types?|data type|keywords|library (strategy|source|selection)|study type|quantification|modifications|tissues?|diseases?|cell types?|software|technolog(y|ies)|organism part)$/i;
+
+function FactValues({ label, values }: { label: string; values: string[] }) {
   const [all, setAll] = useState(false);
   const shown = all ? values : values.slice(0, VALUES_SHOWN);
   return (
     <dd className="grid gap-0.5 text-[13.5px] leading-snug">
-      {shown.map((v) => <span key={v} className="break-words">{v}</span>)}
+      {shown.map((v) =>
+        BROWSABLE.test(label) && !/^(no|none|not)\b/i.test(v) ? (
+          <Link key={v} href={browsePath(label, v)} className={cn("w-fit break-words", LINK)} title={`Every locus dataset with ${label.toLowerCase()} ${v}`}>{v}</Link>
+        ) : (
+          <span key={v} className="break-words">{v}</span>
+        ),
+      )}
       {values.length > VALUES_SHOWN && (
         <button type="button" onClick={() => setAll((v) => !v)} className={cn("w-fit text-[12.5px]", MUTED_LINK)}>
           {all ? "fewer" : `+${values.length - VALUES_SHOWN} more`}
@@ -40,7 +49,7 @@ export function Aside({ rec }: { rec: DatasetRecord }) {
           {rec.facts.map(([label, values]) => (
             <div key={label} className="grid gap-0.5">
               <dt className="text-[12px] text-muted-foreground">{label}</dt>
-              <FactValues values={values} />
+              <FactValues label={label} values={values} />
             </div>
           ))}
         </dl>

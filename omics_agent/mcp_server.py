@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index  # noqa: E402  (needs the API key loaded first)
+from . import agent, browse, index  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -96,6 +96,14 @@ def get_methods(accession: str) -> dict:
     if not d or not d.papers:
         return {"accession": accession, "available": False, "reason": "no linked paper"}
     return {"accession": accession} | paper_methods(d.papers[0])
+
+
+@mcp.tool(annotations=READ_ONLY)
+def browse_datasets(field: str, value: str, source: str = "", offset: int = 0) -> dict:
+    """Every locus dataset that shares one stated value from a dataset record: an organism ('Homo sapiens'), an
+    instrument ('Illumina NovaSeq 6000', 'Q Exactive HF-X'), a data type or a keyword. Returns the total, counts per
+    repository and 50 datasets per page, newest first, with where the value was matched."""
+    return browse.browse(field, value, source, offset)
 
 
 @mcp.tool(annotations=READ_ONLY)

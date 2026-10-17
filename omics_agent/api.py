@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources  # noqa: E402  (needs the API key loaded first)
+from . import agent, browse, design, record, sources  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -83,6 +83,12 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
 def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
     return design.design(accession, source) or {}
+
+
+@app.get("/browse")
+def browse_value(field: str, value: str, source: str = "", offset: int = 0) -> dict:
+    """Every locus dataset that shares one stated value (organism, instrument, data type, keyword), newest first."""
+    return browse.browse(field, value[:200], source, max(0, offset))
 
 
 @app.get("/record/{accession}")
