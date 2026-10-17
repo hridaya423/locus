@@ -101,16 +101,19 @@ def processed_table_zip(accession: str = Path(pattern=r"^GSE\d+$")) -> Response:
 
 @app.get("/first-look/{accession}")
 def first_look(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
-               control: Annotated[list[str] | None, Query()] = None) -> dict:
+               control: Annotated[list[str] | None, Query()] = None, within_factor: str | None = None, within: str | None = None) -> dict:
     """Each gene's change between two sample groups and its significance, from the fetched counts; the method is in the result."""
-    return volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
+    try:
+        return volcano.compare(accession, factor, case, control, (within_factor, within) if within_factor and within else None)
+    except (httpx.HTTPError, ValueError) as error:
+        raise HTTPException(502, f"The table could not be read: {error}") from error
 
 
 @app.get("/first-look/{accession}/paper")
 def first_look_paper(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
                      control: Annotated[list[str] | None, Query()] = None) -> dict:
     """The genes the dataset's paper names, and where each lands in the same comparison."""
-    look = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
+    look = volcano.compare(accession, factor, case, control)
     return volcano.paper_genes(accession, look) if look.get("available") else {"available": False, "reason": look.get("reason")}
 
 

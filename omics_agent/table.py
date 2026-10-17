@@ -34,7 +34,9 @@ def available(accession: str) -> dict | None:
     """The NCBI-generated raw counts file GEO offers for a series, or None."""
     if not re.fullmatch(r"GSE\d+", accession):
         return None
-    page = httpx.get(LISTING.format(accession), timeout=30, follow_redirects=True).text
+    page = httpx.get(LISTING.format(accession), timeout=30, follow_redirects=True).raise_for_status().text
+    if "Download data" not in page:
+        raise ValueError(f"GEO did not send the download page for {accession}")
     if not (m := re.search(rf"{accession}_raw_counts_([^\"&]+?)_NCBI\.tsv\.gz", page)):
         return None
     name = m.group(0)
@@ -181,8 +183,8 @@ counts.tsv  {len(data['gene_ids'])} genes x {len(data['samples'])} samples (colu
 samples.tsv one row per sample, the characteristics from the GEO record
 features.tsv NCBI Gene symbol, description and type per gene_id
 
-Python: import pandas as pd; counts = pd.read_csv("counts.tsv", sep="\\t", index_col=0); samples = pd.read_csv("samples.tsv", sep="\\t", index_col=0)
-R:      counts <- read.delim("counts.tsv", row.names = 1); samples <- read.delim("samples.tsv", row.names = 1)
+Python: import pandas as pd; counts = pd.read_csv("counts.tsv", sep="\\t", index_col=0).drop(columns="symbol"); samples = pd.read_csv("samples.tsv", sep="\\t", index_col=0)
+R:      counts <- read.delim("counts.tsv", row.names = 1)[, -1]; samples <- read.delim("samples.tsv", row.names = 1)
 """)
     return out.getvalue()
 

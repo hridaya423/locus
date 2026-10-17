@@ -15,8 +15,6 @@ from . import record, table
 
 FULLTEXT = Path.home() / ".cache" / "omics-agent" / "fulltext"
 EUROPE_PMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
-UP = re.compile(r"\b(?:increas|elevat|up-?regulat|higher|induc|enrich|overexpress|gain)", re.I)
-DOWN = re.compile(r"\b(?:decreas|reduc|down-?regulat|lower|loss|lost|depleted|suppress|diminish)", re.I)
 # Gene symbols that are also ordinary words or common abbreviations in papers.
 NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "WAS", "CAD", "AIM", "IMPACT", "ACE", "CLOCK", "MET", "ARC",
              "BAD", "CAST", "COPD", "IPF", "MAP", "MARCH", "SEPT", "PC", "TNF", "AGO", "ATM", "BID", "CAP", "CAR", "COIL", "DO", "GC", "HR", "IMP",
@@ -27,12 +25,19 @@ METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as m
 Q, LFC = 0.05, 1.0
 
 
-def groups(accession: str) -> dict:
-    """The sample table's factors whose levels could split cases from controls, with the default comparison."""
+NUISANCE = re.compile(r"donor|patient|individual|subject|\bid\b|platform|batch|lane|run|replicate|\brep\b|sex|gender|\bage\b|title|library|molecule|"
+                      r"flowcell|barcode|instrument|sequenc|plate|well|chip|slide|array|sample name", re.I)
+PREFER = re.compile(r"disease|diagnosis|condition|treatment|genotype|group|phenotype|state|status|infection|agent|stimul|drug|knock|strain|tissue type", re.I)
+
+
+def groups(accession: str, present: set[str] | None = None) -> dict:
+    """The sample table's factors that could split cases from controls, counted over the samples that have data, and the
+    default comparison: only a non-nuisance factor with a control-like level; no default otherwise."""
     rec = record.record(accession)
     if not rec or not rec["samples"]:
         return {"factors": [], "default": None}
     cols, rows = rec["samples"]["columns"], rec["samples"]["rows"]
+    rows = [r for r in rows if present is None or r[0] in present]
     factors = []
     for i, name in enumerate(cols):
         if name in ("Accession", "Title"):
@@ -42,41 +47,51 @@ def groups(accession: str) -> dict:
             if r[i]:
                 levels[r[i]] = levels.get(r[i], 0) + 1
         if 2 <= len(levels) <= 12 and sum(n >= 2 for n in levels.values()) >= 2:
-            factors.append({"name": name, "levels": dict(sorted(levels.items(), key=lambda kv: -kv[1]))})
+            factors.append({"name": name, "levels": dict(sorted(levels.items(), key=lambda kv: -kv[1])), "nuisance": bool(NUISANCE.search(name))})
     default = None
-    for f in factors:
-        controls = [lv for lv in f["levels"] if CONTROL.search(lv)]
-        if controls:
-            cases = [lv for lv in f["levels"] if lv not in controls]
-            if cases:
-                default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}
-                break
-    if not default and factors:
-        f = factors[0]
-        top = list(f["levels"])[:2]
-        default = {"factor": f["name"], "case": [top[0]], "control": [top[1]]}
+    for f in sorted((f for f in factors if not f["nuisance"]), key=lambda f: not PREFER.search(f["name"])):
+        controls = [lv for lv in f["levels"] if CONTROL.search(lv) and f["levels"][lv] >= 2]
+        cases = [lv for lv in f["levels"] if lv not in controls and f["levels"][lv] >= 2]
+        if controls and cases:
+            default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}
+            break
     return {"factors": factors, "default": default}
 
 
-def compare(accession: str, factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None) -> dict:
+def compare(accession: str, factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None,
+            within: tuple[str, str] | None = None) -> dict:
     data = table.counts(accession)
     if not data:
         return {"accession": accession, "available": False, "reason": "no gene by sample table: neither NCBI's counts nor the authors' files"}
-    choice = groups(accession)
+    rec = record.record(accession)
+    present = set(data["samples"])
+    choice = groups(accession, present)
+    base = {"accession": accession, "groups": choice, "samples_with_data": len(present & {r[0] for r in rec["samples"]["rows"]}),
+            "record_samples": len(rec["samples"]["rows"])}
     if factor is None:
         if not choice["default"]:
-            return {"accession": accession, "available": False, "reason": "the sample table has no factor with two groups"}
+            return base | {"available": False, "reason": "no characteristic has a control-like group; choose two groups to compare"}
         factor, case, control = choice["default"]["factor"], choice["default"]["case"], choice["default"]["control"]
-    rec = record.record(accession)
     cols = rec["samples"]["columns"]
     if factor not in cols:
-        return {"accession": accession, "available": False, "reason": f"no sample characteristic named {factor}"}
-    level = {r[0]: r[cols.index(factor)] for r in rec["samples"]["rows"]}
+        return base | {"available": False, "reason": f"no sample characteristic named {factor}"}
+    if not case or not control:
+        f = next((f for f in choice["factors"] if f["name"] == factor), None)
+        controls = [lv for lv in (f["levels"] if f else {}) if CONTROL.search(lv)]
+        cases = [lv for lv in (f["levels"] if f else {}) if lv not in controls]
+        if not (controls and cases):
+            return base | {"available": False, "reason": f"{factor} has no control-like level; name the case and control levels"}
+        case, control = case or [max(cases, key=f["levels"].get)], control or controls
+    if set(case) & set(control):
+        return base | {"available": False, "reason": "the case and control groups overlap"}
+    value = {r[0]: r for r in rec["samples"]["rows"]}
+    keep_row = lambda s: s in value and (within is None or (within[0] in cols and value[s][cols.index(within[0])] == within[1]))
+    level = {s: value[s][cols.index(factor)] for s in data["samples"] if keep_row(s)}
     in_case = np.array([level.get(s) in case for s in data["samples"]])
     in_control = np.array([level.get(s) in control for s in data["samples"]])
     n_case, n_control = int(in_case.sum()), int(in_control.sum())
     if min(n_case, n_control) < 2:
-        return {"accession": accession, "available": False, "reason": f"{n_case} case and {n_control} control samples have counts; each group needs at least 2"}
+        return base | {"available": False, "reason": f"{n_case} case and {n_control} control samples have data; each group needs at least 2"}
 
     m = data["matrix"].astype(float)
     smaller = min(n_case, n_control)
@@ -96,15 +111,29 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     t, p = stats.ttest_ind(a, b, axis=1, equal_var=False)
     p = np.nan_to_num(p, nan=1.0)
     q = stats.false_discovery_control(p)
-    symbols = np.array(data["symbols"])[keep]
+    symbols = [str(s) if not str(s).isdigit() else f"GeneID:{s}" for s in np.array(data["symbols"])[keep]]
     order = np.argsort(p)
-    genes = [[str(symbols[i]), round(float(lfc[i]), 3), round(float(-np.log10(max(p[i], 1e-300))), 3), float(f"{q[i]:.3g}")] for i in order]
-    up = [g for g in genes if g[3] < Q and g[1] >= LFC]
-    down = [g for g in genes if g[3] < Q and g[1] <= -LFC]
-    return {
-        "accession": accession, "available": True, "factor": factor, "case": case, "control": control,
+    genes = [[symbols[i], round(float(lfc[i]), 3), round(float(-np.log10(max(p[i], 1e-300))), 3), float(f"{q[i]:.3g}")] for i in order]
+    up = int(((q < Q) & (lfc >= LFC)).sum())
+    down = int(((q < Q) & (lfc <= -LFC)).sum())
+    chosen = [s for s in data["samples"] if level.get(s) in case + control]
+    pooled = []
+    for i, name in enumerate(cols):
+        if name in ("Accession", "Title", factor) or NUISANCE.search(name):
+            continue
+        seen = {g: {value[s][i] for s in chosen if level.get(s) in grp and value[s][i]} for g, grp in (("case", case), ("control", control))}
+        if len(seen["case"]) > 1 and len(seen["control"]) > 1 and sorted(seen["case"] | seen["control"]) not in [p["levels"] for p in pooled]:
+            pooled.append({"factor": name, "levels": sorted(seen["case"] | seen["control"])})
+    warnings = []
+    if smaller < 3:
+        warnings.append(f"{smaller} samples in the smaller group: too few for a reliable test")
+    if max(n_case, n_control) > 4 * smaller:
+        warnings.append(f"groups of {n_case} and {n_control} are unbalanced")
+    warnings += [f"pooled across {p['factor']} ({', '.join(p['levels'][:4])}{'…' if len(p['levels']) > 4 else ''})" for p in pooled]
+    return base | {
+        "available": True, "factor": factor, "case": case, "control": control, "within": list(within) if within else None,
         "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": method, "q": Q, "lfc": LFC,
-        "up": len(up), "down": len(down), "genes": genes, "source": data["source"], "groups": choice,
+        "up": up, "down": down, "genes": genes, "source": data["source"], "pooled": pooled, "warnings": warnings,
     }
 
 
@@ -156,15 +185,11 @@ def paper_genes(accession: str, look: dict) -> dict:
         for sentence in re.split(r"(?<=[.;])\s+(?=[A-Z(])", text):
             for symbol in dict.fromkeys(re.findall(r"(?<![\w-])[A-Z][A-Z0-9]{2,}(?![\w-])", sentence)):
                 if symbol in here and symbol not in NOT_GENES and symbol not in named:
-                    up, down = bool(UP.search(sentence)), bool(DOWN.search(sentence))
-                    says = "higher" if up and not down else "lower" if down and not up else None
                     g = here[symbol]
-                    significant = g[3] < look["q"] and abs(g[1]) >= look["lfc"]
-                    agrees = None if says is None or not significant else (says == "higher") == (g[1] > 0)
-                    named[symbol] = {"gene": symbol, "sentence": sentence if sentence != symbol else None, "where": where, "says": says, "log2fc": g[1], "q": g[3], "significant": significant, "agrees": agrees}
+                    named[symbol] = {"gene": symbol, "sentence": sentence if sentence != symbol else None, "where": where,
+                                     "log2fc": g[1], "q": g[3], "significant": g[3] < look["q"] and abs(g[1]) >= look["lfc"]}
     genes = sorted(named.values(), key=lambda n: n["q"])
     return {"available": True, **head, "genes": genes, "named": len(genes), "significant": sum(n["significant"] for n in genes),
-            "agree": sum(n["agrees"] is True for n in genes), "disagree": sum(n["agrees"] is False for n in genes),
             "by_chance": round(len(genes) * (look["up"] + look["down"]) / look["tested"], 1)}
 
 
@@ -173,10 +198,15 @@ if __name__ == "__main__":
     assert g["default"] == {"factor": "disease state", "case": ["IPF"], "control": ["healthy donor"]}, g["default"]
     r = compare("GSE124685")
     assert (r["n_case"], r["n_control"]) == (49, 35), (r["n_case"], r["n_control"])
-    top = {g[0]: g for g in r["genes"][:2000]}
+    top = {x[0]: x for x in r["genes"][:2000]}
     for gene in ("MMP7", "SPP1", "COL1A1"):
         assert gene in top and top[gene][1] > 1, (gene, top.get(gene))
+    partial = compare("GSE254942")
+    assert "groups" in partial and (partial["available"] or partial["reason"]), "a partial table must not lose the pickers"
+    assert compare("GSE150411")["available"] is False or compare("GSE150411")["factor"] != "donor", "donor is never the default"
+    assert not compare("GSE124685", "disease state", ["IPF"], ["IPF"])["available"], "overlapping groups are refused"
+    pooled = compare("GSE227269")
+    assert not pooled["available"] or pooled["pooled"] or pooled["factor"] != "treatment", pooled.get("warnings")
     check = paper_genes("GSE124685", r)
     assert check["available"] and check["named"] >= 5, {k: v for k, v in check.items() if k != "genes"}
-    print("paper check:", {k: v for k, v in check.items() if k != "genes"})
-    print("volcano self-check passed:", r["tested"], "genes tested,", r["up"], "up,", r["down"], "down; top", [g[0] for g in r["genes"][:8]])
+    print("volcano self-check passed:", r["tested"], "tested,", r["up"], "up,", r["down"], "down; GSE227269", pooled.get("warnings"), pooled.get("factor"))

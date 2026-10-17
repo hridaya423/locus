@@ -115,15 +115,15 @@ def first_look(accession: str, factor: str = "", case: list[str] | None = None, 
     (Europe PMC full text or text-mined mentions) and where each lands here. A screen, not DESeq2."""
     result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     if not result.get("available"):
-        return result
+        return {k: v for k, v in result.items() if k != "groups"} | {"factors": result.get("groups", {}).get("factors", [])}
     check = volcano.paper_genes(accession, result)
     genes = result.pop("genes")
     result.pop("groups")
     result["paper_check"] = {k: v for k, v in check.items() if k != "genes"} | {"genes": [
-        {k: g[k] for k in ("gene", "log2fc", "q", "significant", "says", "agrees", "where", "sentence")} for g in check.get("genes", [])[:top]]}
+        {k: g[k] for k in ("gene", "log2fc", "q", "significant", "where", "sentence")} for g in check.get("genes", [])[:top]]}
     columns = ["gene", "log2_fold_change", "minus_log10_p", "q"]
-    result["top_up"] = [dict(zip(columns, g)) for g in genes if g[1] > 0][:top]
-    result["top_down"] = [dict(zip(columns, g)) for g in genes if g[1] < 0][:top]
+    result["top_up"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] >= result["lfc"]][:top]
+    result["top_down"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] <= -result["lfc"]][:top]
     return result
 
 

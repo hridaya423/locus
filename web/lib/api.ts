@@ -166,7 +166,8 @@ export type TableSummary = { accession: string; available: boolean; reason?: str
 export type Gene = [symbol: string, lfc: number, minusLog10P: number, q: number];
 export type FirstLook = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
   tested: number; method: string; q: number; lfc: number; up: number; down: number; genes: Gene[]; source: NonNullable<TableSummary["source"]>;
-  groups: { factors: { name: string; levels: Record<string, number> }[]; default: { factor: string; case: string[]; control: string[] } | null } };
+  groups: { factors: { name: string; levels: Record<string, number>; nuisance: boolean }[]; default: { factor: string; case: string[]; control: string[] } | null };
+  within: [string, string] | null; pooled: { factor: string; levels: string[] }[]; warnings: string[]; samples_with_data: number; record_samples: number };
 
 export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
   const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });
@@ -176,21 +177,27 @@ export async function tableSummary(accession: string, signal?: AbortSignal): Pro
 
 export const tableDownload = (accession: string) => `${API}/table/${encodeURIComponent(accession)}/download`;
 
-export async function firstLook(accession: string, pick: { factor: string; case: string[]; control: string[] } | null, signal?: AbortSignal): Promise<FirstLook> {
+export type Pick = { factor: string; case: string[]; control: string[]; within?: [string, string] | null };
+
+export async function firstLook(accession: string, pick: Pick | null, signal?: AbortSignal): Promise<FirstLook> {
   const q = new URLSearchParams();
   if (pick) {
     q.set("factor", pick.factor);
     pick.case.forEach((c) => q.append("case", c));
     pick.control.forEach((c) => q.append("control", c));
+    if (pick.within) {
+      q.set("within_factor", pick.within[0]);
+      q.set("within", pick.within[1]);
+    }
   }
   const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}?${q}`, { signal });
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
 
-export type PaperGene = { gene: string; sentence: string | null; where: string; says: "higher" | "lower" | null; log2fc: number; q: number; significant: boolean; agrees: boolean | null };
+export type PaperGene = { gene: string; sentence: string | null; where: string; log2fc: number; q: number; significant: boolean };
 export type PaperCheck = { available: boolean; reason?: string; paper?: string; title?: string; journal?: string; year?: string; url?: string; read?: string;
-  genes: PaperGene[]; named: number; significant: number; agree: number; disagree: number; by_chance: number };
+  genes: PaperGene[]; named: number; significant: number; by_chance: number };
 
 export async function paperCheck(accession: string, pick: { factor: string; case: string[]; control: string[] }, signal?: AbortSignal): Promise<PaperCheck> {
   const q = new URLSearchParams({ factor: pick.factor });
