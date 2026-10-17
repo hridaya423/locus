@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
 import { looksLikeIdentifier, rememberFound, resolve, search, type Plan, type Result } from "@/lib/api";
 import { LINK } from "@/components/page-kit";
+import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
 import { Results } from "@/components/results";
 import { Reticle, Wordmark } from "@/components/logo";
@@ -124,6 +125,7 @@ export function Search() {
   const [q, setQ] = useState("");
   const [looking, setLooking] = useState(false);
   const [miss, setMiss] = useState<string | null>(null);
+  const voice = useDictation(q, setQ);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [reached, setReached] = useState<StepKey[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -176,6 +178,7 @@ export function Search() {
   // A pasted accession, PMID or DOI opens the page it names; anything else, or an identifier locus lacks, is offered as a search.
   async function open(text: string, replace = false) {
     setMiss(null);
+    voice.stop();
     if (!looksLikeIdentifier(text)) return run(text);
     current.current?.abort();
     setLooking(true);
@@ -253,8 +256,9 @@ export function Search() {
           }}
           aria-label="Describe your research"
           placeholder="Lung fibrosis in humans, single-cell and proteomics, patients and controls"
-          className="block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 pr-16 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground"
+          className={cn("block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground", voice.supported ? "pr-24" : "pr-16")}
         />
+        {voice.supported && <MicButton listening={voice.listening} onClick={voice.toggle} />}
         <button
           type="submit"
           disabled={!q.trim()}
@@ -272,6 +276,11 @@ export function Search() {
         </button>
       </form>
 
+      {(voice.listening || voice.problem) && (
+        <p className="text-sm text-muted-foreground" role="status">
+          {voice.listening ? "Listening. Speak your question, then select the microphone to stop." : voice.problem}
+        </p>
+      )}
       {miss && (
         <p className="flex flex-wrap items-baseline gap-x-3 text-sm" role="status">
           {miss}
