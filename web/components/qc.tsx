@@ -6,33 +6,57 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { quality, samplePath, type DepthRow, type Quality } from "@/lib/api";
 
 const QUOTES = 5;
+const BARS = 40;
+const OUTLIERS = 10;
 const millions = (n: number) => `${(n / 1e6).toFixed(n < 1e7 ? 1 : 0)} M`;
 
-function Strip({ dataset, name, rows, median, lo, hi }: { dataset: string; name: string; rows: DepthRow[]; median: number; lo: number; hi: number }) {
-  const x = (n: number) => ((Math.log10(Math.max(n, 1)) - lo) / (hi - lo)) * 100;
-  const out = rows.filter((r) => r.outlier);
+function SampleLink({ dataset, sample }: { dataset: string; sample: string }) {
+  return sample.startsWith("GSM") ? <Link href={samplePath(dataset, sample)} className={cn("font-mono text-[12px]", LINK)}>{sample}</Link> : <span className="font-mono text-[12px]">{sample}</span>;
+}
+
+function Bars({ dataset, rows, max }: { dataset: string; rows: DepthRow[]; max: number }) {
   return (
-    <div className="grid gap-1.5">
+    <ul className="grid gap-0.5 text-[12.5px]">
+      {rows.map((r) => (
+        <li key={r.sample} className="grid grid-cols-[6.5rem_minmax(0,1fr)_4rem] items-center gap-x-3 sm:grid-cols-[6.5rem_minmax(0,14rem)_minmax(0,1fr)_4rem]">
+          <SampleLink dataset={dataset} sample={r.sample} />
+          <span className="truncate text-muted-foreground max-sm:hidden" title={r.title}>{r.title}</span>
+          <span aria-hidden className="relative h-2 rounded-full bg-foreground/10">
+            <span className={cn("absolute inset-y-0 left-0 rounded-full", r.outlier ? "bg-signal" : "bg-foreground/50")} style={{ width: `${(r.reads / max) * 100}%` }} />
+          </span>
+          <span className="text-right font-mono tabular">{millions(r.reads)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Group({ dataset, name, rows, group }: { dataset: string; name: string; rows: DepthRow[]; group: Quality["depth"]["groups"][string] }) {
+  const [all, setAll] = useState(false);
+  const outliers = rows.filter((r) => r.outlier);
+  return (
+    <div className="grid gap-2">
       <p className="flex flex-wrap items-baseline gap-x-3 text-[13px]">
         <span className="font-medium">{name}</span>
-        <span className="font-mono text-[12px] tabular text-muted-foreground">{rows.length} samples · median {millions(median)} reads</span>
+        <span className="font-mono text-[12px] tabular text-muted-foreground">
+          {group.samples} samples · {millions(group.min_reads)} to {millions(group.max_reads)} reads, median {millions(group.median_reads)}
+          {!group.flagged && " · not flagged"}
+        </span>
       </p>
-      <div className="relative h-7 rounded-md border border-rule bg-card" role="img" aria-label={`${name}: reads per sample, median ${millions(median)}`}>
-        <span aria-hidden className="absolute inset-y-1 w-px bg-foreground/50" style={{ left: `${x(median)}%` }} />
-        {rows.map((r) => (
-          <span key={r.sample} title={`${r.sample} ${r.title}: ${r.reads.toLocaleString()} reads${r.outlier ? ` (${r.outlier})` : ""}`}
-            className={cn("absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full", r.outlier ? "bg-signal" : "bg-foreground/40")}
-            style={{ left: `${x(r.reads)}%` }} />
-        ))}
-      </div>
-      {out.length > 0 && (
-        <p className="flex flex-wrap gap-x-4 gap-y-1 text-[12.5px]">
-          {out.map((r) => (
-            <span key={r.sample} className="text-signal">
-              {r.sample.startsWith("GSM") ? <Link href={samplePath(dataset, r.sample)} className={LINK}>{r.sample}</Link> : r.sample}{" "}
-              <span className="text-muted-foreground">{r.title}</span> {millions(r.reads)} · {r.outlier}
-            </span>
-          ))}
+      {rows.length <= BARS ? (
+        <Bars dataset={dataset} rows={rows} max={group.max_reads} />
+      ) : (
+        outliers.length > 0 && <Bars dataset={dataset} rows={all ? outliers : outliers.slice(0, OUTLIERS)} max={group.max_reads} />
+      )}
+      {outliers.length > 0 && (
+        <p className="flex flex-wrap items-center gap-x-3 text-[12.5px]">
+          <span className="flex items-center gap-1.5">
+            <span aria-hidden className="size-2 rounded-full bg-signal" />
+            {outliers.length} far from the median: {outliers.slice(0, 3).map((r) => `${r.sample} ${r.outlier}`).join(", ")}{outliers.length > 3 && "…"}
+          </span>
+          {rows.length > BARS && outliers.length > OUTLIERS && (
+            <button type="button" onClick={() => setAll((v) => !v)} className={MUTED_LINK}>{all ? "Fewer" : `All ${outliers.length}`}</button>
+          )}
         </p>
       )}
     </div>
@@ -42,35 +66,53 @@ function Strip({ dataset, name, rows, median, lo, hi }: { dataset: string; name:
 export function QualitySection({ accession }: { accession: string }) {
   const [data, setData] = useState<Quality | null>(null);
   const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [all, setAll] = useState(false);
   useEffect(() => {
     const ctrl = new AbortController();
-    quality(accession, ctrl.signal).then(setData, () => !ctrl.signal.aborted && setFailed(true));
+    quality(accession, ctrl.signal).then((d) => { setData(d); setFailed(false); }, () => !ctrl.signal.aborted && setFailed(true));
     return () => ctrl.abort();
-  }, [accession]);
+  }, [accession, attempt]);
 
-  if (failed) return null;
+  if (failed)
+    return (
+      <section className="grid content-start gap-3">
+        <Heading id="quality">Quality</Heading>
+        <p className="flex flex-wrap gap-x-3 text-[13px] text-muted-foreground">
+          locus could not read the run table and methods.
+          <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
+        </p>
+      </section>
+    );
   if (!data) return <p className="text-[13px] text-muted-foreground">Reading run tables and methods for quality…</p>;
   const { depth, criteria } = data;
+  const sequencing = depth.sequencing !== false;
   if (!depth.available && criteria.quotes.length === 0) return null;
-  const reads = depth.available ? depth.rows.map((r) => r.reads) : [];
-  const lo = Math.floor(Math.log10(Math.max(1, Math.min(...reads))) * 4) / 4 - 0.1;
-  const hi = Math.ceil(Math.log10(Math.max(1, ...reads)) * 4) / 4 + 0.1;
   const quotes = all ? criteria.quotes : criteria.quotes.slice(0, QUOTES);
+  const topUps = depth.available ? depth.rows.filter((r) => r.top_up_of) : [];
   return (
     <section className="grid content-start gap-6">
       <Heading id="quality">Quality</Heading>
       {depth.available ? (
-        <div className="grid gap-4">
+        <div className="grid gap-5">
           {Object.entries(depth.groups).map(([name, g]) => (
-            <Strip key={name} dataset={accession} name={name} rows={depth.rows.filter((r) => r.library === name)} median={g.median_reads} lo={lo} hi={hi} />
+            <Group key={name} dataset={accession} name={name} group={g} rows={depth.rows.filter((r) => r.library === name && !r.top_up_of)} />
           ))}
-          <p className="text-[12px] text-muted-foreground">
-            Reads per sample on a log scale, {millions(10 ** lo)} to {millions(10 ** hi)}, from the {depth.source}. Orange: {depth.rule}.
-          </p>
+          {topUps.length > 0 && (
+            <div className="grid gap-1 text-[12.5px]">
+              <p className="font-medium">Re-sequencing top-ups, counted apart</p>
+              {topUps.map((r) => (
+                <p key={r.sample} className="flex flex-wrap gap-x-2 text-muted-foreground">
+                  <SampleLink dataset={accession} sample={r.sample} /> {millions(r.reads)} reads, a top-up of{" "}
+                  {r.top_up_of?.startsWith("GSM") ? <SampleLink dataset={accession} sample={r.top_up_of} /> : r.top_up_of}
+                </p>
+              ))}
+            </div>
+          )}
+          <p className="text-[12px] text-muted-foreground">Reads per sample from the {depth.source}. Flagged: {depth.rule}.</p>
         </div>
       ) : (
-        <p className="text-[13px] text-muted-foreground">Depth per sample: {depth.reason}.</p>
+        sequencing && <p className="text-[13px] text-muted-foreground">Depth per sample: {depth.reason}.</p>
       )}
       {criteria.quotes.length > 0 && (
         <div className="grid gap-3">
@@ -86,7 +128,7 @@ export function QualitySection({ accession }: { accession: string }) {
               {all ? "Fewer" : `${criteria.quotes.length - QUOTES} more`}
             </button>
           )}
-          <p className="text-[12px] text-muted-foreground">Sentences that state a filter or threshold with a number, read from: {criteria.read.join("; ")}.</p>
+          <p className="text-[12px] text-muted-foreground">Read from: {criteria.read.join("; ")}.</p>
         </div>
       )}
     </section>

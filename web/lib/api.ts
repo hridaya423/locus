@@ -172,11 +172,12 @@ export async function assays(accession: string, signal?: AbortSignal): Promise<A
   return res.json();
 }
 
-export type DepthRow = { sample: string; title: string; runs: string[]; reads: number; bases: number; library: string; read_length: number | null; outlier: string | null };
+export type DepthRow = { sample: string; title: string; runs: string[]; reads: number; bases: number; library: string; paired: boolean; read_length: number | null; outlier: string | null; top_up_of: string | null };
 export type Quality = {
   accession: string;
-  depth: { available: boolean; reason?: string; project?: string; rows: DepthRow[]; groups: Record<string, { samples: number; median_reads: number }>; outliers: number; rule: string; source: string };
-  criteria: { quotes: { text: string; field: string }[]; more: number; read: string[] };
+  depth: { available: boolean; reason?: string; sequencing?: boolean; project?: string; rows: DepthRow[]; outliers: number; top_ups: number; rule: string; source: string;
+    groups: Record<string, { samples: number; median_reads: number; min_reads: number; max_reads: number; flagged: boolean }> };
+  criteria: { quotes: { text: string; field: string }[]; read: string[] };
 };
 
 export async function quality(accession: string, signal?: AbortSignal): Promise<Quality> {
