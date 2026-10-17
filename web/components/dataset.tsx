@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ChevronDown } from "lucide-react";
@@ -12,15 +12,8 @@ import { SampleTable } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
 import { dataType } from "@/components/result-card";
-import { datasetRecord, found, repositoryName, type DatasetRecord, type Found, type Hit } from "@/lib/api";
-
-const noSubscription = () => () => {};
-
-// What the search found, read after hydration so the server and the first client render agree.
-function useFound(accession: string): Found | null {
-  const known = useSyncExternalStore(noSubscription, () => found(accession) !== null, () => false);
-  return useMemo(() => (known ? found(accession) : null), [known, accession]);
-}
+import { MarkedText, MarkedTitle, MatchedLine, goToMatch, hasMatch, useFound, useMatches, type Matches } from "@/components/matches";
+import { datasetRecord, repositoryName, type DatasetRecord, type Hit } from "@/lib/api";
 
 export function DatasetPage({ accession }: { accession: string }) {
   const router = useRouter();
@@ -112,7 +105,7 @@ function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord
           {source && <span className="text-muted-foreground">{repositoryName(source)}</span>}
           {published && <span className="text-muted-foreground tabular">{published.slice(0, 10)}</span>}
         </p>
-        <h1 className="max-w-4xl font-display text-[34px] leading-[1.08] sm:text-[44px]">{rec?.title ?? hit?.title ?? accession}</h1>
+        <h1 className="max-w-4xl font-display text-[34px] leading-[1.08] sm:text-[44px]">{rec ? <MarkedTitle accession={accession} title={rec.title} /> : (hit?.title ?? accession)}</h1>
       </div>
       <dl className="grid grid-cols-2 border-y border-rule sm:grid-cols-4">
         {figures.map(([label, value], i) => (
@@ -148,36 +141,42 @@ function Body({ rec }: { rec: DatasetRecord }) {
 
 const PROTOCOL = /protocol|processing/i;
 
-function Text({ text }: { text: string }) {
+function Text({ text, index, m }: { text: string; index: number; m: Matches | null }) {
   return (
     <div className="grid max-w-[68ch] gap-3 text-[15px] leading-relaxed text-pretty">
-      {text.split(/\n\s*\n/).map((p, i) => <p key={i} className="whitespace-pre-line">{p.trim()}</p>)}
+      <MarkedText text={text} index={index} m={m} />
     </div>
   );
 }
 
 export function About({ rec }: { rec: DatasetRecord }) {
-  const main = rec.texts.filter(([label]) => !PROTOCOL.test(label));
-  const protocols = rec.texts.filter(([label]) => PROTOCOL.test(label));
+  const m = useMatches(rec.accession);
+  useEffect(() => {
+    if (m?.why && location.hash.startsWith("#match-")) goToMatch(location.hash.slice(7));
+  }, [m?.why]);
+  const texts = rec.texts.map(([label, text], index) => ({ label, text, index }));
+  const main = texts.filter(({ label }) => !PROTOCOL.test(label));
+  const protocols = texts.filter(({ label }) => PROTOCOL.test(label));
   return (
     <section className="grid content-start gap-6">
       <Heading id="about">About</Heading>
+      {m && <MatchedLine m={m} />}
       {main.length === 0 && protocols.length === 0 && <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} gives no description.</p>}
-      {main.map(([label, text], i) => (
+      {main.map(({ label, text, index }, i) => (
         <div key={label} className="grid gap-2">
           {i > 0 && <h3 className="text-[13px] font-medium">{label}</h3>}
-          <Text text={text} />
+          <Text text={text} index={index} m={m} />
         </div>
       ))}
       {protocols.length > 0 && (
         <div className="grid border-t border-rule">
-          {protocols.map(([label, text]) => (
-            <details key={label} className="group/p border-b border-rule">
+          {protocols.map(({ label, text, index }) => (
+            <details key={label} open={hasMatch(m, index)} className="group/p border-b border-rule">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[14px] [&::-webkit-details-marker]:hidden">
                 {label.replace(/^Protocol: /, "")}
                 <ChevronDown aria-hidden className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open/p:rotate-180" />
               </summary>
-              <div className="pb-4"><Text text={text} /></div>
+              <div className="pb-4"><Text text={text} index={index} m={m} /></div>
             </details>
           ))}
         </div>

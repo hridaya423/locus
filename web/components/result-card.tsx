@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { DesignView } from "@/components/design";
 import { EASE_OUT } from "@/lib/springs";
 import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
-import { Methods, Partners, Ready } from "@/components/row-details";
+import { Evidence, Methods, Partners, Ready } from "@/components/row-details";
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -305,17 +305,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     ))}
                   </div>
                 )}
-                {hit.evidence && (
-                  <p className="border-l-2 border-foreground pl-3 font-mono text-[12.5px] leading-relaxed">
-                    &quot;{hit.evidence}&quot;
-                    {facts?.case != null && (
-                      // Only the sample count is shown; the full provenance (e.g. which curators grouped the samples) stays on hover.
-                      <span className="label block pt-1.5 text-muted-foreground" title={facts.source}>
-                        counts from {facts.source.split(",")[0]}
-                      </span>
-                    )}
-                  </p>
-                )}
+                <Evidence hit={hit} onOpen={rememberScroll} />
                 {facts?.methods && <Methods methods={facts.methods} />}
                 {hit.source === "PRIDE" && <Ready accession={hit.accession} />}
                 <DesignView accession={hit.accession} source={hit.source} />
