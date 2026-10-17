@@ -133,7 +133,7 @@ function Genes({ accession, file, title, x, y, xLabel, yLabel, zero }: {
         <Scatter name="other" data={rest} {...dot("var(--muted-foreground)")} fillOpacity={0.35} />
         <Scatter name="padj < 0.05" data={hits} {...dot("var(--signal)")} />
       </ScatterChart>
-      <span className="max-w-[300px] text-[11px] leading-snug text-muted-foreground">{xLabel} vs {yLabel}; orange: padj &lt; 0.05</span>
+      <span className="block w-[300px] whitespace-normal text-[11px] leading-snug text-muted-foreground">{xLabel} vs {yLabel}; orange: padj &lt; 0.05</span>
     </Panel>
   );
 }
@@ -188,7 +188,7 @@ function Results({ accession, result }: { accession: string; result: ProcessResu
       </div>
       <p className="text-[12px] text-muted-foreground">
         Subsampled: the first {result.reads_per_fastq.toLocaleString()} reads of each FASTQ, salmon {result.tools.salmon} on {result.reference.source} {result.reference.release} ({result.reference.index}),
-        DESeq2 {result.tools.DESeq2} with apeglm {result.tools.apeglm}; {Math.round(result.seconds / 60)} min. manifest.json records the samples, runs and versions
+        DESeq2 {result.tools.DESeq2} with apeglm {result.tools.apeglm}; {result.seconds < 90 ? `${result.seconds} s` : `${Math.round(result.seconds / 60)} min`}. manifest.json records the samples, runs and versions
         {result.skipped.length > 0 && `; ${result.skipped.length} samples left out`}.
       </p>
     </div>
