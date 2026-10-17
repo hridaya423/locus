@@ -198,6 +198,7 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - New worktree: `sh scripts/worktree-setup.sh` (symlinks data/, copies .env, clones node_modules copy-on-write; a symlinked node_modules breaks Turbopack).
 - Harness: `node scripts/harness.mjs [--only 3] [--pages] [--out DIR]` (8 questions → top 3 dataset pages + one sample page each, screenshots at 1280/390, console errors, overflow, timings).
 - Door audit: `node scripts/doors.mjs [--seed 1] [--out DIR]` (30 random datasets, one per repository first; outbound links and values that open nothing).
+- Harness baseline (23:10): all 8 questions return results (11–44 rows; warm searches 2–25 s); 36 pages, 2 with a problem (/design 500 on GSE179525, GSE149204); median page load 0.6 s; top datasets q1 GSE250593 GSE132703 GSE241588 · q2 GSE108778 GSE179525 GSE149204 · q3 GSE86618 GSE94555 GSE286182 · q4 PXD047213 PXD013934 PXD025836 · q5 ST003390 MTBLS352 ST000383 · q6 PRJEB39707 PRJEB44790 PRJNA481243 · q7 MSV000083560 PXD062418 MSV000097408 · q8 PXD010450 PXD062985 PXD015748. Results: /tmp/locus-night/harness/baseline/.
 - `dataset.tsx` split into `page-kit.tsx`, `sample-table.tsx`, `files.tsx`, `aside.tsx` so parallel builders never share a file.
 
 ### Moments
