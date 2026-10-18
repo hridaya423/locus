@@ -17,6 +17,7 @@ const typeInto = (selector, text) => `(() => { const el = document.querySelector
 const submit = (selector) => `(() => { document.querySelector(${JSON.stringify(selector)}).closest("form").requestSubmit(); return true })()`;
 const click = (text, scope = "button, a, summary") => `(() => { const el = [...document.querySelectorAll(${JSON.stringify(scope)})].find((e) => e.textContent.trim().startsWith(${JSON.stringify(text)})); el?.scrollIntoView({ block: "center" }); el?.click(); return !!el })()`;
 const scrollTo = (selector) => `(() => { const el = document.querySelector(${JSON.stringify(selector)}); if (!el) return false; window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 40, behavior: "smooth" }); return true })()`;
+const scrollText = (text, scope = "h2, h3") => `(() => { const el = [...document.querySelectorAll(${JSON.stringify(scope)})].find((e) => e.textContent.includes(${JSON.stringify(text)})); if (!el) return false; window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 40, behavior: "smooth" }); return true })()`;
 const fresh = `(() => { sessionStorage.clear(); return true })()`;
 const IPF_BULK = "Bulk RNA-seq of lung tissue from idiopathic pulmonary fibrosis patients and healthy controls";
 const MTOR = "Matched RNA-seq and Ribo-seq before and after mTOR inhibition";
@@ -36,6 +37,14 @@ export const MOMENTS = [
   { slug: "file-preview", steps: [["go", "/d/GSE86618"], ["wait", "!!document.querySelector('#files')", 120000], ["eval", scrollTo("#files")], ["pause", 1200], ["eval", click("Preview")], ["wait", "/IPF/.test(document.querySelector('#files').parentElement.innerText)", 60000], ["pause", 2500]] },
   { slug: "paste-paper", steps: [["go", "/"], ["eval", fresh], ["go", "/"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "PMID: 35680905")], ["pause", 600], ["eval", submit("textarea")],
     ["wait", "/Deposited/.test(document.body.innerText)", 120000], ["pause", 2500]] },
+  { slug: "cases-controls", steps: [["go", "/d/GSE173357"], ["wait", "!!document.querySelector('#samples') && /control/.test(document.querySelector('#samples').parentElement.innerText)", 120000], ["eval", scrollTo("#samples")], ["pause", 2500]] },
+  { slug: "contributor", steps: [["go", "/d/GSE132703"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Carson C Thoreen", "aside a")], ["wait", "/Datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
+  { slug: "pathways", steps: [["go", "/d/GSE124685"], ["wait", "/Pathways higher/.test(document.body.innerText) && !/Asking Enrichr/.test(document.body.innerText)", 180000], ["eval", scrollText("Pathways higher")], ["pause", 2500]] },
+  { slug: "ribo-checks", steps: [["go", "/d/GSE132703"], ["wait", "/Ribo-seq checks/.test(document.body.innerText)", 180000], ["eval", scrollText("Ribo-seq checks")], ["pause", 2500]] },
+  { slug: "mito-ip-paper", steps: [["go", "/d/PXD058312"], ["wait", "/from the paper/.test(document.body.innerText)", 180000], ["eval", scrollTo("#measured")], ["pause", 1200], ["eval", click("Organelle IP", "summary")], ["pause", 2500]] },
+  { slug: "design-check", steps: [["go", "/d/GSE150910"], ["wait", "/detectable/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
+  { slug: "your-list", steps: [["go", "/list?in=GSE124685"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN SDHB TOMM20 CYC1 P08574 ACTB GAPDH")], ["pause", 600], ["eval", submit("textarea")],
+    ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 240000], ["pause", 2500]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 

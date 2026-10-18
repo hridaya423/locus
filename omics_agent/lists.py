@@ -51,8 +51,10 @@ def _items(text: str) -> list[str]:
 
 
 def check(text: str, accession: str = "", factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None) -> dict:
-    items = _items(text)
     mc = mitocarta()
+    # An accession and its gene symbol name one gene (P08574 is CYC1); the first spelling is kept.
+    gene = lambda i: mc[i.upper()]["symbol"].upper() if i.upper() in mc else i.upper()
+    items = list({gene(i): i for i in reversed(_items(text))}.values())[::-1]
     rows = [{"item": i, "mitocarta": mc.get(i.upper())} for i in items]
     hits = [r for r in rows if r["mitocarta"]]
     compartments: dict[str, int] = {}
@@ -66,14 +68,14 @@ def check(text: str, accession: str = "", factor: str | None = None, case: list[
         if look.get("available"):
             ranks = {g[0].upper(): (n + 1, g) for n, g in enumerate(look["genes"])}
             coloured = {g[0].upper() for g in look["genes"] if g[3] < look["q"] and abs(g[1]) >= look["lfc"]}
-            found = [i for i in items if i.upper() in ranks]
-            overlap = [i for i in found if i.upper() in coloured]
+            found = [i for i in items if gene(i) in ranks]
+            overlap = [i for i in found if gene(i) in coloured]
             N, K, n, k = len(ranks), len(coloured), len(found), len(overlap)
             p = sum(comb(K, j) * comb(N - K, n - j) for j in range(k, min(K, n) + 1)) / comb(N, n) if n and N else None
             for r in rows:
-                if r["item"].upper() in ranks:
-                    rank, g = ranks[r["item"].upper()]
-                    r["dataset"] = {"rank": rank, "log2fc": g[1], "q": g[3], "coloured": r["item"].upper() in coloured}
+                if gene(r["item"]) in ranks:
+                    rank, g = ranks[gene(r["item"])]
+                    r["dataset"] = {"rank": rank, "log2fc": g[1], "q": g[3], "coloured": gene(r["item"]) in coloured}
             result["dataset"] = {"accession": accession, "factor": look["factor"], "case": look["case"], "control": look["control"], "tested": N,
                                  "in_table": n, "coloured": k, "expected": round(n * K / N, 1) if N else None, "p": p, "method": look["method"]}
         else:
@@ -85,7 +87,7 @@ if __name__ == "__main__":
     mc = mitocarta()
     assert len({g["symbol"] for g in mc.values()}) == 1136, len({g["symbol"] for g in mc.values()})
     r = check("CYC1, SDHB\nP08574 ACTB GAPDH TOMM20 sp|O94826|TOM70_HUMAN NDUFA4-2")
-    assert r["items"] == 8 and r["mitocarta"] == 6, [(x["item"], bool(x["mitocarta"])) for x in r["rows"]]
+    assert r["items"] == 7 and r["mitocarta"] == 5, [(x["item"], bool(x["mitocarta"])) for x in r["rows"]]
     ipf = check("COL1A1 COL3A1 MMP7 SPP1 ACTB GAPDH", "GSE124685")
     assert ipf["dataset"]["coloured"] >= 4, ipf["dataset"]
     print("lists self-check passed:", r["mitocarta"], "of", r["items"], "in MitoCarta;", ipf["dataset"])
