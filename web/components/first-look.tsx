@@ -289,7 +289,16 @@ export function FirstLookSection({ accession }: { accession: string }) {
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;
-  if (summary && !summary.available) return null;
+  if (summary && !summary.available)
+    return (
+      <section className="grid content-start gap-3">
+        <Heading id="first-look">First look</Heading>
+        <p className="max-w-[80ch] text-[13px] text-muted-foreground">
+          No first look: {summary.reason?.replace(/\.$/, "") ?? "locus found no table of values by sample"}. The authors&apos; own files are in{" "}
+          <a href="#files" className={MUTED_LINK}>Files</a>.
+        </p>
+      </section>
+    );
   const factors = look?.groups?.factors ?? [];
   const starter = factors.find((f) => !f.nuisance) ?? factors[0];
   const current: Pick | null = look?.available

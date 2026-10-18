@@ -290,7 +290,10 @@ def summary(accession: str) -> dict:
     except (httpx.HTTPError, ValueError) as error:
         return {"accession": accession, "available": False, "reason": str(error)}
     if not data:
-        return {"accession": accession, "available": False, "reason": "neither NCBI nor the authors' supplementary files give a gene by sample table"}
+        reason = ("no MaxQuant protein table (proteinGroups.txt) with intensities for at least 4 named samples" if accession.startswith("PXD")
+                  else "no metabolite table with values for at least 4 samples" if re.match(r"ST\d|MTBLS", accession)
+                  else "neither NCBI nor the authors' supplementary files give a gene by sample table")
+        return {"accession": accession, "available": False, "reason": reason}
     m = data["matrix"]
     return {"accession": accession, "available": True, "genes": int(m.shape[0]), "samples": len(data["samples"]), "kind": data["kind"],
             "reads": int(m.sum()) if data["kind"] == "raw counts" else None, "source": data["source"], "organism": data["organism"]}
