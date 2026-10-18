@@ -61,6 +61,9 @@ RULES = [
     ("Nascent transcription (PRO-seq/GRO-seq)", "named", r"\bPRO-?seq\b|\bGRO-?seq\b|\bPRO-?cap\b|\bTT-?seq\b"),
     ("Cross-linking MS", "named", r"cross-?linking mass spec|\bXL-?MS\b|\bDSSO\b"),
 ]
+MS_SOURCES = {"PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"}
+FROM_PAPER = {"Organelle IP", "Immunopeptidomics (HLA/MHC ligands)", "Phosphoproteomics", "Ubiquitylomics", "Proximity labelling", "Cross-linking MS"}
+PROTEIN = re.compile(r"prote|peptid", re.I)
 CASE_SENSITIVE = {"Data-independent acquisition (DIA)", "Data-dependent acquisition (DDA)", "Proximity labelling"}
 COMPILED = [(assay, how, re.compile(p, 0 if assay in CASE_SENSITIVE else re.I)) for assay, how, p in RULES]
 
@@ -208,6 +211,19 @@ def classify(accession: str) -> dict | None:
                     entry["terms"].append(short)
                 if sentence not in (e["text"] for e in entry["evidence"]):
                     entry["evidence"].append({"text": sentence, "term": term, "field": field, "samples": sample_list, "how": how})
+
+    # MS records often drop the words that define the experiment ("Following mitoIP," on PXD058312); the paper's methods
+    # add only sample-preparation assays, only from sentences about proteins or peptides, labelled as from the paper.
+    paper = next((p["id"] for p in rec["papers"] if p.get("id") and p["id"] != "pmid:1"), None)
+    if rec["source"] in MS_SOURCES and paper:
+        for p in _methods(paper).get("paragraphs", []):
+            for sentence in _sentences(p["text"]):
+                if not PROTEIN.search(sentence + " " + p["section"]):
+                    continue
+                for assay, how, term in _match(sentence, sentence):
+                    if assay in FROM_PAPER and assay not in found:
+                        found[assay] = {"assay": assay, "how": how, "terms": [term], "from_paper": True,
+                                        "evidence": [{"text": sentence, "term": term, "field": f"Paper methods: {p['section']}", "samples": [], "how": how}]}
 
     if SINGLE_CELL & set(found):
         found.pop("RNA-seq", None)

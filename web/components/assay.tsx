@@ -70,6 +70,7 @@ function Row({ dataset, assay }: { dataset: string; assay: Assay }) {
           <span className="min-w-0 text-[14px]">
             <span className="font-medium">{assay.assay}</span>
             {assay.terms.length > 0 && <span className="text-muted-foreground"> · {assay.terms.slice(0, 3).join(", ")}</span>}
+            {assay.from_paper && <span className="text-muted-foreground"> · from the paper; the record does not say</span>}
           </span>
           <span className="flex items-center gap-3 font-mono text-[12px] tabular text-muted-foreground">
             {samples.length > 0 && <span>{samples.length} {samples.length === 1 ? "sample" : "samples"}</span>}
