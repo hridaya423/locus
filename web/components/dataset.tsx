@@ -175,7 +175,7 @@ export function About({ rec }: { rec: DatasetRecord }) {
       {m && <MatchedLine m={m} />}
       {main.length === 0 && protocols.length === 0 && <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} gives no description.</p>}
       {main.map(({ label, text, index }, i) => (
-        <div key={label} className="grid gap-2">
+        <div key={index} className="grid gap-2">
           {i > 0 && <h3 className="text-[13px] font-medium">{label}</h3>}
           <Text text={text} index={index} m={m} />
         </div>
@@ -183,7 +183,7 @@ export function About({ rec }: { rec: DatasetRecord }) {
       {protocols.length > 0 && (
         <div className="grid border-t border-rule">
           {protocols.map(({ label, text, index }) => (
-            <details key={label} open={hasMatch(m, index)} className="group/p border-b border-rule">
+            <details key={index} open={hasMatch(m, index)} className="group/p border-b border-rule">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-[14px] [&::-webkit-details-marker]:hidden">
                 {label.replace(/^Protocol: /, "")}
                 <ChevronDown aria-hidden className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open/p:rotate-180" />

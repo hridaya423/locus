@@ -33,7 +33,7 @@ for (const acc of picks) {
   const ready = await page.until(PAGE_READY, 90000);
   let settled = await page.until(`!${LOADING}.test(document.body.innerText)`, 120000);
   const text = await page.eval("document.body.innerText");
-  const failed = text.split("\n").filter((l) => FAILED.test(l)).slice(0, 3);
+  const failed = text.split("\n").filter((l) => l.length < 200 && FAILED.test(l)).slice(0, 3);
   const loading = settled ? [] : text.split("\n").filter((l) => LOADING.test(l)).slice(0, 3);
   const sections = await page.eval("[...document.querySelectorAll('h2[id]')].map(h => h.id)");
   const row = { acc, ready: !!ready, ms: Date.now() - t0, sections, failed, loading, errors: page.errors.slice(before).map((e) => e.slice(0, 200)) };
