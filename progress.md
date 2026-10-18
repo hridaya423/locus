@@ -38,7 +38,9 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 
 **06:00 close.** No piece started after 05:45. Final check at 06:00 on the frozen build: harness 36 pages, 0 problems, median 325 ms; 25 MCP tools registered; MCP parity 24 of 24; working tree clean. A third `delegate_task` attempt at 05:33 also returned `parent_not_active`, so the builder/critic fan-out the bar asks for was not possible after 02:45 in this session.
 
-**Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`, all recaptured from the final build at 05:39 and checked against their claims (three claims were corrected to match: SPP1 in 6 of 10 datasets, the list in 8 of 12, the metabolomics and cases-and-controls wording). Dictation is not captured: the headless browser has no microphone.
+**Final review, 06:00–06:10.** Harness 36 pages, 0 problems; 25 MCP tools; parity 24 of 24; door audit 5.63 outbound and 14.32 dead values per page (baseline 5.97 and 20.03); interview tasks 10 of 10 on locus; captures refreshed after 06:00. Not met, and stated: no fresh critic after 02:45 (delegate_task unavailable); Opus recall 15 of 34; PRIDE protein volcano not built. Per the bar, no new piece was started after 06:00.
+
+**Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`, all recaptured from the final build at 06:03–06:08 and checked on one contact sheet (two captures were redone so they end on the request list and on a fresh tab) and checked against their claims (three claims were corrected to match: SPP1 in 6 of 10 datasets, the list in 8 of 12, the metabolomics and cases-and-controls wording). Dictation is not captured: the headless browser has no microphone.
 
 **Found during the final review.** Your list across datasets and the gene links from First look mixed every search the browser had run ("all 33 GEO datasets of your search (mTOR inhibition)" after an IPF search); they now use the tab's last search. Paper pages now link each author to their contributor page.
 

@@ -45,7 +45,7 @@ export const MOMENTS = [
   { slug: "ribo-checks", steps: [["go", "/d/GSE132703"], ["wait", "/Ribo-seq checks/.test(document.body.innerText)", 180000], ["eval", scrollText("Ribo-seq checks")], ["pause", 2500]] },
   { slug: "mito-ip-paper", steps: [["go", "/d/PXD058312"], ["wait", "/from the paper/.test(document.body.innerText)", 180000], ["eval", scrollTo("#measured")], ["pause", 1200], ["eval", click("Organelle IP", "summary")], ["pause", 2500]] },
   { slug: "design-check", steps: [["go", "/d/GSE150910"], ["wait", "/detectable/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
-  { slug: "your-list", steps: [["go", "/list?in=GSE124685"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN SDHB TOMM20 CYC1 P08574 ACTB GAPDH")], ["pause", 600], ["eval", submit("textarea")],
+  { slug: "your-list", steps: [["go", "/"], ["eval", fresh], ["go", "/list?in=GSE124685"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN SDHB TOMM20 CYC1 P08574 ACTB GAPDH")], ["pause", 600], ["eval", submit("textarea")],
     ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 240000], ["pause", 2500]] },
   { slug: "zip-preview", steps: [["go", "/d/PXD047213"], ["wait", "!!document.querySelector('#files') && !/Reading /.test(document.body.innerText)", 120000], ["eval", scrollTo("#files")], ["pause", 1200], ["eval", click("Preview")], ["wait", "/inside the zip/.test(document.body.innerText)", 60000], ["pause", 2500]] },
   { slug: "list-across", steps: [["go", "/"], ["eval", "(() => { localStorage.clear(); sessionStorage.clear(); return true })()"], ["go", `/?q=${encodeURIComponent(IPF_BULK)}`],
@@ -57,8 +57,9 @@ export const MOMENTS = [
   { slug: "ms-start-with", steps: [["go", "/"], ["eval", fresh], ["go", "/"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "Phosphoproteomics of human liver cancer against normal liver tissue")], ["pause", 400], ["eval", submit("textarea")],
     ["wait", "!!document.querySelector('#start-with')", 240000], ["pause", 800], ["eval", scrollTo("#start-with")], ["pause", 2500]] },
   { slug: "nested-people", steps: [["go", "/d/GSE86618"], ["wait", "/samples come from 6 and 3 people/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
-  { slug: "provenance", steps: [["go", "/d/GSE132703"], ["wait", "/This page was read from/.test(document.body.innerText)", 120000],
-    ["eval", "(() => { const s = [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)); s.click(); s.scrollIntoView({ block: 'center', behavior: 'smooth' }); return true })()"], ["pause", 2500]] },
+  { slug: "provenance", steps: [["go", "/d/GSE132703"], ["wait", "/This page was read from/.test(document.body.innerText) && !/Reading |Asking Enrichr|testing…/.test(document.body.innerText)", 180000], ["pause", 1500],
+    ["eval", "(() => { const s = [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)); s.click(); s.scrollIntoView({ block: 'center' }); return true })()"], ["pause", 1200],
+    ["eval", "(() => { [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)).scrollIntoView({ block: 'center' }); return true })()"], ["pause", 1500]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 
