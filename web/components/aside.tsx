@@ -62,7 +62,6 @@ export function Aside({ rec: full }: { rec: DatasetRecord }) {
               <li key={p.url || p.title} className="grid gap-0.5 text-[13.5px] leading-snug">
                 {p.id ? <Link href={paperPath(p.id)} className={LINK}>{p.title}</Link> : p.url ? <a href={p.url} target="_blank" rel="noreferrer" className={LINK}>{p.title}</a> : <span>{p.title}</span>}
                 {(p.journal || p.year) && <span className="text-[12.5px] text-muted-foreground"><span className="italic">{p.journal}</span> {p.year}</span>}
-                {p.id && p.url && <a href={p.url} target="_blank" rel="noreferrer" className={cn("w-fit text-[12.5px]", MUTED_LINK)}>{new URL(p.url).hostname}</a>}
               </li>
             ))}
           </ul>

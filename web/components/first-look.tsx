@@ -373,7 +373,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
                 )}
               </div>
               <p className="max-w-[80ch] text-[12px] leading-relaxed text-muted-foreground">
-                {look.method}. Table: {look.source.pipeline}, {look.source.build} (<a href={look.source.url} className={MUTED_LINK}>{look.source.file}</a>). A screen for direction, not a replacement for {unit === "gene" ? "DESeq2 or limma" : "the authors' statistics"}.
+                {look.method}. Table: {look.source.pipeline}, {look.source.build} (<a href="#files" className={MUTED_LINK} title="Listed under Files, with its preview and download">{look.source.file}</a>). A screen for direction, not a replacement for {unit === "gene" ? "DESeq2 or limma" : "the authors' statistics"}.
               </p>
             </>
           )}

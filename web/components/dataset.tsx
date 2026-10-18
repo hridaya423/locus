@@ -216,7 +216,7 @@ function Samples({ rec, designed, selection }: { rec: DatasetRecord; designed: b
   );
 }
 
-// Provenance: the repository requests this page was built from, each one a URL that can be opened and rerun.
+// Provenance: the repository requests this page was built from, as text to copy and rerun; receipts, not doors out.
 function ReadFrom({ sources }: { sources: string[] }) {
   return (
     <details className="group/src text-[12px] text-muted-foreground">
@@ -225,7 +225,7 @@ function ReadFrom({ sources }: { sources: string[] }) {
       </summary>
       <ul className="mt-2 grid gap-1 font-mono text-[11.5px]">
         {sources.map((s) => (
-          <li key={s} className="truncate">{s.startsWith("http") ? <a href={s} target="_blank" rel="noreferrer" className={MUTED_LINK}>{s}</a> : s}</li>
+          <li key={s} className="select-all break-all">{s}</li>
         ))}
       </ul>
     </details>
