@@ -19,10 +19,11 @@ RULES = [
     ("Ribo-seq (elongating ribosomes)", "inferred", r"\bRNase ?I\b.{0,120}\b(?:monosome|ribosom|sucrose)|\b(?:monosome|80S)\b.{0,120}\b(?:RNase|nuclease|digest)"),
     ("Ribo-seq (elongating ribosomes)", "inferred", r"\bcycloheximide\b|\bCHX\b"),
     ("Polysome profiling", "named", r"polysome[- ](?:profil|seq|fraction)|polysomal (?:RNA|fraction)"),
-    ("Single-cell RNA-seq, droplet", "named", r"\b10[xX] (?:Genomics )?Chromium\b|\bChromium (?:Single Cell|Controller|Next GEM|X|iX|Connect)\b|\b10[xX] Genomics\b.{0,80}\b(?:single[- ]cell|scRNA|snRNA|GEMs?|[35]['′’])|\bSingle Cell [35]['′’] |\bDrop-?seq\b|\binDrops?\b|\bBD Rhapsody\b"),
+    ("Single-cell RNA-seq, droplet", "named", r"\b10[xX] (?:Genomics )?Chromium\b|\bChromium (?:Single Cell|Controller|Next GEM|X|iX|Connect)\b|\b10[xX] Genomics\b.{0,80}\b(?:single[- ]cell|scRNA|snRNA|GEMs?|[35](?:['′’]| ?prime\b))|\bSingle Cell [35]['′’] |\bDrop-?seq\b|\binDrops?\b|\bBD Rhapsody\b"),
     ("Single-cell RNA-seq, plate", "named", r"\bSmart-?seq ?[23]\b|\bSMART-?Seq2\b|\bSMART-Seq\b(?=.{0,80}single[- ]cell)|\bCEL-?seq2?\b|\bMARS-?seq\b|\bFluidigm C1\b|\bC1 (?:IFC|Single-Cell|system)"),
     ("Single-cell RNA-seq, combinatorial", "named", r"\bsci-RNA-seq\b|\bSPLiT-seq\b|\bParse Biosciences\b|\bEvercode\b"),
     ("Single-nucleus RNA-seq", "named", r"\bsnRNA-?seq\b|\bsingle[- ]nucle(?:us|i) RNA"),
+    ("Single-cell RNA-seq", "named", r"\bsingle[- ]cell RNA[- ]?seq|\bscRNA-?seq\b"),
     ("Immune repertoire (V(D)J)", "named", r"\bV\(D\)J\b|(?-i:\bVDJ\b)|\b(?:TCR|BCR) (?:repertoire|sequencing|libraries|library)"),
     ("CITE-seq (RNA + surface protein)", "named", r"\bCITE-?seq\b|\bTotalSeq\b|antibody[- ]derived tags?"),
     ("Spatial transcriptomics", "named", r"\bVisium\b|\bSlide-?seq(?:V2)?\b|\bMERFISH\b|\bXenium\b|\bCosMx\b|\bGeoMx\b|\bStereo-?seq\b|\bseqFISH\b"),
@@ -69,7 +70,7 @@ COMPILED = [(assay, how, re.compile(p, 0 if assay in CASE_SENSITIVE else re.I)) 
 
 # Harringtonine is also a leukaemia drug (homoharringtonine, omacetaxine); it marks TIS-seq only next to ribosome profiling.
 RIBOSOME_PROFILING = re.compile(r"ribosome profiling|ribo-?seq|footprint|\bRPFs?\b|monosome|ribosome[- ]protected", re.I)
-SINGLE_CELL = {"Single-cell RNA-seq, droplet", "Single-cell RNA-seq, plate", "Single-cell RNA-seq, combinatorial", "Single-nucleus RNA-seq", "Spatial transcriptomics"}
+SINGLE_CELL = {"Single-cell RNA-seq", "Single-cell RNA-seq, droplet", "Single-cell RNA-seq, plate", "Single-cell RNA-seq, combinatorial", "Single-nucleus RNA-seq", "Spatial transcriptomics"}
 
 BACKGROUND = re.compile(r"\bto date\b|\bpreviously\b|\bprevious (?:stud|work|method)|\bhas (?:involved|been)\b|\bhave been\b|\btraditional(?:ly)?\b|\bconventional(?:ly)?\b|\btypically\b|\bcommonly\b|\bexisting\b|\bin contrast to\b", re.I)
 TIS, RIBO, RNA, SMALL = "TIS-seq (initiating ribosomes)", "Ribo-seq (elongating ribosomes)", "RNA-seq", "Small RNA-seq"
@@ -227,6 +228,8 @@ def classify(accession: str) -> dict | None:
 
     if SINGLE_CELL & set(found):
         found.pop("RNA-seq", None)
+    if SINGLE_CELL - {"Single-cell RNA-seq"} & set(found):
+        found.pop("Single-cell RNA-seq", None)
     if "ChIP-chip (tiling array)" in found:
         found.pop("ChIP-seq", None)
     libraries = {}
