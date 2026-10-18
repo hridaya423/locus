@@ -74,6 +74,7 @@ def words(data: dict) -> list[str]:
 
 
 HLA = re.compile(r"immunopeptid|ligandom|\b(?:HLA|MHC)\b.{0,40}(?:peptid|ligand|present)", re.I)
+ORGANELLE = re.compile(r"\bmito-?IP\b|\bmito-?tag\b|\blyso-?IP\b|organelle (?:immuno)?(?:precipitation|IP|capture)|\bHA-?OMP25\b|\bTMEM192\b", re.I)
 
 
 def assay(data: dict, text: str = "") -> str | None:
@@ -82,6 +83,8 @@ def assay(data: dict, text: str = "") -> str | None:
     layer = LAYER.get(value(data, "enrichment") or "", "proteome")
     if value(data, "enrichment") == "ap_ms" and HLA.search(text):
         layer = "immunopeptidome"
+    elif value(data, "enrichment") == "ap_ms" and ORGANELLE.search(text):
+        layer = "organelle IP proteome"
     qualifiers = [WORDS[f].get(v, "") for f in ("acquisition", "labelling") if (v := value(data, f)) and v != "label_free"]
     return f"{layer} ({', '.join(q for q in qualifiers if q)})" if any(qualifiers) else layer
 
