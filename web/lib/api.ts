@@ -233,3 +233,16 @@ export function foundAll(): { accessions: string[]; topic: string } {
     return { accessions: [], topic: "" };
   }
 }
+
+export type Trap = { kind: "small" | "batch" | "tissue" | "imbalance"; title: string; detail: string; factor: string; table: [string, number, number][] | null };
+export type DesignCheck = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
+  traps: Trap[]; balanced: { factor: string; v: number }[]; power: { n_case: number; n_control: number; median_sd: number; detectable_log2fc: number; fold: number; method: string } | null };
+
+export async function designCheck(accession: string, pick: Pick, signal?: AbortSignal): Promise<DesignCheck> {
+  const q = new URLSearchParams({ factor: pick.factor });
+  pick.case.forEach((c) => q.append("case", c));
+  pick.control.forEach((c) => q.append("control", c));
+  const res = await fetch(`${API}/design-check/${encodeURIComponent(accession)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}

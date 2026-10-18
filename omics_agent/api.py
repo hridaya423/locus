@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, everywhere, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, design_check, everywhere, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -122,6 +122,13 @@ def gene_across(symbol: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,29}$")
     """One gene's change between cases and controls in each listed GEO dataset, one row each."""
     accessions = [a for a in (accession or []) if re.fullmatch(r"GSE\d+", a)][:40]
     return everywhere.gene_everywhere(symbol, accessions, hint)
+
+
+@app.get("/design-check/{accession}")
+def design_checks(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+                  control: Annotated[list[str] | None, Query()] = None) -> dict:
+    """Confounding with batch, unbalanced characteristics, different tissues and small groups for one comparison, and the smallest detectable change."""
+    return design_check.check(accession, factor, case, control)
 
 
 @app.get("/record/{accession}")

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import { useRouter } from "next/navigation";
-import { foundAll, genePath, firstLook, paperCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type Pick, type TableSummary } from "@/lib/api";
+import { designCheck, foundAll, genePath, firstLook, paperCheck, type DesignCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type Pick, type TableSummary } from "@/lib/api";
 
 
 const H = 360;
@@ -175,6 +175,37 @@ function PaperLine({ check, ringOn, onRing }: { check: PaperCheck; ringOn: boole
   );
 }
 
+function DesignChecks({ check }: { check: DesignCheck }) {
+  if (!check.available) return null;
+  return (
+    <div className="grid gap-2 border-l-2 border-foreground pl-3 text-[13px]">
+      <p className="font-medium">Design check</p>
+      {check.traps.length === 0 && <p className="text-muted-foreground">No batch-like characteristic goes with the comparison, and no characteristic is unbalanced by 30 points or more.</p>}
+      {check.traps.map((t) => (
+        <details key={t.title} className="group/t">
+          <summary className="flex cursor-pointer list-none flex-wrap items-baseline gap-x-2 [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center gap-1.5"><span aria-hidden className="size-2 rounded-full bg-signal" />{t.title}</span>
+            <span className="text-muted-foreground">{t.detail}</span>
+          </summary>
+          {t.table && (
+            <table className="mt-1 text-[12px]">
+              <thead><tr className="text-muted-foreground"><th className="pr-4 text-left font-normal">{t.factor}</th><th className="pr-4 text-right font-normal">cases</th><th className="text-right font-normal">controls</th></tr></thead>
+              <tbody>{t.table.map(([lv, a, b]) => <tr key={lv}><td className="pr-4">{lv}</td><td className="pr-4 text-right font-mono tabular">{a}</td><td className="text-right font-mono tabular">{b}</td></tr>)}</tbody>
+            </table>
+          )}
+        </details>
+      ))}
+      {check.balanced.length > 0 && <p className="text-muted-foreground">Balanced: {check.balanced.map((b) => `${b.factor} (V ${b.v})`).join(", ")}</p>}
+      {check.power && (
+        <p>
+          With {check.power.n_case} and {check.power.n_control} samples, a {check.power.fold}× change (log2 {check.power.detectable_log2fc}) in a typical gene is detectable.
+          <span className="text-muted-foreground"> {check.power.method}.</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 function Select({ label, value, options, onChange }: { label: string; value: string; options: [string, string][]; onChange: (v: string) => void }) {
   return (
     <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}
@@ -191,6 +222,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [check, setCheck] = useState<PaperCheck | null>(null);
+  const [design, setDesign] = useState<DesignCheck | null>(null);
   const [ringOn, setRingOn] = useState(true);
 
   useEffect(() => {
@@ -213,6 +245,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
     if (!look?.available) return;
     const ctrl = new AbortController();
     paperCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setCheck, () => {});
+    designCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setDesign, () => {});
     return () => ctrl.abort();
   }, [accession, look]);
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
@@ -281,6 +314,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
                   {look.warnings.map((w) => <li key={w}>Caution: {w}</li>)}
                 </ul>
               )}
+              {design && <DesignChecks check={design} />}
               {check && <PaperLine check={check} ringOn={ringOn} onRing={() => setRingOn((v) => !v)} />}
               <div className={cn("grid gap-8 transition-opacity duration-200", busy && "opacity-50")}>
                 <Volcano look={look} ringed={ringed} />

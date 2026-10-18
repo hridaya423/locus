@@ -27,6 +27,7 @@ Q, LFC = 0.05, 1.0
 
 NUISANCE = re.compile(r"donor|patient|individual|subject|\bid\b|platform|batch|lane|run|replicate|\brep\b|sex|gender|\bage\b|title|library|molecule|"
                       r"flowcell|barcode|instrument|sequenc|plate|well|chip|slide|array|sample name", re.I)
+EXPERIMENTAL = re.compile(r"cell line|cell type|strain|genotype|treatment|time|dose|agent|drug|knock|condition|stimul|infection|passage", re.I)
 PREFER = re.compile(r"disease|diagnosis|condition|treatment|genotype|group|phenotype|state|status|infection|agent|stimul|drug|knock|strain|tissue type", re.I)
 
 
@@ -119,7 +120,7 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     chosen = [s for s in data["samples"] if level.get(s) in case + control]
     pooled = []
     for i, name in enumerate(cols):
-        if name in ("Accession", "Title", factor) or NUISANCE.search(name):
+        if name in ("Accession", "Title", factor) or NUISANCE.search(name) or not EXPERIMENTAL.search(name) or re.match(r"rs\d", name):
             continue
         seen = {g: {value[s][i] for s in chosen if level.get(s) in grp and value[s][i]} for g, grp in (("case", case), ("control", control))}
         if len(seen["case"]) > 1 and len(seen["control"]) > 1 and sorted(seen["case"] | seen["control"]) not in [p["levels"] for p in pooled]:

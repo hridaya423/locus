@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, everywhere, index, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, design_check, everywhere, index, table, volcano  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -133,6 +133,15 @@ def gene_everywhere(gene: str, accessions: list[str], hint: str = "") -> dict:
     controls (the characteristic with a control-like level; the case level preferring words of `hint`, e.g. the disease),
     from NCBI's counts or the authors' own table. One row per dataset, with the reason when a dataset cannot answer."""
     return everywhere.gene_everywhere(gene, accessions, hint)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def check_design(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None) -> dict:
+    """The traps an expert checks before trusting a case/control comparison in a dataset: the condition going with a
+    batch-like characteristic (plate, date, institution; Cramér's V), unbalanced characteristics (sex, age, smoking),
+    cases and controls from different tissues, groups under 3, each with its cross-table; batch-like characteristics
+    found balanced; and the smallest fold change detectable at p < 0.05 with 80% power from the expression table."""
+    return design_check.check(accession, factor or None, case, control)
 
 
 @mcp.tool(annotations=READ_ONLY)
