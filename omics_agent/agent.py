@@ -9,7 +9,11 @@ from pathlib import Path
 import anthropic
 import httpx
 
+<<<<<<< HEAD
 from . import assay, compare, index, methods, samples, samplesheet, store
+=======
+from . import answer, compare, index, methods, samples, samplesheet, store
+>>>>>>> feat/answer
 from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
 PLANNER = "claude-sonnet-5-5"
@@ -665,6 +669,7 @@ def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> 
         h["download_plan"] = download_plan(h["accession"], h["source"], h["url"])
     groups = bundles(hits)
     return {
+        "answer": answer.pick(search_plan, hits),
         "question": question,
         "plan": search_plan,
         "candidates": len(pool),

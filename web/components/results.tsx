@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { datasetPath, genePath, repositoryName, type Hit, type Result } from "@/lib/api";
 import { LINK as LINK_CLASS } from "@/components/page-kit";
 import { CompareDialog, Connector } from "@/components/compare";
-import { Checkbox, CountCell, DatasetRow, ROW, SEP, Stem, assayOf, materialOf, unfold } from "@/components/result-card";
+import { Checkbox, CountCell, DatasetRow, ROW, SEP, Stem, assayOf, materialOf, rememberScroll, unfold } from "@/components/result-card";
+import Link from "next/link";
 
 type SortKey = "control" | "case" | "samples" | "year";
 
@@ -166,6 +167,27 @@ function SortHeader({ label, k, sort, setSort, className }: { label: string; k: 
   );
 }
 
+const KIND: Record<string, string> = { matched: "Best matched assays", cohort: "Largest counted comparison", ready: "Ready to analyse" };
+
+function StartWith({ answer }: { answer: NonNullable<Result["answer"]> }) {
+  return (
+    <section aria-labelledby="start-with" className="grid gap-3 border-y border-foreground py-4">
+      <h2 id="start-with" className="label text-muted-foreground">Start with</h2>
+      <ol className="grid gap-3">
+        {answer.map((a) => (
+          <li key={a.accession} className="grid gap-0.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-x-4">
+            <span className="label pt-0.5 text-muted-foreground">{KIND[a.kind]}</span>
+            <div className="grid min-w-0 gap-0.5">
+              <Link href={`${datasetPath(a.accession)}#${a.anchor}`} onClick={rememberScroll} className="w-fit text-[15px] leading-snug underline decoration-rule underline-offset-4 transition-colors duration-150 hover:decoration-foreground">{a.title}</Link>
+              <p className="text-[13px] text-muted-foreground"><span className="font-mono text-[12px] text-foreground/80">{a.accession}</span> · {a.fact}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function Table({ hits, matched, topic, sort, setSort, selected, toggle, select }: { hits: Hit[]; matched: string[]; topic: string; sort: SortKey; setSort: (k: SortKey) => void; selected: Set<string>; toggle: (a: string) => void; select: (ids: string[], on: boolean) => void }) {
   const rows = useMemo(() => sortHits(hits, sort), [hits, sort]);
   // Case and control columns only appear when some dataset in the table was counted.
@@ -246,6 +268,8 @@ export function Results({ result }: { result: Result }) {
         )}
         {strongCount !== result.datasets.length && <Tally value={result.datasets.length} label="relevant" />}
       </h2>
+
+      {!!result.answer?.length && <StartWith answer={result.answer} />}
 
       {geo.length > 0 && (
         <form onSubmit={(e) => { e.preventDefault(); if (gene.trim()) router.push(genePath(gene.trim(), geo, result.plan.terms.join(", "))); }} className="flex flex-wrap items-center gap-2 text-[13px]">
