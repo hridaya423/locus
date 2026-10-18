@@ -26,6 +26,8 @@ RIBO_CHECKS = [
     ("Replicate agreement", re.compile(r"replicates?.{0,60}(?:correlat|agree|reproducib)|(?:correlat|reproducib).{0,60}replicates?", re.I)),
     ("PCR duplicates (UMI)", re.compile(r"\bUMIs?\b|unique molecular identifier|de-?duplicat|PCR duplicates?", re.I)),
 ]
+# Chromatography set-up has lengths and sizes but is not a quality criterion (PXD008373: "15cm length × 75μm column").
+HARDWARE = re.compile(r"\bcolumns?\b|\bC18\b|nano-?LC|EASY-?n?LC|flow rate|reconstituted|\bbeads?\b", re.I)
 ANALYSIS = re.compile(r"sequenc|analys|profil|librar|bioinformat|process|read|align|mapp|footprint|quantif|statistic|quality", re.I)
 
 
@@ -109,7 +111,7 @@ def criteria(accession: str) -> dict:
     quotes: list[dict] = []
     for field, text in texts:
         for sentence in assay._sentences(text):
-            if len(sentence) > 400 or not (QC_CHECK.search(sentence) or (QC_WORD.search(sentence) and CRITERION.search(sentence))):
+            if len(sentence) > 400 or not (QC_CHECK.search(sentence) or (QC_WORD.search(sentence) and CRITERION.search(sentence))) or HARDWARE.search(sentence):
                 continue
             key = _key(sentence)
             if any(key in q["key"] or q["key"] in key for q in quotes):
