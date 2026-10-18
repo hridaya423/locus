@@ -5,10 +5,81 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import { checkList, datasetPath, type ListCheck } from "@/lib/api";
+import { checkList, checkListAcross, datasetPath, foundAll, type ListAcross, type ListCheck } from "@/lib/api";
 
 const ROWS = 30;
+const HITS_SHOWN = 6;
 const percent = (x: number) => `${(x * 100).toFixed(0)}%`;
+const pText = (p: number) => (p < 0.001 ? p.toExponential(1) : p.toFixed(3));
+
+// The same overlap in every GEO dataset of the last search, the strongest first; datasets locus could not compare are listed after.
+function Across({ text }: { text: string }) {
+  const [found] = useState(foundAll);
+  const geo = [...new Set(found.accessions.filter((a) => /^GSE\d+$/.test(a)))].slice(0, 40);
+  const [state, setState] = useState<{ busy?: boolean; data?: ListAcross; error?: boolean }>({});
+  if (geo.length < 2) return null;
+  const run = () => {
+    setState({ busy: true });
+    checkListAcross(text, geo, found.topic).then((data) => setState({ data }), () => setState({ error: true }));
+  };
+  const compared = (state.data?.rows ?? []).filter((r) => r.tested != null).sort((a, b) => (a.p ?? 1) - (b.p ?? 1));
+  const skipped = (state.data?.rows ?? []).filter((r) => r.tested == null);
+  return (
+    <section className="grid gap-4">
+      {!state.data && (
+        <button type="button" disabled={state.busy} onClick={run} className={cn("w-fit text-[13px] disabled:opacity-60", LINK)}>
+          {state.busy ? `Comparing in ${geo.length} datasets…` : `Check it in all ${geo.length} GEO datasets of your search${found.topic ? ` (${found.topic.split(", ")[0]})` : ""}`}
+        </button>
+      )}
+      {state.error && <p className="text-[13px] text-muted-foreground">locus could not compare the list across datasets.</p>}
+      {state.data && (
+        <>
+          <h2 className="text-[15px] font-medium">Your list in {state.data.compared} datasets</h2>
+          <table className="w-full max-w-5xl text-[12.5px]">
+            <thead>
+              <tr className="border-b border-rule text-left text-muted-foreground">
+                <th className="py-1 font-normal">Dataset</th>
+                <th className="py-1 font-normal max-sm:hidden">Compared</th>
+                <th className="py-1 text-right font-normal">Significant / tested</th>
+                <th className="py-1 text-right font-normal">By chance</th>
+                <th className="py-1 text-right font-normal">p</th>
+                <th className="py-1 pl-4 font-normal max-sm:hidden">Which</th>
+              </tr>
+            </thead>
+            <tbody>
+              {compared.map((r) => (
+                <tr key={r.accession} className="border-b border-rule/50 align-top">
+                  <td className="py-1"><Link href={`${datasetPath(r.accession)}#first-look`} className={cn("font-mono", LINK)}>{r.accession}</Link></td>
+                  <td className="py-1 text-muted-foreground max-sm:hidden">{r.case?.join(", ")} vs {r.control?.join(", ")}</td>
+                  <td className="py-1 text-right font-mono tabular"><span className="font-medium">{r.coloured}</span> / {r.in_table}</td>
+                  <td className="py-1 text-right font-mono tabular text-muted-foreground">{r.expected}</td>
+                  <td className={cn("py-1 text-right font-mono tabular", r.p != null && r.p < 0.05 ? "text-foreground" : "text-muted-foreground")}>{r.p != null ? pText(r.p) : "–"}</td>
+                  <td className="py-1 pl-4 max-sm:hidden">
+                    {r.hits?.slice(0, HITS_SHOWN).map((h, i) => (
+                      <span key={h.item} className={cn("font-mono", h.log2fc > 0 ? "text-signal" : "text-control")}>{i > 0 && " "}{h.item}</span>
+                    ))}
+                    {(r.hits?.length ?? 0) > HITS_SHOWN && <span className="text-muted-foreground"> +{r.hits!.length - HITS_SHOWN}</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {skipped.length > 0 && (
+            <details className="max-w-[80ch] text-[12px] text-muted-foreground">
+              <summary className={cn("w-fit cursor-pointer", MUTED_LINK)}>{skipped.length} datasets not compared</summary>
+              <ul className="mt-2 grid gap-1">
+                {Object.entries(Object.groupBy(skipped, (r) => (r.reason ?? "no reason given").replace(/^\d+ case and \d+ control.*/, "too few samples with data in a group"))).map(([reason, rows]) => (
+                  <li key={reason}>{reason}: {rows!.map((r) => r.accession).join(", ")}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <p className="max-w-[80ch] text-[12px] text-muted-foreground">Each dataset&apos;s cases against its controls as in one gene everywhere; significant means q &lt; 0.05 and |log2FC| ≥ 1 in locus&apos;s first look; p is hypergeometric. Higher in cases in orange, lower in green.</p>
+        </>
+      )}
+    </section>
+  );
+}
 
 export function ListPage() {
   const params = useSearchParams();
@@ -72,6 +143,7 @@ export function ListPage() {
               </p>
             )
           )}
+          <Across text={text} />
           <table className="w-full max-w-5xl text-[12.5px]">
             <thead>
               <tr className="border-b border-rule text-left text-muted-foreground">

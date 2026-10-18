@@ -426,6 +426,15 @@ export type ListCheck = { items: number; mitocarta: number; recovery: number | n
   source: { name: string; url: string; citation: string; genes: number };
   dataset?: { accession: string; reason?: string; factor?: string; case?: string[]; control?: string[]; tested?: number; in_table?: number; coloured?: number; expected?: number; p?: number | null; method?: string } };
 
+type Overlap = { accession: string; reason?: string; factor?: string; case?: string[]; control?: string[]; tested?: number; in_table?: number; coloured?: number; expected?: number; p?: number | null };
+export type ListAcross = { items: number; compared: number; rows: (Overlap & { hits?: { item: string; log2fc: number; q: number }[] })[] };
+
+export async function checkListAcross(text: string, accessions: string[], hint: string, signal?: AbortSignal): Promise<ListAcross> {
+  const res = await fetch(`${API}/list/across`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, accessions, hint }), signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
 export async function checkList(text: string, accession: string, signal?: AbortSignal): Promise<ListCheck> {
   const res = await fetch(`${API}/list`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, accession }), signal });
   if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail?.[0]?.msg ?? `${res.status}`);
