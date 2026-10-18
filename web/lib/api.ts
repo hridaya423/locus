@@ -258,6 +258,16 @@ export type Assays = { accession: string; source: string; assays: Assay[]; unass
 
 export async function assays(accession: string, signal?: AbortSignal): Promise<Assays> {
   const res = await fetch(`${API}/assay/${encodeURIComponent(accession)}`, { signal });
+export type TableSummary = { accession: string; available: boolean; reason?: string; genes?: number; samples?: number; reads?: number; organism?: string;
+  source?: { url: string; file: string; build: string; pipeline: string; sha256: string; bytes: number } };
+export type Gene = [symbol: string, lfc: number, minusLog10P: number, q: number];
+export type FirstLook = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
+  tested: number; method: string; q: number; lfc: number; up: number; down: number; genes: Gene[]; source: NonNullable<TableSummary["source"]>;
+  groups: { factors: { name: string; levels: Record<string, number>; nuisance: boolean }[]; default: { factor: string; case: string[]; control: string[] } | null };
+  within: [string, string] | null; pooled: { factor: string; levels: string[] }[]; warnings: string[]; samples_with_data: number; record_samples: number };
+
+export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
+  const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
@@ -273,5 +283,88 @@ export type Quality = {
 export async function quality(accession: string, signal?: AbortSignal): Promise<Quality> {
   const res = await fetch(`${API}/qc/${encodeURIComponent(accession)}`, { signal });
   if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+export const tableDownload = (accession: string) => `${API}/table/${encodeURIComponent(accession)}/download`;
+
+export type Pick = { factor: string; case: string[]; control: string[]; within?: [string, string] | null };
+
+export async function firstLook(accession: string, pick: Pick | null, signal?: AbortSignal): Promise<FirstLook> {
+  const q = new URLSearchParams();
+  if (pick) {
+    q.set("factor", pick.factor);
+    pick.case.forEach((c) => q.append("case", c));
+    pick.control.forEach((c) => q.append("control", c));
+    if (pick.within) {
+      q.set("within_factor", pick.within[0]);
+      q.set("within", pick.within[1]);
+    }
+  }
+  const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export type PaperGene = { gene: string; sentence: string | null; where: string; log2fc: number; q: number; significant: boolean };
+export type PaperCheck = { available: boolean; reason?: string; paper?: string; title?: string; journal?: string; year?: string; url?: string; read?: string;
+  genes: PaperGene[]; named: number; significant: number; by_chance: number };
+
+export async function paperCheck(accession: string, pick: { factor: string; case: string[]; control: string[] }, signal?: AbortSignal): Promise<PaperCheck> {
+  const q = new URLSearchParams({ factor: pick.factor });
+  pick.case.forEach((c) => q.append("case", c));
+  pick.control.forEach((c) => q.append("control", c));
+  const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}/paper?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export type GeneRow = { accession: string; title: string; status: "higher" | "lower" | "no clear change" | "not tested" | "no table" | "no groups" | "failed"; reason?: string;
+  factor?: string; case?: string[]; control?: string[]; n_case?: number; n_control?: number; source?: string; file?: string;
+  log2fc?: number; minus_log10_p?: number; q?: number; rank?: number; tested?: number };
+export type GeneAcross = { gene: string; description: string; hint: string; rows: GeneRow[]; measured: number; higher: number; lower: number; method: string };
+
+export async function geneAcross(gene: string, accessions: string[], hint: string, signal?: AbortSignal): Promise<GeneAcross> {
+  const q = new URLSearchParams({ hint });
+  accessions.forEach((a) => q.append("in", a));
+  const res = await fetch(`${API}/gene/${encodeURIComponent(gene)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export const genePath = (gene: string, accessions: string[], hint: string) =>
+  `/g/${encodeURIComponent(gene)}?${new URLSearchParams([...accessions.map((a) => ["in", a]), ["hint", hint]])}`;
+
+export function foundAll(): { accessions: string[]; topic: string } {
+  try {
+    const all: Record<string, Found> = JSON.parse(localStorage.getItem(FOUND) ?? "{}");
+    const list = Object.values(all);
+    return { accessions: list.map((f) => f.hit.accession), topic: list[0]?.topic ?? "" };
+  } catch {
+    return { accessions: [], topic: "" };
+  }
+}
+
+export type Trap = { kind: "small" | "batch" | "tissue" | "imbalance"; title: string; detail: string; factor: string; table: [string, number, number][] | null };
+export type DesignCheck = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
+  traps: Trap[]; balanced: { factor: string; v: number }[]; power: { n_case: number; n_control: number; median_sd: number; detectable_log2fc: number; fold: number; method: string } | null };
+
+export async function designCheck(accession: string, pick: Pick, signal?: AbortSignal): Promise<DesignCheck> {
+  const q = new URLSearchParams({ factor: pick.factor });
+  pick.case.forEach((c) => q.append("case", c));
+  pick.control.forEach((c) => q.append("control", c));
+  const res = await fetch(`${API}/design-check/${encodeURIComponent(accession)}?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export type MitoGene = { symbol: string; description: string; evidence: string; compartment: string; pathways: string; tissues: string };
+export type ListRow = { item: string; mitocarta: MitoGene | null; dataset?: { rank: number; log2fc: number; q: number; coloured: boolean } };
+export type ListCheck = { items: number; mitocarta: number; recovery: number | null; compartments: Record<string, number>; rows: ListRow[];
+  source: { name: string; url: string; citation: string; genes: number };
+  dataset?: { accession: string; reason?: string; factor?: string; case?: string[]; control?: string[]; tested?: number; in_table?: number; coloured?: number; expected?: number; p?: number | null; method?: string } };
+
+export async function checkList(text: string, accession: string, signal?: AbortSignal): Promise<ListCheck> {
+  const res = await fetch(`${API}/list`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, accession }), signal });
+  if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail?.[0]?.msg ?? `${res.status}`);
   return res.json();
 }

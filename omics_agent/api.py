@@ -1,6 +1,7 @@
 import json
 import os
 import queue
+import re
 import threading
 from dataclasses import asdict
 from typing import Annotated
@@ -15,7 +16,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, assay, design, paper, preview, qc, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, design, design_check, everywhere, lists, paper, preview, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -113,6 +114,64 @@ def assays(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) 
 def quality(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """Reads per sample from the run table with outliers flagged, and the authors' QC criteria quoted from their methods."""
     return qc.sample_qc(accession)
+@app.get("/table/{accession}")
+def processed_table(accession: str = Path(pattern=r"^GSE\d+$")) -> dict:
+    """Whether locus can hand over the finished counts table for a GEO series, its size and its source."""
+    return table.summary(accession)
+
+
+@app.get("/table/{accession}/download")
+def processed_table_zip(accession: str = Path(pattern=r"^GSE\d+$")) -> Response:
+    """counts, sample metadata, gene annotation and a manifest, as one zip."""
+    if not table.summary(accession)["available"]:
+        raise HTTPException(404, f"No processed table for {accession}.")
+    return Response(table.bundle(accession), media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{accession}_locus_table.zip"'})
+
+
+@app.get("/first-look/{accession}")
+def first_look(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+               control: Annotated[list[str] | None, Query()] = None, within_factor: str | None = None, within: str | None = None) -> dict:
+    """Each gene's change between two sample groups and its significance, from the fetched counts; the method is in the result."""
+    try:
+        return volcano.compare(accession, factor, case, control, (within_factor, within) if within_factor and within else None)
+    except (httpx.HTTPError, ValueError) as error:
+        raise HTTPException(502, f"The table could not be read: {error}") from error
+
+
+@app.get("/first-look/{accession}/paper")
+def first_look_paper(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+                     control: Annotated[list[str] | None, Query()] = None) -> dict:
+    """The genes the dataset's paper names, and where each lands in the same comparison."""
+    look = volcano.compare(accession, factor, case, control)
+    return volcano.paper_genes(accession, look) if look.get("available") else {"available": False, "reason": look.get("reason")}
+
+
+@app.get("/gene/{symbol}")
+def gene_across(symbol: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,29}$"), accession: Annotated[list[str] | None, Query(alias="in")] = None, hint: str = "") -> dict:
+    """One gene's change between cases and controls in each listed GEO dataset, one row each."""
+    accessions = [a for a in (accession or []) if re.fullmatch(r"GSE\d+", a)][:40]
+    return everywhere.gene_everywhere(symbol, accessions, hint)
+
+
+@app.get("/design-check/{accession}")
+def design_checks(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+                  control: Annotated[list[str] | None, Query()] = None) -> dict:
+    """Confounding with batch, unbalanced characteristics, different tissues and small groups for one comparison, and the smallest detectable change."""
+    return design_check.check(accession, factor, case, control)
+
+
+class ListIn(BaseModel):
+    text: str = Field(max_length=200_000)
+    accession: str = Field(default="", pattern=r"^(GSE\d+)?$")
+    factor: str | None = None
+    case: list[str] | None = None
+    control: list[str] | None = None
+
+
+@app.post("/list")
+def your_list(body: ListIn) -> dict:
+    """A pasted gene or protein list against MitoCarta 3.0 and, given a GEO dataset, against its first-look comparison."""
+    return lists.check(body.text, body.accession, body.factor, body.case, body.control)
 
 
 @app.get("/record/{accession}")

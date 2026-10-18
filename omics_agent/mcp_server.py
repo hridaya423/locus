@@ -8,7 +8,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, assay, index, paper, preview, qc, record, resolve, subset, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, design_check, everywhere, index, lists, paper, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -126,6 +126,58 @@ def sample_qc(accession: str) -> dict:
     samples far from their group's median flagged; and the authors' own QC criteria (trimming, length selection, rRNA
     filtering, thresholds) quoted from the record's processing text and the paper's open-access methods, with fields."""
     return qc.sample_qc(accession)
+def get_table(accession: str) -> dict:
+    """The finished, processed counts table locus can hand over for a GEO RNA-seq series (NCBI-generated raw counts,
+    one pipeline for all of GEO): genes, samples, total reads, genome build, source URL and checksum. The zip with
+    counts.tsv, samples.tsv, features.tsv and manifest.json is served at /table/<accession>/download by the locus API."""
+    return table.summary(accession)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25) -> dict:
+    """A first differential-expression look at a GEO RNA-seq series from its fetched counts: genes up and down between
+    two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
+    the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes, the
+    top genes each way with log2 fold change, -log10 p and BH q, and paper_check: the genes the dataset's paper names
+    (Europe PMC full text or text-mined mentions) and where each lands here. A screen, not DESeq2."""
+    result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
+    if not result.get("available"):
+        return {k: v for k, v in result.items() if k != "groups"} | {"factors": result.get("groups", {}).get("factors", [])}
+    check = volcano.paper_genes(accession, result)
+    genes = result.pop("genes")
+    result.pop("groups")
+    result["paper_check"] = {k: v for k, v in check.items() if k != "genes"} | {"genes": [
+        {k: g[k] for k in ("gene", "log2fc", "q", "significant", "where", "sentence")} for g in check.get("genes", [])[:top]]}
+    columns = ["gene", "log2_fold_change", "minus_log10_p", "q"]
+    result["top_up"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] >= result["lfc"]][:top]
+    result["top_down"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] <= -result["lfc"]][:top]
+    return result
+
+
+@mcp.tool(annotations=READ_ONLY)
+def gene_everywhere(gene: str, accessions: list[str], hint: str = "") -> dict:
+    """One gene across several GEO RNA-seq datasets: in each, its log2 fold change and BH q between the cases and the
+    controls (the characteristic with a control-like level; the case level preferring words of `hint`, e.g. the disease),
+    from NCBI's counts or the authors' own table. One row per dataset, with the reason when a dataset cannot answer."""
+    return everywhere.gene_everywhere(gene, accessions, hint)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def check_design(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None) -> dict:
+    """The traps an expert checks before trusting a case/control comparison in a dataset: the condition going with a
+    batch-like characteristic (plate, date, institution; Cramér's V), unbalanced characteristics (sex, age, smoking),
+    cases and controls from different tissues, groups under 3, each with its cross-table; batch-like characteristics
+    found balanced; and the smallest fold change detectable at p < 0.05 with 80% power from the expression table."""
+    return design_check.check(accession, factor or None, case, control)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def check_list(items: str, accession: str = "") -> dict:
+    """A pasted gene or protein list (symbols, UniProt accessions or FASTA headers) checked against MitoCarta 3.0:
+    how many are mitochondrial (the recovery an organelle IP should show), their sub-compartments, evidence and
+    pathways; with a GEO accession, also each item's rank, log2 fold change and q in that dataset's first look and
+    the overlap with its significant genes against chance (hypergeometric p)."""
+    return lists.check(items, accession)
 
 
 @mcp.tool(annotations=READ_ONLY)
