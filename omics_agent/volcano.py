@@ -23,7 +23,7 @@ NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "
 
 # Pooled quality-control injections are neither cases nor controls (MTBLS10965: "pooled quality control sample").
 QC_SAMPLE = re.compile(r"quality control|\bQC\b|\bpooled\b|\bblank\b", re.I)
-CONTROL = re.compile(r"^(?:no|non)\b|control|healt?h?y|normal|\bwt\b|^wt(?![a-z])|empty vector|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
+CONTROL = re.compile(r"control|healt?h?y|normal|\bwt\b|^wt[_ -]?(?:ev|empty|vector|ctrl|\d+)$|empty vector|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
 METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
 Q, LFC = 0.05, 1.0
 # Metabolite levels move less than transcripts; a 1.5-fold change is the usual cut-off in metabolomics.
@@ -34,6 +34,13 @@ NUISANCE = re.compile(r"donor|patient|individual|subject|\bid\b|platform|batch|l
                       r"flowcell|barcode|instrument|sequenc|plate|well|chip|slide|array|sample name", re.I)
 EXPERIMENTAL = re.compile(r"cell line|cell type|strain|genotype|treatment|time|dose|agent|drug|knock|condition|stimul|infection|passage", re.I)
 PREFER = re.compile(r"disease|diagnosis|condition|treatment|genotype|group|phenotype|state|status|infection|agent|stimul|drug|knock|strain|tissue type", re.I)
+
+
+def _negated(level: str, levels: list[str]) -> bool:
+    """'no PH (no pulmonary hypertension)' beside 'PH (pulmonary hypertension)': the absence of another level is its control.
+    'Non-small cell lung cancer' names no other level, so it stays a case."""
+    rest = re.sub(r"^(?:no|non)[- ]", "", level, flags=re.I)
+    return rest != level and any(o != level and o.split()[0].lower() == rest.split()[0].lower() for o in levels if o.split())
 
 
 def _keyed_control(level: str, about: str) -> bool:
@@ -63,7 +70,9 @@ def groups(accession: str, present: set[str] | None = None) -> dict:
     default = None
     for f in sorted((f for f in factors if not f["nuisance"]), key=lambda f: not PREFER.search(f["name"])):
         usable = [lv for lv in f["levels"] if f["levels"][lv] >= 2 and not QC_SAMPLE.search(lv)]
-        controls = [lv for lv in usable if CONTROL.search(lv)] or [lv for lv in usable if _keyed_control(lv, about)]
+        controls = [lv for lv in usable if CONTROL.search(lv) or _negated(lv, usable)] or [lv for lv in usable if _keyed_control(lv, about)]
+        # 'WT EGD' beside 'KO EGD' is wild type under a second condition, not the baseline (PXD011513).
+        controls = [lv for lv in controls if not ((rest := re.sub(r"[\s_-]+", " ", CONTROL.sub(" ", lv)).strip()) and any(rest in o for o in usable if o not in controls))] or controls
         cases = [lv for lv in usable if lv not in controls]
         if controls and cases:
             default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}

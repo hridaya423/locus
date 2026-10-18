@@ -347,7 +347,8 @@ def _pride(accession: str, row: dict) -> Record:
 
 RAW_EXTENSION = re.compile(r"(?:\.(?:raw|wiff2?|scan|d|mzml|mzxml|mgf|zip|rar|7z|gz|tar))+$", re.I)
 FRACTION = re.compile(r"(?:[_ -]F(?:rac(?:tion)?)?[_ -]?\d+$)|fraction", re.I)
-SAMPLE_KEY = re.compile(r"sample.?(?:name|key|map|list)|sdrf.*\.(?:txt|tsv)$", re.I)
+SAMPLE_KEY = re.compile(r"sample.?(?:name|key|map|list)(?!.*sdrf)", re.I)
+MULTIPLEXED = re.compile(r"\bTMT|iTRAQ|\d+-?plex", re.I)
 
 
 def _pride_samples(rec: Record) -> None:
@@ -384,7 +385,9 @@ def _pride_samples(rec: Record) -> None:
     # Else the raw files' own names, when they fall into a few groups of at least two (PXD017593: Mock1–3, CWMV-Infected1–3).
     # Fractions of one sample are not samples ('HeLa_rep1_F07').
     groups = Counter(stem(n) for n in raws)
-    if 2 <= len(groups) <= 12 and min(groups.values()) >= 2 and not any(FRACTION.search(n) for n in raws):
+    # A multiplexed (TMT, iTRAQ) record's raw files are fractions of a few sets, and ten or more files to a group usually are too (PXD028968: HM1_1 … HM1_16).
+    multiplexed = MULTIPLEXED.search(" ".join([rec.title, *(t for _, t in rec.texts), *(v for _, vs in rec.facts for v in vs)]))
+    if 2 <= len(groups) <= 12 and 2 <= min(groups.values()) and max(groups.values()) < 10 and not multiplexed and not any(FRACTION.search(n) for n in raws):
         rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for n, raw in sorted(raws.items())],
                        "read_from": "the raw file names"}
 
@@ -566,6 +569,7 @@ def _workbench(accession: str, row: dict) -> Record:
 METABOLIGHTS_FILES = "https://www.ebi.ac.uk/metabolights/ws/studies/{}/files?include_raw_data=false"
 METABOLIGHTS_FTP = "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/{}/{}"
 ISA_COLUMN = re.compile(r"^(?:Factor Value|Characteristics)\[(.+)\]$")
+QC_RUN = re.compile(r"(?<![A-Za-z])(?:QC|QA\d*|[Bb]lank|BLANK|[Pp]ool(?:ed)?|POOL)(?![a-z])")
 ION_MODE = re.compile(r"[_-](?:pos|neg|positive|negative)(?:[_-]?mode)?$", re.I)
 
 
@@ -588,7 +592,7 @@ def _metabolights(accession: str, row: dict) -> Record:
             first = {label: next(i for i in keep if ISA_COLUMN.match(header[i])[1] == label) for label in labels}
             table = [[r[name], *[r[first[label]] for label in labels]] for r in rows[1:] if len(r) == len(header) and r[name]]
             # One plasma sample run in positive and negative ionisation is one subject (MTBLS352: SD-B00001, SD-B00001_NEG).
-            subjects = [ION_MODE.sub("", r[0]) for r in table]
+            subjects = ["" if QC_RUN.search(r[0]) else ION_MODE.sub("", r[0]) for r in table]
             if len(set(subjects)) < len({r[0] for r in table}):
                 labels, table = [*labels, "Subject"], [[*r, s] for r, s in zip(table, subjects)]
             rec.samples = {"columns": ["Accession", *labels], "link": "", "rows": table}

@@ -143,6 +143,9 @@ def _record(accession: str, source: str) -> dict | None:
     if not table:
         return None
     rows = [dict(zip(table["columns"], r)) for r in table["rows"]]
+    if "Subject" in table["columns"]:
+        # One subject run in two ionisation modes is charted once (MTBLS352: 114 T2D, not 228 injections).
+        rows = list({r["Subject"] or r["Accession"]: {k: v for k, v in r.items() if k not in ("Accession", "Subject")} for r in rows}.values())
     rows = [{k: v for k, v in r.items() if k not in NOT_SAMPLE and k != "No. of Samples"}
             for r in rows for _ in range(int(r.get("No. of Samples") or 1))]
     label = table.get("read_from") or {"MetabolomicsWorkbench": "Metabolomics Workbench sample factors", "PRIDE": "sample names in the authors' protein table"}.get(source, f"{source} sample table")
