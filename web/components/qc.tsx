@@ -20,7 +20,7 @@ function Bars({ dataset, rows, max }: { dataset: string; rows: DepthRow[]; max: 
       {rows.map((r) => (
         <li key={r.sample} className="grid grid-cols-[6.5rem_minmax(0,1fr)_4rem] items-center gap-x-3 sm:grid-cols-[6.5rem_minmax(0,14rem)_minmax(0,1fr)_4rem]">
           <SampleLink dataset={dataset} sample={r.sample} />
-          <span className="truncate text-muted-foreground max-sm:hidden" title={r.title}>{r.title}</span>
+          <span className="truncate text-muted-foreground max-sm:order-last max-sm:col-span-3 max-sm:-mt-0.5 max-sm:mb-1 max-sm:text-[11.5px]" title={r.title}>{r.title}</span>
           <span aria-hidden className="relative h-2 rounded-full bg-foreground/10">
             <span className={cn("absolute inset-y-0 left-0 rounded-full", r.outlier ? "bg-signal" : "bg-foreground/50")} style={{ width: `${(r.reads / max) * 100}%` }} />
           </span>
