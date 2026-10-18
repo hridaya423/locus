@@ -17,7 +17,10 @@ PARTICLES = {"van", "von", "der", "den", "de", "del", "della", "da", "di", "du",
 
 
 def author_query(name: str) -> str | None:
-    """Europe PMC's form of a name, surname then initials: 'Carson C Thoreen' and 'Thoreen, Carson C.' give 'Thoreen CC'."""
+    """Europe PMC's form of a name, surname then initials: 'Carson C Thoreen' and 'Thoreen, Carson C.' give 'Thoreen CC';
+    a name already in that form ('Zhang Y', from a paper's author list) is kept."""
+    if re.fullmatch(r"[A-Za-zÀ-ÿ' -]+ [A-Z]{1,4}", name.strip()):
+        return name.strip()
     if "," in name:
         surname, _, given = name.partition(",")
         words, last = given.split(), surname.split()
@@ -90,7 +93,7 @@ def person(name: str) -> dict:
 
 if __name__ == "__main__":
     for raw, want in [("Carson C Thoreen", "Thoreen CC"), ("Dr Juliane S. Walz", "Walz JS"), ("Thoreen, Carson C.", "Thoreen CC"),
-                      ("Ludwig van der Berg", "van der Berg L"), ("Jean-Pierre Dupont", "Dupont JP"), ("Madonna", None)]:
+                      ("Ludwig van der Berg", "van der Berg L"), ("Jean-Pierre Dupont", "Dupont JP"), ("Madonna", None), ("Thoreen CC", "Thoreen CC"), ("van den Elzen AMG", "van den Elzen AMG")]:
         assert author_query(raw) == want, (raw, author_query(raw), want)
     p = person("Carson C Thoreen")
     assert p["matched"] >= 30 and any(d["accession"] == "GSE132703" for x in p["papers"] for d in x["datasets"]), p["counts"]

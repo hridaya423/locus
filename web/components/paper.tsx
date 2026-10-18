@@ -7,7 +7,7 @@ import { Wordmark } from "@/components/logo";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import { dataType } from "@/components/result-card";
-import { paperRecord, repositoryName, type PaperDataset, type PaperRecord } from "@/lib/api";
+import { paperRecord, personPath, repositoryName, type PaperDataset, type PaperRecord } from "@/lib/api";
 
 const AUTHORS_SHOWN = 8;
 const DATASETS_SHOWN = 10;
@@ -78,7 +78,12 @@ function Authors({ names }: { names: string[] }) {
   const shown = all ? names : names.slice(0, AUTHORS_SHOWN);
   return (
     <p className="max-w-4xl text-[15px] leading-relaxed text-pretty">
-      {shown.join(", ")}
+      {shown.map((name, i) => (
+        <span key={`${name}${i}`}>
+          {i > 0 && ", "}
+          <Link href={personPath(name)} className={LINK} title={`${name}'s papers and their datasets`}>{name}</Link>
+        </span>
+      ))}
       {names.length > AUTHORS_SHOWN && (
         <>
           {" "}
