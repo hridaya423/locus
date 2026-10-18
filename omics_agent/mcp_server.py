@@ -140,7 +140,8 @@ def get_table(accession: str) -> dict:
 
 @mcp.tool(annotations=READ_ONLY)
 def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25, pathways: bool = False) -> dict:
-    """A first differential-expression look at a GEO RNA-seq series from its fetched counts: genes up and down between
+    """A first differential look at a GEO RNA-seq series from its fetched counts, or at a Metabolomics Workbench study
+    (accession ST…) from its mwTab metabolite table (feature: metabolite; 1.5-fold cut-off): features up and down between
     two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
     the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes, the
     top genes each way with log2 fold change, -log10 p and BH q, and paper_check: the genes the dataset's paper names

@@ -123,9 +123,58 @@ def _authors_matrix(accession: str) -> dict | None:
     return None
 
 
+WORKBENCH = Path.home() / "omics-data" / "workbench"
+
+
+def _workbench_matrix(accession: str) -> dict | None:
+    """A Metabolomics Workbench study's metabolites x samples table from the mwTab of the analysis that covers the most
+    samples; its columns are the local sample IDs, matched to the sample table's titles."""
+    from . import preview
+
+    rec = record.record(accession)
+    if not rec or not rec["samples"]:
+        return None
+    local = {r[1]: r[0] for r in rec["samples"]["rows"]}
+    best = None
+    for f in [f for f in rec["files"] if f["name"].endswith("_mwtab.txt")]:
+        path = WORKBENCH / f["name"]
+        if not path.exists():
+            body = httpx.get(f["url"], timeout=120, follow_redirects=True).raise_for_status().content
+            if len(body) > MAX_BYTES:
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+        try:
+            header, rows = preview._mwtab(path.read_text(errors="replace").splitlines())
+        except ValueError:
+            continue
+        columns = [i for i, h in enumerate(header) if h in local]
+        if len(columns) >= 4 and (best is None or len(columns) > len(best[2])):
+            best = (f, header, columns, rows, path)
+    if not best:
+        return None
+    f, header, columns, rows, path = best
+    numbers = lambda r: [float(r[i]) if i < len(r) and re.fullmatch(r"-?[\d.]+(?:[eE]-?\d+)?", r[i].strip()) else np.nan for i in columns]
+    body = [r for r in rows if r and r[0]]
+    matrix = np.array([numbers(r) for r in body])
+    keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
+    matrix, names = matrix[keep], [r[0] for r, k in zip(body, keep) if k]
+    kind = "log scale" if np.nanmin(matrix) < 0 else "normalised, linear"
+    units = next((v[0] for label, v in rec["facts"] if label == "Units"), "")
+    return {
+        "accession": accession, "samples": [local[header[i]] for i in columns], "gene_ids": names, "matrix": np.nan_to_num(matrix, nan=0.0), "kind": kind,
+        "symbols": names, "genes": {}, "organism": next((v[0] for label, v in rec["facts"] if label == "Organism"), "not stated"), "feature": "metabolite",
+        "source": {"url": f["url"], "file": f["name"], "build": f"as the authors quantified it{f' ({units})' if units else ''}", "pipeline": "the authors' mwTab metabolite table",
+                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "bytes": path.stat().st_size, "genes_url": ""},
+    }
+
+
 @lru_cache(maxsize=8)
 def counts(accession: str) -> dict | None:
-    """A genes x samples matrix with gene symbols and where it came from: NCBI's raw counts, else the authors' own table."""
+    """A genes x samples matrix with gene symbols and where it came from: NCBI's raw counts, else the authors' own table;
+    for a Metabolomics Workbench study, metabolites x samples from its mwTab."""
+    if re.fullmatch(r"ST\d{6}", accession):
+        return _workbench_matrix(accession)
     if not (found := available(accession)):
         return _authors_matrix(accession)
     path = _fetch(found["url"], DATA / found["file"])
@@ -178,10 +227,11 @@ def bundle(accession: str) -> bytes:
         z.writestr("features.tsv", "\n".join(feature_lines) + "\n")
         z.writestr("manifest.json", json.dumps({"accession": accession, "retrieved": date.today().isoformat(), "tier": "fetched, not reprocessed",
                                                 "counts": data["source"], "samples_from": rec["url"], "organism": data["organism"]}, indent=1))
-        z.writestr("README.txt", f"""{accession}: {data['kind']} from {data['source']['pipeline']}, genome {data['source']['build']}.
-counts.tsv  {len(data['gene_ids'])} genes x {len(data['samples'])} samples (columns are GEO sample accessions)
-samples.tsv one row per sample, the characteristics from the GEO record
-features.tsv NCBI Gene symbol, description and type per gene_id
+        metabolites = data.get("feature") == "metabolite"
+        z.writestr("README.txt", f"""{accession}: {data['kind']} from {data['source']['pipeline']}, {data['source']['build'] if metabolites else f"genome {data['source']['build']}"}.
+counts.tsv  {len(data['gene_ids'])} {'metabolites' if metabolites else 'genes'} x {len(data['samples'])} samples (columns are {'Metabolomics Workbench sample IDs' if metabolites else 'GEO sample accessions'})
+samples.tsv one row per sample, the characteristics from the {'Metabolomics Workbench sample factors' if metabolites else 'GEO record'}
+features.tsv {'the metabolite names as the authors wrote them' if metabolites else 'NCBI Gene symbol, description and type per gene_id'}
 
 Python: import pandas as pd; counts = pd.read_csv("counts.tsv", sep="\\t", index_col=0).drop(columns="symbol"); samples = pd.read_csv("samples.tsv", sep="\\t", index_col=0)
 R:      counts <- read.delim("counts.tsv", row.names = 1)[, -1]; samples <- read.delim("samples.tsv", row.names = 1)

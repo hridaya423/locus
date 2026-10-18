@@ -143,7 +143,7 @@ function Body({ rec }: { rec: DatasetRecord }) {
         <About rec={rec} />
         <Samples rec={rec} designed={designed} selection={selection} />
         <QualitySection accession={rec.accession} />
-        {rec.source === "GEO" && <FirstLookSection accession={rec.accession} />}
+        {(rec.source === "GEO" || rec.source === "MetabolomicsWorkbench") && <FirstLookSection accession={rec.accession} />}
         <Files rec={rec} selection={selection} />
       </div>
       <Aside rec={rec} />

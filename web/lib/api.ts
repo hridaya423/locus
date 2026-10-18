@@ -305,7 +305,7 @@ export type Gene = [symbol: string, lfc: number, minusLog10P: number, q: number]
 export type FirstLook = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
   tested: number; method: string; q: number; lfc: number; up: number; down: number; genes: Gene[]; source: NonNullable<TableSummary["source"]>;
   groups: { factors: { name: string; levels: Record<string, number>; nuisance: boolean }[]; default: { factor: string; case: string[]; control: string[] } | null };
-  within: [string, string] | null; pooled: { factor: string; levels: string[] }[]; warnings: string[]; samples_with_data: number; record_samples: number };
+  within: [string, string] | null; pooled: { factor: string; levels: string[] }[]; warnings: string[]; samples_with_data: number; record_samples: number; feature?: "gene" | "metabolite" };
 
 export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
   const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });

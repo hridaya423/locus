@@ -23,5 +23,6 @@ Raw material for the demo video. Each moment is one thing a researcher would ret
 | "I pasted my gene list: 3 of 11 are MitoCarta proteins, and 6 are among the significant IPF genes, against 0.6 by chance." | Bring your own list: MitoCarta recovery and its rank in a dataset. | /list against GSE124685 | `your-list.png`, `your-list.mp4` |
 | "The protein table was inside a 1.6 GB txt.zip; locus showed proteinGroups.txt, 365 columns, in under a second without downloading it." | Preview reaches inside archives: two Range reads, the zip's directory and the table's first bytes. | PXD047213 | `zip-preview.png`, `zip-preview.mp4` |
 | "I pasted my 15 genes once and saw them light up in 8 of 11 IPF datasets, each with its odds against chance." | A list is checked across every comparable dataset of the search, not one at a time. | IPF bulk search → /list | `list-across.png`, `list-across.mp4` |
+| "The metabolomics study had only a summary on its repository page; locus showed 200 controls and 100 T2DM samples and a volcano where S-adenosylhomocysteine rose." | The first look works on metabolite tables, not only transcripts. | ST003390 | `metabolite-volcano.png`, `metabolite-volcano.mp4` |
 
 Not captured: dictation (needs real speech; the headless browser has no microphone).

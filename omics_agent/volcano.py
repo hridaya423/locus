@@ -24,6 +24,8 @@ NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "
 CONTROL = re.compile(r"control|healthy|normal|\bwt\b|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
 METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
 Q, LFC = 0.05, 1.0
+# Metabolite levels move less than transcripts; a 1.5-fold change is the usual cut-off in metabolomics.
+METABOLITE_LFC = 0.585
 
 
 NUISANCE = re.compile(r"donor|patient|individual|subject|\bid\b|platform|batch|lane|run|replicate|\brep\b|sex|gender|\bage\b|title|library|molecule|"
@@ -107,7 +109,7 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
         floor = np.percentile(values[:, in_case | in_control], 25)
         keep = (values[:, in_case | in_control] > floor).sum(axis=1) >= smaller
         logged = values[keep]
-        method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; genes above the 25th percentile in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
+        method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; {data.get('feature', 'gene')}s above the 25th percentile in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
     a, b = logged[:, in_case], logged[:, in_control]
     lfc = a.mean(axis=1) - b.mean(axis=1)
     t, p = stats.ttest_ind(a, b, axis=1, equal_var=False)
@@ -116,8 +118,9 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     symbols = [str(s) if not str(s).isdigit() else f"GeneID:{s}" for s in np.array(data["symbols"])[keep]]
     order = np.argsort(p)
     genes = [[symbols[i], round(float(lfc[i]), 3), round(float(-np.log10(max(p[i], 1e-300))), 3), float(f"{q[i]:.3g}")] for i in order]
-    up = int(((q < Q) & (lfc >= LFC)).sum())
-    down = int(((q < Q) & (lfc <= -LFC)).sum())
+    cut = METABOLITE_LFC if data.get("feature") == "metabolite" else LFC
+    up = int(((q < Q) & (lfc >= cut)).sum())
+    down = int(((q < Q) & (lfc <= -cut)).sum())
     chosen = [s for s in data["samples"] if level.get(s) in case + control]
     pooled = []
     for i, name in enumerate(cols):
@@ -134,8 +137,8 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     warnings += [f"pooled across {p['factor']} ({', '.join(p['levels'][:4])}{'…' if len(p['levels']) > 4 else ''})" for p in pooled]
     return base | {
         "available": True, "factor": factor, "case": case, "control": control, "within": list(within) if within else None,
-        "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": method, "q": Q, "lfc": LFC,
-        "up": up, "down": down, "genes": genes, "source": data["source"], "pooled": pooled, "warnings": warnings,
+        "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": method, "q": Q, "lfc": cut,
+        "up": up, "down": down, "genes": genes, "source": data["source"], "pooled": pooled, "warnings": warnings, "feature": data.get("feature", "gene"),
     }
 
 

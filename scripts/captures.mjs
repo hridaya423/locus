@@ -51,6 +51,7 @@ export const MOMENTS = [
     ["go", "/list"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN MMP1 COMP CXCL14 FHL2 SDHB TOMM20 CYC1 ACTB GAPDH")], ["pause", 500], ["eval", submit("textarea")],
     ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 120000], ["pause", 800], ["eval", click("Check it in all")],
     ["wait", "/Your list in [0-9]+ datasets/.test(document.body.innerText)", 400000], ["eval", scrollText("Your list in")], ["pause", 2500]] },
+  { slug: "metabolite-volcano", steps: [["go", "/d/ST003390"], ["wait", "/metabolites tested/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 

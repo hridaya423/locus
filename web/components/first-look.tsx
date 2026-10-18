@@ -70,7 +70,7 @@ function Volcano({ look, ringed }: { look: FirstLook; ringed: Set<string> }) {
   return (
     <figure className="grid content-start gap-2">
       <svg ref={svg} viewBox={`0 0 ${W} ${H}`} className="h-auto w-full touch-pan-y select-none" onPointerMove={nearest} onPointerDown={nearest} onPointerLeave={() => setHover(null)} role="img"
-        aria-label={`Volcano plot: ${look.up} genes higher and ${look.down} lower in ${look.case.join(", ")} than ${look.control.join(", ")}`}>
+        aria-label={`Volcano plot: ${look.up} ${look.feature ?? "gene"}s higher and ${look.down} lower in ${look.case.join(", ")} than ${look.control.join(", ")}`}>
         {xs.map((v) => (
           <g key={`x${v}`}>
             <line x1={x(v)} x2={x(v)} y1={PAD.t} y2={H - PAD.b} className="stroke-rule" strokeWidth={v === 0 ? 1 : 0.5} />
@@ -101,14 +101,14 @@ function Volcano({ look, ringed }: { look: FirstLook; ringed: Set<string> }) {
         {hover ? (
           <><span className="font-medium text-foreground">{hover[0]}</span> log2FC {hover[1].toFixed(2)} · p {(10 ** -hover[2]).toExponential(1)} · q {hover[3] >= 0.001 ? hover[3].toPrecision(2) : hover[3].toExponential(1)}{ringed.has(hover[0]) && " · named in the paper"}</>
         ) : (
-          "Hover or tap a dot to name its gene."
+          `Hover or tap a dot to name its ${look.feature ?? "gene"}.`
         )}
       </figcaption>
     </figure>
   );
 }
 
-function TopList({ accession, title, genes, tone }: { accession: string; title: string; genes: Gene[]; tone: "signal" | "control" }) {
+function TopList({ accession, title, genes, tone, feature = "gene" }: { accession: string; title: string; genes: Gene[]; tone: "signal" | "control"; feature?: string }) {
   const router = useRouter();
   const across = (gene: string) => {
     const last = foundAll();
@@ -123,7 +123,7 @@ function TopList({ accession, title, genes, tone }: { accession: string; title: 
       <table className="w-full text-[12.5px]">
         <thead>
           <tr className="border-b border-rule text-left text-muted-foreground">
-            <th className="py-1 font-normal">Gene</th>
+            <th className="py-1 font-normal capitalize">{feature}</th>
             <th className="py-1 text-right font-normal">log2FC</th>
             <th className="py-1 text-right font-normal">q</th>
           </tr>
@@ -132,7 +132,7 @@ function TopList({ accession, title, genes, tone }: { accession: string; title: 
           {genes.slice(0, LISTED).map((g) => (
             <tr key={g[0]} className="border-b border-rule/60 last:border-b-0">
               <td className="py-1 font-medium">
-                <button type="button" onClick={() => across(g[0])} title={`${g[0]} in every dataset of the search`} className={cn("cursor-pointer", LINK)}>{g[0]}</button>
+                {feature === "gene" ? <button type="button" onClick={() => across(g[0])} title={`${g[0]} in every dataset of the search`} className={cn("cursor-pointer", LINK)}>{g[0]}</button> : g[0]}
               </td>
               <td className="py-1 text-right font-mono tabular">{g[1].toFixed(2)}</td>
               <td className="py-1 text-right font-mono tabular text-muted-foreground">{g[3] >= 0.001 ? g[3].toPrecision(2) : g[3].toExponential(1)}</td>
@@ -274,8 +274,10 @@ export function FirstLookSection({ accession }: { accession: string }) {
   useEffect(() => {
     if (!look?.available) return;
     const ctrl = new AbortController();
-    paperCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setCheck, () => {});
     designCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setDesign, () => {});
+    // The paper's genes and Reactome pathways are about genes; a metabolite table has neither.
+    if (look.feature === "metabolite") return () => ctrl.abort();
+    paperCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setCheck, () => {});
     pathways(accession, { factor: look.factor, case: look.case, control: look.control, within: look.within }, ctrl.signal).then(
       (data) => setAnswered({ look, data }),
       () => !ctrl.signal.aborted && setAnswered({ look, data: { available: false, reason: "Enrichr did not answer" } }),
@@ -283,6 +285,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
     return () => ctrl.abort();
   }, [accession, look]);
   const paths = answered?.look === look ? answered.data : null;
+  const unit = look?.feature ?? (accession.startsWith("ST") ? "metabolite" : "gene");
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;
@@ -313,7 +316,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
       {failed ? (
         <p className="text-[13px] text-muted-foreground">locus could not compute the comparison; its server failed.</p>
       ) : !look ? (
-        <p className="text-[13px] text-muted-foreground">Reading {summary?.genes?.toLocaleString()} genes × {summary?.samples} samples…</p>
+        <p className="text-[13px] text-muted-foreground">Reading {summary?.genes?.toLocaleString()} {unit}s × {summary?.samples} samples…</p>
       ) : (
         <>
           {current && factors.length > 0 && (
@@ -342,7 +345,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
             <>
               <p className="font-mono text-[12.5px] tabular">
                 <span className="text-signal">{look.up.toLocaleString()} higher</span> · <span className="text-control">{look.down.toLocaleString()} lower</span> in {look.n_case} {look.case.join(", ")} than {look.n_control} {look.control.join(", ")}
-                <span className="text-muted-foreground"> · {look.tested.toLocaleString()} genes tested · q &lt; {look.q}, |log2FC| ≥ {look.lfc}{look.samples_with_data < look.record_samples && ` · data for ${look.samples_with_data} of ${look.record_samples} samples`}</span>
+                <span className="text-muted-foreground"> · {look.tested.toLocaleString()} {unit}s tested · q &lt; {look.q}, |log2FC| ≥ {look.lfc}{look.samples_with_data < look.record_samples && ` · data for ${look.samples_with_data} of ${look.record_samples} samples`}</span>
               </p>
               {look.warnings.length > 0 && (
                 <ul className="grid gap-0.5 text-[12.5px] text-warn">
@@ -354,10 +357,10 @@ export function FirstLookSection({ accession }: { accession: string }) {
               <div className={cn("grid gap-8 transition-opacity duration-200", busy && "opacity-50")}>
                 <Volcano look={look} ringed={ringed} />
                 <div className="grid content-start gap-6 sm:grid-cols-2 sm:gap-10">
-                  <TopList accession={accession} title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" />
-                  <TopList accession={accession} title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" />
+                  <TopList accession={accession} title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" feature={unit} />
+                  <TopList accession={accession} title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" feature={unit} />
                 </div>
-                {paths?.available === false ? (
+                {unit !== "gene" ? null : paths?.available === false ? (
                   <p className="text-[12.5px] text-muted-foreground">Pathways: {paths.reason}.</p>
                 ) : (
                   <div className="grid gap-3">
@@ -370,17 +373,17 @@ export function FirstLookSection({ accession }: { accession: string }) {
                 )}
               </div>
               <p className="max-w-[80ch] text-[12px] leading-relaxed text-muted-foreground">
-                {look.method}. Table: {look.source.pipeline}, {look.source.build} (<a href={look.source.url} className={MUTED_LINK}>{look.source.file}</a>). A screen for direction, not a replacement for DESeq2 or limma.
+                {look.method}. Table: {look.source.pipeline}, {look.source.build} (<a href={look.source.url} className={MUTED_LINK}>{look.source.file}</a>). A screen for direction, not a replacement for {unit === "gene" ? "DESeq2 or limma" : "the authors' statistics"}.
               </p>
             </>
           )}
         </>
       )}
-      {look?.available && <Link href={`/list?in=${accession}`} className={cn("w-fit text-[13px]", MUTED_LINK)}>Check your own gene list in this comparison</Link>}
+      {look?.available && unit === "gene" && <Link href={`/list?in=${accession}`} className={cn("w-fit text-[13px]", MUTED_LINK)}>Check your own gene list in this comparison</Link>}
       {summary?.available && summary.source && (
         <a href={tableDownload(accession)} download className={cn("flex w-fit items-center gap-1.5 text-[13px] font-medium", LINK)}>
           <Download aria-hidden className="size-3.5" />
-          Get the table: {summary.genes?.toLocaleString()} genes × {summary.samples} samples, with sample characteristics and gene names
+          Get the table: {summary.genes?.toLocaleString()} {unit}s × {summary.samples} samples, with sample characteristics{unit === "gene" && " and gene names"}
           <span className="font-mono text-[12px] font-normal text-muted-foreground">zip, from {size(summary.source.bytes)}</span>
         </a>
       )}
