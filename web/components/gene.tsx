@@ -29,6 +29,7 @@ function Row({ row, max }: { row: GeneRow; max: number }) {
         <Link href={`${datasetPath(row.accession)}#first-look`} className="w-fit font-mono text-[12.5px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">{row.accession}</Link>
         <span className="truncate text-[13px] text-muted-foreground" title={row.title}>{row.title}</span>
         {row.case && <span className="text-[12px] text-muted-foreground" title={`Table: ${row.source}, ${row.file}`}>{row.case.join(", ")} ({row.n_case}) vs {row.control?.join(", ")} ({row.n_control})</span>}
+        {row.warnings?.filter((w) => w.includes("people")).map((w) => <span key={w} className="text-[12px] text-warn">Caution: {w}</span>)}
       </div>
       {measured ? (
         <div className="relative h-6" role="img" aria-label={`log2 fold change ${row.log2fc}`}>

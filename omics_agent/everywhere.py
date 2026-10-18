@@ -35,7 +35,7 @@ def one(gene: str, accession: str, hint: str = "") -> dict:
         return row | {"status": "no table", "reason": look.get("reason", "")}
     hit = next((g for g in look["genes"] if g[0].upper() == gene.upper()), None)
     base = row | {"factor": look["factor"], "case": look["case"], "control": look["control"], "n_case": look["n_case"], "n_control": look["n_control"],
-                  "source": look["source"]["pipeline"], "file": look["source"]["file"]}
+                  "source": look["source"]["pipeline"], "file": look["source"]["file"], "warnings": look["warnings"]}
     if not hit:
         present = gene.upper() in (s.upper() for s in table.counts(accession)["symbols"])
         return base | {"status": "not tested", "reason": "expressed too low to test" if present else "not in the table"}

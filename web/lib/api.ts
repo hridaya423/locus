@@ -382,7 +382,7 @@ export async function paperCheck(accession: string, pick: { factor: string; case
 }
 
 export type GeneRow = { accession: string; title: string; status: "higher" | "lower" | "no clear change" | "not tested" | "no table" | "no groups" | "failed"; reason?: string;
-  factor?: string; case?: string[]; control?: string[]; n_case?: number; n_control?: number; source?: string; file?: string;
+  factor?: string; case?: string[]; control?: string[]; n_case?: number; n_control?: number; source?: string; file?: string; warnings?: string[];
   log2fc?: number; minus_log10_p?: number; q?: number; rank?: number; tested?: number };
 export type GeneAcross = { gene: string; description: string; hint: string; rows: GeneRow[]; measured: number; higher: number; lower: number; method: string };
 
