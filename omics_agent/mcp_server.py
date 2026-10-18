@@ -1,6 +1,5 @@
 from dataclasses import asdict
 
-import httpx
 from dotenv import load_dotenv
 import httpx
 from mcp.server.mcpserver import MCPServer
@@ -8,7 +7,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, assay, browse, design_check, everywhere, index, lists, paper, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design_check, everywhere, index, lists, paper, person, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -292,6 +291,18 @@ def get_paper(id: str, dataset_offset: int = 0) -> dict:
         return paper.paper(id, dataset_offset)
     except LookupError as error:
         return {"error": str(error)}
+    except httpx.HTTPError as error:
+        return {"error": f"Europe PMC did not answer: {error}"}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_person(name: str) -> dict:
+    """A dataset contributor's track record: their papers in Europe PMC, newest first (up to 100; `matched` counts all),
+    found by surname and initials, so a common name mixes people. Per paper: journal, year, preprint or not, citations,
+    open access, supplementary files, last author or not, and the locus datasets it deposited or cites. Also the journals
+    they publish in, with counts. Pass the name as a record shows it, for example 'Carson C Thoreen'."""
+    try:
+        return person.person(name)
     except httpx.HTTPError as error:
         return {"error": f"Europe PMC did not answer: {error}"}
 

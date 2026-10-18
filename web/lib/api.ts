@@ -249,6 +249,25 @@ export async function paperRecord(id: string, signal?: AbortSignal, offset = 0):
   return res.json();
 }
 
+export type PersonPaper = {
+  key: string; pmid: string | null; doi: string | null; title: string; year: string; journal: string; preprint: boolean; authors: string;
+  cited_by: number; open_access: boolean; supplementary: boolean; accessions_in_text: boolean; last_author: boolean;
+  datasets: { accession: string; source: string; title: string; modality: string }[];
+};
+export type Person = {
+  name: string; query?: string; available: boolean; reason?: string; matched?: number; shown?: number; search?: string;
+  journals?: Record<string, number>; papers?: PersonPaper[];
+  counts?: { preprints: number; supplementary: number; open_access: number; last_author: number; with_datasets: number; datasets: number };
+};
+
+export async function person(name: string, signal?: AbortSignal): Promise<Person> {
+  const res = await fetch(`${API}/person?name=${encodeURIComponent(name)}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
+export const personPath = (name: string) => `/a/${encodeURIComponent(name)}`;
+
 // A record's paper ID ("pmid:…" or "doi:…") is the path of its locus paper page.
 export const paperPath = (id: string) => `/p/${id.replace(/^(pmid|doi):/, "")}`;
 // Harvested records carry placeholder PMIDs such as "pmid:1"; a real one has at least six digits.

@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, assay, browse, design, design_check, everywhere, lists, paper, preview, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design, design_check, everywhere, lists, paper, person, preview, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -249,6 +249,16 @@ def resolve_identifier(identifier: str) -> dict | None:
         raise HTTPException(404, str(error))
     except httpx.HTTPError:
         raise HTTPException(502, "A repository did not answer. Please try again.")
+
+
+@app.get("/person")
+def person_page(name: str = Query(min_length=3, max_length=120)) -> dict:
+    """A contributor's papers in Europe PMC (author search by surname and initials), their journals, which papers have
+    supplementary files, and the locus datasets those papers deposited or cite."""
+    try:
+        return person.person(name)
+    except httpx.HTTPError:
+        raise HTTPException(502, "Europe PMC did not answer. Please try again.")
 
 
 @app.get("/paper/{identifier:path}")

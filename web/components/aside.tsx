@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import { browsePath, datasetPath, isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
+import { browsePath, datasetPath, isPaperId, personPath, paperPath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 
@@ -75,7 +75,7 @@ export function Aside({ rec: full }: { rec: DatasetRecord }) {
             <ul className="grid gap-2 text-[13.5px] leading-snug">
               {people.map((p, i) => (
                 <li key={`${p.name}${i}`} className="grid gap-0.5">
-                  <span>{p.name}</span>
+                  <Link href={personPath(p.name)} className={cn("w-fit", LINK)} title={`${p.name}'s papers and their datasets`}>{p.name}</Link>
                   {p.affiliation && <span className="text-[12.5px] text-muted-foreground">{p.affiliation}</span>}
                   {p.email && <a href={`mailto:${p.email}`} className={cn("w-fit text-[12.5px] break-all", MUTED_LINK)}>{p.email}</a>}
                   {p.web && <a href={p.web} target="_blank" rel="noreferrer" className={cn("w-fit text-[12.5px] break-all", MUTED_LINK)}>{p.web}</a>}
