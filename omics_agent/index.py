@@ -96,7 +96,7 @@ def load(accessions: list[str]) -> list[Dataset]:
         Dataset(
             accession=a, source=r[1], modality=r[2], title=r[3], organism=r[4], samples=r[5], url=r[6],
             text=f"{r[3]}\n{r[7]}", papers=json.loads(r[8]), published=r[9],
-            facts=cellxgene_facts(cellxgene[a]) if a in cellxgene else methods.facts(tagged[a], r[4]) if a in tagged else None,
+            facts=cellxgene_facts(cellxgene[a]) if a in cellxgene else methods.facts(tagged[a], r[4], f"{r[3]}\n{r[7]}") if a in tagged else None,
         )
         for a in accessions if (r := rows.get(a))
     ]

@@ -73,9 +73,15 @@ def words(data: dict) -> list[str]:
     return [w for w in out if w]
 
 
-def assay(data: dict) -> str | None:
-    """One readable assay name, for example "phosphoproteome (DIA, TMT)"."""
+HLA = re.compile(r"immunopeptid|ligandom|\b(?:HLA|MHC)\b.{0,40}(?:peptid|ligand|present)", re.I)
+
+
+def assay(data: dict, text: str = "") -> str | None:
+    """One readable assay name, for example "phosphoproteome (DIA, TMT)". An affinity purification of HLA or MHC ligands
+    (W6/32) is an immunopeptidome, not an interactome."""
     layer = LAYER.get(value(data, "enrichment") or "", "proteome")
+    if value(data, "enrichment") == "ap_ms" and HLA.search(text):
+        layer = "immunopeptidome"
     qualifiers = [WORDS[f].get(v, "") for f in ("acquisition", "labelling") if (v := value(data, f)) and v != "label_free"]
     return f"{layer} ({', '.join(q for q in qualifiers if q)})" if any(qualifiers) else layer
 
@@ -90,13 +96,13 @@ def material(data: dict, organism: str) -> str:
     }.get(value(data, "sample_type") or "", "unknown")
 
 
-def facts(data: dict, organism: str) -> dict:
+def facts(data: dict, organism: str, text: str = "") -> dict:
     """The facts a PRIDE row shows and grading reads. PRIDE has no counted case/control groups, so those stay unknown."""
     return {
         "case": None, "control": None, "mixed": 0, "has_control": None,
         "sample_type": material(data, organism),
         "tissue": value(data, "tissue") or value(data, "cell_line") or "",
-        "assays": [assay(data)],
+        "assays": [assay(data, text)],
         "library": {}, "libraries": {},
         "source": "PRIDE Map method tags, from PRIDE metadata and papers",
         "methods": {
