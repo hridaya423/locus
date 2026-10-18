@@ -10,7 +10,11 @@ Researchers often spend days searching GEO, PRIDE and other repositories for dat
 - **Count.** For each GEO study, it reads the sample records and counts the case and control samples and the libraries per assay. A model chooses which record field marks case and control. Code does the counting, so a model never writes a number.
 - **Grade.** It checks four things for each dataset: the topic, the sample material, the data type and the controls. Counted facts override the model. A dataset that meets every requirement is "usable as is". A dataset that misses one is a "close match", and locus shows which check failed.
 - **Hand off.** For each result, it gives download commands. For GEO Ribo-seq studies, it also writes an [nf-core/riboseq](https://nf-co.re/riboseq) samplesheet (see [Samplesheet export](#samplesheet-export)).
-- **Serve agents.** An MCP server gives the same functions to Claude Code or any MCP client.
+- **Read each dataset.** Every dataset has its own locus page. It shows what was measured, read from the methods with the sentence that says so. It shows the samples, with cases and controls marked, people counted, and charts that filter the table and the download commands. It shows quality from the run table and the authors' own QC, and previews processed files, including the protein table inside a PRIDE zip. For GEO RNA-seq and Metabolomics Workbench studies, it adds a first look: a volcano plot, the paper's genes on it, pathways, and a design check. Each page lists the repository API requests it was read from.
+- **Open anything.** An accession, PMID, DOI or informal citation opens its page. Papers and contributors have pages. One gene, or a whole list, can be checked across every dataset a search found.
+- **Serve agents.** An MCP server gives the same functions to Claude Code or any MCP client (25 tools).
+
+How each part is checked, with its failures: [`docs/evaluation.md`](docs/evaluation.md).
 
 Accessions come only from repository records, never from the model. A quote is shown only if it appears word for word in the dataset metadata.
 
