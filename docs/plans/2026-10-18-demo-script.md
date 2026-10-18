@@ -16,7 +16,7 @@ control samples from the sample records, and now runs the first analysis on a la
 
 ## 0:40 – 1:20 Search
 
-Type: **bulk RNA-seq of human cells treated with an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle**
+Type (or, if the app is open on `localhost`, press the microphone and say): **bulk RNA-seq of human cells treated with an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle**. Over `http://<pgx-ip>:3020` the microphone is disabled with its reason: browsers allow speech recognition only on localhost or HTTPS.
 
 Point at the plan (terms: mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2; organism Homo sapiens; assay bulk
 RNA-seq) and at the table: 34 strong GEO hits with case and control counts. Open **GSE273888**: HeLa cells, 100 nM
@@ -37,7 +37,7 @@ Show the panel:
   through ATF4), so their fall after rapamycin is the expected direction. CCN2, CCN1 and THBS1 rise.
 - The paragraph under "Written by the model from the numbers above": the model wrote it from the computed numbers,
   and code checked every number in it against the pipeline's output before it was shown.
-- Downloads: `GSM….count`, `counts.tsv`, `deseq2_results.tsv`, the PNGs and `manifest.json`.
+- Downloads: `GSM….count`, `counts.tsv`, `deseq2_results.tsv`, the PNGs and `manifest.json`; the slide-ready figures (300 dpi PNG and PDF: PCA, volcano, MA, sample-distance heatmap, top-gene counts) are under `plots/` and in `docs/evidence/process/GSE273888/plots/`.
 
 ## 2:20 – 2:50 Honesty
 
