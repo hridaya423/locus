@@ -241,22 +241,27 @@ def _pride_matrix(accession: str) -> dict | None:
     rows = list(csv.reader(io.StringIO(data.decode("utf-8", errors="replace")), delimiter="\t"))
     header, body = rows[0], [r for r in rows[1:] if len(r) == len(rows[0])]
     names = {r[0] for r in rec["samples"]["rows"]}
-    lfq = {h[len("LFQ intensity "):]: i for i, h in enumerate(header) if h.startswith("LFQ intensity ") and h[len("LFQ intensity "):] in names}
-    columns = lfq or {h[len("Intensity "):]: i for i, h in enumerate(header) if h.startswith("Intensity ") and h[len("Intensity "):] in names}
-    if len(columns) < 4:
-        return None
     flag = lambda r, name: name in header and r[header.index(name)] == "+"
     body = [r for r in body if not any(flag(r, f) for f in ("Reverse", "Potential contaminant", "Contaminant", "Only identified by site"))]
     label = lambda r: next((r[header.index(k)].split(";")[0] for k in ("Gene names", "Majority protein IDs", "Protein IDs") if k in header and r[header.index(k)]), "")
     value = lambda v: float(v) if re.fullmatch(r"[\d.]+(?:[eE][-+]?\d+)?", v) and float(v) > 0 else np.nan
-    matrix = np.array([[value(r[i]) for i in columns.values()] for r in body])
+    # LFQ intensities where they cover more proteins than raw intensities do; on PXD047213 LFQ keeps 69 of 6,667 groups, intensity 178.
+    built = []
+    for prefix in ("LFQ intensity ", "Intensity "):
+        columns = {h[len(prefix):]: i for i, h in enumerate(header) if h.startswith(prefix) and h[len(prefix):] in names}
+        if len(columns) >= 4:
+            matrix = np.array([[value(r[i]) for i in columns.values()] for r in body])
+            built.append((int((np.isfinite(matrix).sum(axis=1) >= len(columns) / 2).sum()), prefix == "LFQ intensity ", columns, matrix))
+    if not built:
+        return None
+    _, lfq, columns, matrix = max(built, key=lambda b: b[:2])
     keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
     names_kept = [label(r) for r, k in zip(body, keep) if k]
     return {
         "accession": accession, "samples": list(columns), "gene_ids": names_kept, "matrix": np.log2(matrix[keep]),
         "kind": "log scale", "symbols": names_kept, "genes": {}, "feature": "protein",
         "organism": next((v[0] for lbl, v in rec["facts"] if lbl == "Organism"), "not stated"),
-        "source": {"url": found["url"], "file": found["name"], "build": f"{member}, {'LFQ intensity' if lfq else 'intensity'} columns",
+        "source": {"url": found["url"], "file": found["name"], "build": f"{member}, {'LFQ intensity' if lfq else 'intensity'} columns; {int(keep.sum()):,} of {len(rows) - 1:,} protein groups quantified in at least half of the samples",
                    "pipeline": "the authors' MaxQuant search", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data), "genes_url": ""},
     }
 
