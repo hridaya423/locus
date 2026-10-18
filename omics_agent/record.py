@@ -13,6 +13,7 @@ import re
 import sqlite3
 import struct
 import xml.etree.ElementTree as ET
+from collections import Counter
 from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -344,27 +345,46 @@ def _pride(accession: str, row: dict) -> Record:
     return rec
 
 
+RAW_EXTENSION = re.compile(r"(?:\.(?:raw|wiff2?|scan|d|mzml|mzxml|mgf|zip|rar|7z|gz|tar))+$", re.I)
+FRACTION = re.compile(r"(?:[_ -]F(?:rac(?:tion)?)?[_ -]?\d+$)|fraction", re.I)
+SAMPLE_KEY = re.compile(r"sample.?(?:name|key|map|list)|sdrf.*\.(?:txt|tsv)$", re.I)
+
+
 def _pride_samples(rec: Record) -> None:
     """PRIDE lists no samples, but a search-engine table names them in its columns ('Intensity XAD_3'). Those names become
     the sample table, grouped by name without the trailing number, read once from the table's first bytes and cached."""
     from . import preview
 
     path = CACHE / f"{rec.accession}.experiments.json"
-    if not path.exists():
-        found = next((f for f in rec.files if preview.ZIP.search(f["name"]) and f["group"] in ("Search", "Result")), None)
-        if not found:
-            return
+    found = next((f for f in rec.files if preview.ZIP.search(f["name"]) and f["group"] in ("Search", "Result")), None)
+    if found and not path.exists():
         try:
             data, _, member, _ = preview._zip_member(found["url"])
             named = preview.experiments(data.decode("utf-8", errors="replace").split("\n", 1)[0].rstrip("\r").split("\t"))
+            path.write_text(json.dumps({"file": found["name"], "member": member, "names": (named or {}).get("names", [])}))
         except (httpx.HTTPError, ValueError, struct.error):
-            return
-        path.write_text(json.dumps({"file": found["name"], "member": member, "names": (named or {}).get("names", [])}))
-    names = json.loads(path.read_text())["names"]
-    if len(names) < 2:
-        return
+            pass
+    names = json.loads(path.read_text())["names"] if found and path.exists() else []
     stem = lambda n: re.sub(r"[_ .-]*\d+$", "", n) or n
-    rec.samples = {"columns": ["Accession", "named group"], "link": "", "rows": [[n, stem(n)] for n in names]}
+    if len(names) >= 2:
+        rec.samples = {"columns": ["Accession", "named group"], "link": "", "rows": [[n, stem(n)] for n in names]}
+        return
+    raws = {RAW_EXTENSION.sub("", f["name"]): f["name"] for f in rec.files if f["group"] == "Raw"}
+    # The authors' own key from raw file to sample (PXD058425's 695-byte PRIDE_SampleName.txt: E2_3793_01.raw → WT_01).
+    for f in [f for f in rec.files if SAMPLE_KEY.search(f["name"]) and (f.get("bytes") or 0) < 64_000]:
+        try:
+            lines = [ln.split("\t") for ln in _cached(f"{rec.accession}.{f['name']}", f["url"]).splitlines() if "\t" in ln]
+        except httpx.HTTPError:
+            continue
+        keyed = [(c[0].strip(), c[1].strip()) for c in lines if len(c) >= 2 and RAW_EXTENSION.sub("", c[0].strip()) in raws and c[1].strip()]
+        if len(keyed) >= 4:
+            rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for raw, n in keyed]}
+            return
+    # Else the raw files' own names, when they fall into a few groups of at least two (PXD017593: Mock1–3, CWMV-Infected1–3).
+    # Fractions of one sample are not samples ('HeLa_rep1_F07').
+    groups = Counter(stem(n) for n in raws)
+    if 2 <= len(groups) <= 12 and min(groups.values()) >= 2 and not any(FRACTION.search(n) for n in raws):
+        rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for n, raw in sorted(raws.items())]}
 
 
 def _pride_kinds(accession: str) -> list[dict]:
