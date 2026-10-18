@@ -23,6 +23,8 @@ CHECKS = [
     ("matched libraries and the split sentence", lambda: m.classify_assays("GSE132703"), lambda r: bool(r.get("matched")) and "split" in (r.get("split") or {}).get("text", "")),
     ("Ribo-seq QC checks", lambda: m.sample_qc("GSE132703"), lambda r: [c["stated"] for c in r["criteria"]["checklist"]].count(False) == 2),
     ("design check, power in people", lambda: m.check_design("GSE86618"), lambda r: r["power"]["unit"] == "people"),
+    ("MetaboLights samples, cases and controls", lambda: m.filter_samples("MTBLS352", {}), lambda r: r["comparison"]["case"] == ["T2D patients"] and r["samples"] == 730),
+    ("first look on a MetaboLights MAF", lambda: m.first_look("MTBLS8644", top=2), lambda r: r["feature"] == "metabolite" and r["tested"] > 100),
     ("get the table (metabolites)", lambda: m.get_table("ST003390"), lambda r: r.get("available")),
     ("first look with pathways", lambda: m.first_look("GSE124685", pathways=True, top=5), lambda r: r["pathways"]["sides"]["up"]["terms"][0]["term"].startswith("Extracellular")),
     ("first look on metabolites", lambda: m.first_look("ST003390", top=3), lambda r: r["feature"] == "metabolite" and r["up"] >= 1),
@@ -33,7 +35,7 @@ CHECKS = [
     ("contributor page", lambda: m.get_person("Carson C Thoreen"), lambda r: r["counts"]["datasets"] >= 5),
     ("provenance: the requests a record was read from", lambda: m.list_files("GSE132703"), lambda r: len(r["read_from"]) >= 4),
     ("the answer and watching a search", lambda: m.search_datasets("Plasma metabolomics in type 2 diabetes against healthy controls", seen=["ST003390"]),
-     lambda r: r["answer"][0]["accession"] == "ST003390" and "ST003390" not in r["new"]),
+     lambda r: r["answer"][0]["kind"] == "cohort" and "ST003390" not in r["new"] and len(r["new"]) == len(r["datasets"]) - 1),
 ]
 
 failed = 0
