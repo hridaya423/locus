@@ -4,7 +4,7 @@ Every number below comes from a script in this repository or a log named in `pro
 
 | What | Ground truth | Result | Known failures |
 |---|---|---|---|
-| Search recall against Claude Opus 5.5 with web search (8 harness questions) | The datasets Opus named that locus indexes (34) | locus returns 14, 11 of them graded strong | IPF Cell Atlas (GSE136831) never reaches the 300-candidate pool; HLA Ligand Atlas (PXD020186) is cut at triage; GSE100007 not retrieved |
+| Search recall against Claude Opus 5.5 with web search (8 harness questions) | The datasets Opus named that locus indexes (34) | locus returns 15, 12 of them graded strong (was 14 and 11 before the question became its own ranking) | HLA Ligand Atlas (PXD020186) is cut at triage; GSE100007 and PXD058312 are never retrieved; q4 and q7 return none of Opus's picks |
 | Assay labels, footprint libraries | Every cached Ribo-seq study title (4,273) | The title rule holds on all of them (`uv run python -m omics_agent.assay`) | A fresh check at 02:55 found RP, TTS, disome and input libraries mislabelled; fixed, then rechecked |
 | Assay labels, other data types | 16 random GEO, PRIDE and ArrayExpress pages; 12 random PRIDE studies with papers | 1 false claim (a tiling array also called ChIP-seq), fixed; 0 spurious additions from papers | Assays named only in a paper behind a paywall are missed |
 | First look against the paper | Genes the paper names (Europe PMC full text or text-mined) | GSE124685: 50 of 63 paper genes significant, 3.2 expected by chance; GSE86618: 35 of 97, 4.2 by chance | A screen (Welch t-test), not DESeq2; single-cell data is flagged as nested in people, not corrected |
