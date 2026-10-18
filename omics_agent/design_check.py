@@ -7,7 +7,7 @@ from collections import Counter
 
 import numpy as np
 
-from . import record, table, volcano
+from . import design, record, table, volcano
 
 BATCH = re.compile(r"batch|plate|date|lane|\brun\b|institution|site|center|centre|hospital|cohort|processing|sequenc|flowcell|chip|slide|array|library prep|operator", re.I)
 TISSUE = re.compile(r"tissue|cell type|source|organism part|organ|region|location|compartment", re.I)
@@ -90,8 +90,12 @@ def check(accession: str, factor: str | None = None, case: list[str] | None = No
             expressed = (values[:, in_case | in_control] > np.percentile(values[:, in_case | in_control], 50)).mean(axis=1) > 0.5
             pooled = np.sqrt((values[expressed][:, in_case].var(axis=1, ddof=1) * (a - 1) + values[expressed][:, in_control].var(axis=1, ddof=1) * (b - 1)) / (a + b - 2))
             sd = float(np.median(pooled))
-            lfc = Z * sd * math.sqrt(1 / a + 1 / b)
-            power = {"n_case": a, "n_control": b, "median_sd": round(sd, 3), "detectable_log2fc": round(lfc, 3), "fold": round(2 ** lfc, 2),
+            # Power comes from independent units: 540 single cells from 9 patients are 9, not 540.
+            people = design.people(accession, {"factor": factor, "case": case, "control": control})
+            unit = "people" if people and people.get("case") and people.get("control") and people["case"] + people["control"] < a + b else "samples"
+            na, nb = (people["case"], people["control"]) if unit == "people" else (a, b)
+            lfc = Z * sd * math.sqrt(1 / na + 1 / nb)
+            power = {"n_case": na, "n_control": nb, "unit": unit, "median_sd": round(sd, 3), "detectable_log2fc": round(lfc, 3), "fold": round(2 ** lfc, 2),
                      "method": "two-sided p < 0.05 for one gene at 80% power, median within-group SD of log2 expression over expressed genes"}
     return {"accession": accession, "available": True, "factor": factor, "case": case, "control": control, "n_case": n["case"], "n_control": n["control"],
             "traps": traps, "balanced": balanced, "power": power}

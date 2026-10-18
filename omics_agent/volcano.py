@@ -12,7 +12,7 @@ import httpx
 import numpy as np
 from scipy import stats
 
-from . import record, table
+from . import design, record, table
 
 FULLTEXT = Path.home() / ".cache" / "omics-agent" / "fulltext"
 EUROPE_PMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
@@ -135,6 +135,11 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
     if max(n_case, n_control) > 4 * smaller:
         warnings.append(f"groups of {n_case} and {n_control} are unbalanced")
     warnings += [f"pooled across {p['factor']} ({', '.join(p['levels'][:4])}{'…' if len(p['levels']) > 4 else ''})" for p in pooled]
+    # Several samples from one person (single cells, repeated visits) are not independent; the test counts them as if they were.
+    people = design.people(accession, {"factor": factor, "case": case, "control": control})
+    if people and people.get("case") and people["case"] + people["control"] < n_case + n_control:
+        warnings.append(f"the {n_case + n_control} samples come from {people['case']} and {people['control']} people ({people['field']}); "
+                        f"samples from one person are not independent, so these q values overstate the evidence")
     return base | {
         "available": True, "factor": factor, "case": case, "control": control, "within": list(within) if within else None,
         "n_case": n_case, "n_control": n_control, "tested": int(keep.sum()), "method": method, "q": Q, "lfc": cut,

@@ -199,7 +199,7 @@ function DesignChecks({ check }: { check: DesignCheck }) {
       {check.balanced.length > 0 && <p className="text-muted-foreground">Balanced: {check.balanced.map((b) => `${b.factor} (V ${b.v})`).join(", ")}</p>}
       {check.power && (
         <p>
-          With {check.power.n_case} and {check.power.n_control} samples, a {check.power.fold}× change (log2 {check.power.detectable_log2fc}) in a typical gene is detectable.
+          With {check.power.n_case} and {check.power.n_control} {check.power.unit ?? "samples"}, a {check.power.fold}× change (log2 {check.power.detectable_log2fc}) in a typical gene is detectable.
           <span className="text-muted-foreground"> {check.power.method}.</span>
         </p>
       )}

@@ -409,7 +409,7 @@ export function foundAll(): { accessions: string[]; topic: string } {
 
 export type Trap = { kind: "small" | "batch" | "tissue" | "imbalance"; title: string; detail: string; factor: string; table: [string, number, number][] | null };
 export type DesignCheck = { accession: string; available: boolean; reason?: string; factor: string; case: string[]; control: string[]; n_case: number; n_control: number;
-  traps: Trap[]; balanced: { factor: string; v: number }[]; power: { n_case: number; n_control: number; median_sd: number; detectable_log2fc: number; fold: number; method: string } | null };
+  traps: Trap[]; balanced: { factor: string; v: number }[]; power: { n_case: number; n_control: number; unit?: "people" | "samples"; median_sd: number; detectable_log2fc: number; fold: number; method: string } | null };
 
 export async function designCheck(accession: string, pick: Pick, signal?: AbortSignal): Promise<DesignCheck> {
   const q = new URLSearchParams({ factor: pick.factor });
