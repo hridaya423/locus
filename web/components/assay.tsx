@@ -160,10 +160,15 @@ export function useAssays(accession: string, enabled: boolean): AssayState {
   return state;
 }
 
-// Assays with libraries assigned to them; otherwise those the record's own text names (not only inferred, not only in the paper).
+const MASS_SPEC = new Set(["PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"]);
+// Acquisition and quantification modes describe how, not what: PXD008373 is phosphoproteomics, acquired by DDA.
+const MODE = /^(Data-(in)?dependent acquisition|Label-free quantification)/;
+
+// Assays with libraries assigned to them; else what the record's text names (for mass spectrometry, the experiment
+// type it names or implies, without acquisition modes).
 export const assayNames = (data?: Assays) => {
   const assigned = data?.assays.filter((a) => a.samples?.length) ?? [];
-  const named = data?.assays.filter((a) => a.how === "named" && !a.from_paper) ?? [];
+  const named = !data ? [] : MASS_SPEC.has(data.source) ? data.assays.filter((a) => !MODE.test(a.assay)) : data.assays.filter((a) => a.how === "named" && !a.from_paper);
   return (assigned.length ? assigned : named).map((a) => a.assay.replace(/ \(.*\)$/, ""));
 };
 
