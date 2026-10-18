@@ -6,7 +6,7 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { designCheck, foundAll, genePath, firstLook, paperCheck, type DesignCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type Pick, type TableSummary } from "@/lib/api";
+import { designCheck, foundAll, genePath, firstLook, paperCheck, pathways, type DesignCheck, type Pathways, type PathwaySide, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type Pick, type TableSummary } from "@/lib/api";
 
 
 const H = 360;
@@ -216,6 +216,34 @@ function Select({ label, value, options, onChange }: { label: string; value: str
   );
 }
 
+const qText = (q: number) => (q >= 0.001 ? q.toPrecision(2) : q.toExponential(1));
+
+function PathwayList({ title, side, tone }: { title: string; side?: PathwaySide; tone: "signal" | "control" }) {
+  return (
+    <div className="grid content-start gap-2">
+      <h3 className="flex items-center gap-2 text-[13px] font-medium">
+        <span aria-hidden className={cn("size-2 rounded-full", tone === "signal" ? "bg-signal" : "bg-control")} />
+        {title}
+      </h3>
+      {!side ? (
+        <p className="text-[12.5px] text-muted-foreground">Asking Enrichr…</p>
+      ) : side.terms.length === 0 ? (
+        <p className="text-[12.5px] text-muted-foreground">{side.reason ?? `No Reactome pathway reaches q < 0.05 among the top ${side.genes} genes`}.</p>
+      ) : (
+        <ul className="grid gap-1.5 text-[12.5px]">
+          {side.terms.map((t) => (
+            <li key={t.term} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3">
+              <a href={`https://reactome.org/content/detail/${t.id}`} target="_blank" rel="noreferrer" title={t.genes.join(", ")} className={cn("w-fit", LINK)}>{t.term}</a>
+              <span className="font-mono tabular text-muted-foreground">{t.genes.length} genes · q {qText(t.q)}</span>
+            </li>
+          ))}
+          {(side.significant ?? 0) > side.terms.length && <li className="text-muted-foreground">+{side.significant! - side.terms.length} more at q &lt; 0.05</li>}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function FirstLookSection({ accession }: { accession: string }) {
   const [summary, setSummary] = useState<TableSummary | null>(null);
   const [look, setLook] = useState<FirstLook | null>(null);
@@ -225,6 +253,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
   const [check, setCheck] = useState<PaperCheck | null>(null);
   const [design, setDesign] = useState<DesignCheck | null>(null);
   const [ringOn, setRingOn] = useState(true);
+  const [answered, setAnswered] = useState<{ look: FirstLook; data: Pathways } | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -247,8 +276,13 @@ export function FirstLookSection({ accession }: { accession: string }) {
     const ctrl = new AbortController();
     paperCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setCheck, () => {});
     designCheck(accession, { factor: look.factor, case: look.case, control: look.control }, ctrl.signal).then(setDesign, () => {});
+    pathways(accession, { factor: look.factor, case: look.case, control: look.control, within: look.within }, ctrl.signal).then(
+      (data) => setAnswered({ look, data }),
+      () => !ctrl.signal.aborted && setAnswered({ look, data: { available: false, reason: "Enrichr did not answer" } }),
+    );
     return () => ctrl.abort();
   }, [accession, look]);
+  const paths = answered?.look === look ? answered.data : null;
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;
@@ -323,6 +357,17 @@ export function FirstLookSection({ accession }: { accession: string }) {
                   <TopList accession={accession} title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" />
                   <TopList accession={accession} title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" />
                 </div>
+                {paths?.available === false ? (
+                  <p className="text-[12.5px] text-muted-foreground">Pathways: {paths.reason}.</p>
+                ) : (
+                  <div className="grid gap-3">
+                    <div className="grid content-start gap-6 sm:grid-cols-2 sm:gap-10">
+                      <PathwayList title={`Pathways higher in ${look.case.join(", ")}`} side={paths?.sides?.up} tone="signal" />
+                      <PathwayList title={`Pathways higher in ${look.control.join(", ")}`} side={paths?.sides?.down} tone="control" />
+                    </div>
+                    {paths?.method && <p className="max-w-[80ch] text-[12px] text-muted-foreground">{paths.method}. <a href={paths.source} className={MUTED_LINK}>Enrichr</a>, {paths.library?.replace("_", " ")}.</p>}
+                  </div>
+                )}
               </div>
               <p className="max-w-[80ch] text-[12px] leading-relaxed text-muted-foreground">
                 {look.method}. Table: {look.source.pipeline}, {look.source.build} (<a href={look.source.url} className={MUTED_LINK}>{look.source.file}</a>). A screen for direction, not a replacement for DESeq2 or limma.

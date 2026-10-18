@@ -133,16 +133,22 @@ def get_table(accession: str) -> dict:
 
 
 @mcp.tool(annotations=READ_ONLY)
-def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25) -> dict:
+def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25, pathways: bool = False) -> dict:
     """A first differential-expression look at a GEO RNA-seq series from its fetched counts: genes up and down between
     two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
     the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes, the
     top genes each way with log2 fold change, -log10 p and BH q, and paper_check: the genes the dataset's paper names
-    (Europe PMC full text or text-mined mentions) and where each lands here. A screen, not DESeq2."""
+    (Europe PMC full text or text-mined mentions) and where each lands here. With pathways=True, also the Reactome pathways
+    Enrichr finds over-represented among the top 200 genes each way. A screen, not DESeq2."""
     result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     if not result.get("available"):
         return {k: v for k, v in result.items() if k != "groups"} | {"factors": result.get("groups", {}).get("factors", [])}
     check = volcano.paper_genes(accession, result)
+    if pathways:
+        try:
+            result["pathways"] = volcano.pathways(result)
+        except httpx.HTTPError as error:
+            result["pathways"] = {"available": False, "reason": f"Enrichr did not answer: {error}"}
     genes = result.pop("genes")
     result.pop("groups")
     result["paper_check"] = {k: v for k, v in check.items() if k != "genes"} | {"genes": [

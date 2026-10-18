@@ -345,6 +345,19 @@ export type PaperGene = { gene: string; sentence: string | null; where: string; 
 export type PaperCheck = { available: boolean; reason?: string; paper?: string; title?: string; journal?: string; year?: string; url?: string; read?: string;
   genes: PaperGene[]; named: number; significant: number; by_chance: number };
 
+export type PathwaySide = { genes: number; terms: { term: string; id: string; p: number; q: number; genes: string[] }[]; significant?: number; reason?: string };
+export type Pathways = { available: boolean; reason?: string; library?: string; source?: string; method?: string; sides?: { up: PathwaySide; down: PathwaySide } };
+
+export async function pathways(accession: string, pick: Pick, signal?: AbortSignal): Promise<Pathways> {
+  const q = new URLSearchParams({ factor: pick.factor });
+  pick.case.forEach((c) => q.append("case", c));
+  pick.control.forEach((c) => q.append("control", c));
+  pick.within?.forEach((w) => q.append("within", w));
+  const res = await fetch(`${API}/first-look/${encodeURIComponent(accession)}/pathways?${q}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
 export async function paperCheck(accession: string, pick: { factor: string; case: string[]; control: string[] }, signal?: AbortSignal): Promise<PaperCheck> {
   const q = new URLSearchParams({ factor: pick.factor });
   pick.case.forEach((c) => q.append("case", c));

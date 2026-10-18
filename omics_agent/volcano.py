@@ -4,6 +4,7 @@ Method, stated wherever the result is shown: library-size CPM, genes with CPM >=
 smaller group, Welch's t-test on log2(CPM + 1), Benjamini-Hochberg FDR. It is a screen, not DESeq2 or limma-voom."""
 
 import re
+from functools import lru_cache
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -153,6 +154,33 @@ def _fulltext(paper: str) -> tuple[ElementTree.Element | None, dict]:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(httpx.get(f"{EUROPE_PMC}/{hit['pmcid']}/fullTextXML", timeout=60).raise_for_status().content)
     return ElementTree.fromstring(path.read_bytes()), head | {"url": f"https://europepmc.org/article/PMC/{hit['pmcid']}"}
+
+
+ENRICHR = "https://maayanlab.cloud/Enrichr"
+LIBRARY = "Reactome_2022"
+PATHWAY_GENES, PATHWAYS_SHOWN = 200, 8
+
+
+@lru_cache(maxsize=128)
+def _enrich(genes: tuple[str, ...]) -> list:
+    added = httpx.post(f"{ENRICHR}/addList", files={"list": (None, "\n".join(genes)), "description": (None, "locus first look")}, timeout=30).raise_for_status().json()
+    return httpx.get(f"{ENRICHR}/enrich", params={"userListId": added["userListId"], "backgroundType": LIBRARY}, timeout=30).raise_for_status().json()[LIBRARY]
+
+
+def pathways(look: dict) -> dict:
+    """Reactome pathways over-represented among the most significant genes up and down, from Enrichr."""
+    sides = {}
+    for side, sign in (("up", 1), ("down", -1)):
+        genes = [g[0].upper() for g in look["genes"] if g[3] < look["q"] and sign * g[1] >= look["lfc"] and not g[0].startswith("GeneID:")][:PATHWAY_GENES]
+        if len(genes) < 5:
+            sides[side] = {"genes": len(genes), "terms": [], "reason": f"{len(genes)} significant genes; Enrichr needs at least 5"}
+            continue
+        terms = [{"term": re.sub(r"\s*R-HSA-\d+$", "", r[1]), "id": (re.search(r"R-HSA-\d+", r[1]) or [""])[0], "p": r[2], "q": r[6], "genes": r[5]}
+                 for r in _enrich(tuple(genes)) if r[6] < 0.05]
+        sides[side] = {"genes": len(genes), "terms": terms[:PATHWAYS_SHOWN], "significant": len(terms)}
+    return {"available": True, "library": LIBRARY, "source": f"{ENRICHR}/", "sides": sides,
+            "method": f"The {PATHWAY_GENES} most significant genes each way (q < {look['q']}, |log2FC| ≥ {look['lfc']:g}) sent to Enrichr; Fisher's exact test against "
+                      f"Enrichr's whole-genome background, not the {look['tested']:,} genes tested here; Benjamini–Hochberg q < 0.05"}
 
 
 def paper_genes(accession: str, look: dict) -> dict:

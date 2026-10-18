@@ -147,6 +147,19 @@ def first_look_paper(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | N
     return volcano.paper_genes(accession, look) if look.get("available") else {"available": False, "reason": look.get("reason")}
 
 
+@app.get("/first-look/{accession}/pathways")
+def first_look_pathways(accession: str = Path(pattern=r"^GSE\d+$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+                        control: Annotated[list[str] | None, Query()] = None, within: Annotated[list[str] | None, Query()] = None) -> dict:
+    """Reactome pathways over-represented among the top genes up and down in the same comparison, from Enrichr."""
+    look = volcano.compare(accession, factor, case, control, tuple(within) if within and len(within) == 2 else None)
+    if not look.get("available"):
+        return {"available": False, "reason": look.get("reason")}
+    try:
+        return volcano.pathways(look)
+    except httpx.HTTPError:
+        raise HTTPException(502, "Enrichr did not answer. Please try again.")
+
+
 @app.get("/gene/{symbol}")
 def gene_across(symbol: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,29}$"), accession: Annotated[list[str] | None, Query(alias="in")] = None, hint: str = "") -> dict:
     """One gene's change between cases and controls in each listed GEO dataset, one row each."""
