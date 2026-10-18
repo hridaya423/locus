@@ -204,6 +204,8 @@ FEW_PROTEINS = 1000
 
 def _not_genes(look: dict, universe: bool = True) -> str | None:
     """Why a protein comparison cannot be read as genes: proteins named by UniProt ID, or too few tested for a genome-wide background."""
+    if look.get("feature") == "phosphosite":
+        return "the rows are phosphosites, and a site's change is not its gene's"
     if look.get("feature") != "protein":
         return None
     if sum(bool(UNIPROT.fullmatch(g[0])) for g in look["genes"]) > len(look["genes"]) / 2:

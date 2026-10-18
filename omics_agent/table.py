@@ -22,6 +22,8 @@ import numpy as np
 
 from . import record
 
+PHOSPHO = re.compile(r"phospho", re.I)
+SITES = re.compile(r"(^|/)Phospho \(STY\)\s?Sites\.txt$", re.I)
 # MaxQuant's protein tables hold sequence and ID lists longer than csv's 128 KB field default (PXD011513).
 csv.field_size_limit(sys.maxsize)
 DATA = Path.home() / "omics-data" / "ncbi-counts"
@@ -224,6 +226,12 @@ def _metabolights_matrix(accession: str) -> dict | None:
     }
 
 
+def _centred(logged: np.ndarray) -> np.ndarray:
+    """Each sample shifted so its median matches the table's: loading differs between runs (PXD047213's tumour runs sit
+    0.6 log2 above the normal ones), and an unshifted table reports that as change."""
+    return logged - np.nanmedian(logged, axis=0) + np.nanmedian(logged)
+
+
 def _pride_matrix(accession: str) -> dict | None:
     """A PRIDE study's proteins x samples table from MaxQuant's proteinGroups.txt inside its search zip (the whole member,
     up to 200 MB): LFQ intensities where present, else intensities; decoys, contaminants and site-only groups removed;
@@ -235,15 +243,26 @@ def _pride_matrix(accession: str) -> dict | None:
     found = next((f for f in rec["files"] if preview.ZIP.search(f["name"]) and f["group"] in ("Search", "Result")), None) if rec and rec["samples"] else None
     if not found:
         return None
-    data, whole, member, _ = preview._zip_member(found["url"], whole=True)
-    if not member.endswith("proteinGroups.txt") or not whole:
+    # A phosphoproteome is read at the site: MaxQuant's Phospho (STY)Sites.txt, class I sites (localisation >= 0.75).
+    phospho = PHOSPHO.search(" ".join([rec["title"], rec.get("modality", ""), *(t for _, t in rec["texts"][:2])]))
+    try:
+        data, whole, member, _ = preview._zip_member(found["url"], whole=True, want=SITES if phospho else None)
+    except ValueError:
+        if not phospho:
+            raise
+        phospho, (data, whole, member, _) = None, preview._zip_member(found["url"], whole=True)
+    if not member.endswith("proteinGroups.txt" if not phospho else "Sites.txt") or not whole:
         return None
     rows = list(csv.reader(io.StringIO(data.decode("utf-8", errors="replace")), delimiter="\t"))
     header, body = rows[0], [r for r in rows[1:] if len(r) == len(rows[0])]
+    if phospho and "Localization prob" in header:
+        body = [r for r in body if re.fullmatch(r"[\d.]+", r[header.index("Localization prob")]) and float(r[header.index("Localization prob")]) >= 0.75]
     names = {r[0] for r in rec["samples"]["rows"]}
     flag = lambda r, name: name in header and r[header.index(name)] == "+"
     body = [r for r in body if not any(flag(r, f) for f in ("Reverse", "Potential contaminant", "Contaminant", "Only identified by site"))]
-    label = lambda r: next((r[header.index(k)].split(";")[0] for k in ("Gene names", "Majority protein IDs", "Protein IDs") if k in header and r[header.index(k)]), "")
+    protein = lambda r: next((r[header.index(k)].split(";")[0] for k in ("Gene names", "Majority protein IDs", "Protein IDs", "Proteins", "Protein") if k in header and r[header.index(k)]), "")
+    site = lambda r: f"{protein(r)}_{r[header.index('Amino acid')]}{r[header.index('Position')]}" if {"Amino acid", "Position"} <= set(header) else protein(r)
+    label = site if phospho else protein
     value = lambda v: float(v) if re.fullmatch(r"[\d.]+(?:[eE][-+]?\d+)?", v) and float(v) > 0 else np.nan
     # LFQ intensities where they cover more proteins than raw intensities do; on PXD047213 LFQ keeps 69 of 6,667 groups, intensity 178.
     built = []
@@ -258,10 +277,10 @@ def _pride_matrix(accession: str) -> dict | None:
     keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
     names_kept = [label(r) for r, k in zip(body, keep) if k]
     return {
-        "accession": accession, "samples": list(columns), "gene_ids": names_kept, "matrix": np.log2(matrix[keep]),
-        "kind": "log scale", "symbols": names_kept, "genes": {}, "feature": "protein",
+        "accession": accession, "samples": list(columns), "gene_ids": names_kept, "matrix": _centred(np.log2(matrix[keep])),
+        "kind": "log scale", "symbols": names_kept, "genes": {}, "feature": "phosphosite" if phospho else "protein",
         "organism": next((v[0] for lbl, v in rec["facts"] if lbl == "Organism"), "not stated"),
-        "source": {"url": found["url"], "file": found["name"], "build": f"{member}, {'LFQ intensity' if lfq else 'intensity'} columns; {int(keep.sum()):,} of {len(rows) - 1:,} protein groups quantified in at least half of the samples",
+        "source": {"url": found["url"], "file": found["name"], "build": f"{member}, {'LFQ intensity' if lfq else 'intensity'} columns; {int(keep.sum()):,} of {len(body):,} {'class I phosphosites (localisation ≥ 0.75)' if phospho else 'protein groups'} quantified in at least half of the samples; each sample median-centred",
                    "pipeline": "the authors' MaxQuant search", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data), "genes_url": ""},
     }
 

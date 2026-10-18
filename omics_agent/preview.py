@@ -104,7 +104,7 @@ def _ranged(url: str, header: str, cap: int = 4 * READ) -> tuple[bytes, int] | N
 MAX_MEMBER = 200 * 1024**2
 
 
-def _zip_member(url: str, whole: bool = False) -> tuple[bytes, bool, str, int]:
+def _zip_member(url: str, whole: bool = False, want: re.Pattern | None = None) -> tuple[bytes, bool, str, int]:
     """The first bytes of the most useful table inside a zip, inflated, without downloading the zip: two Range reads, one
     for the central directory and one for the start of the member; with `whole`, the entire member (up to 200 MB
     unpacked). Returns the bytes, whether they are the whole member, its path and how many files the zip holds."""
@@ -113,6 +113,8 @@ def _zip_member(url: str, whole: bool = False) -> tuple[bytes, bool, str, int]:
         raise ValueError("locus could not read this zip's list of files (the server ignores Range, or it is a zip64 archive).")
     tables = [f for f in files if TABLE.search(f["path"]) and not NOT_MEMBER.search(f["path"])]
     pick = next((f for rx in MEMBERS for f in tables if rx.search(f["path"])), max(tables, key=lambda f: f["size"], default=None))
+    if want:
+        pick = next((f for f in files if want.search(f["path"])), None)
     if not pick or pick["method"] not in (0, 8):
         raise ValueError(f"The zip holds {len(files)} files and no table locus can read.")
     if whole and pick["size"] > MAX_MEMBER:
