@@ -163,7 +163,7 @@ export function useAssays(accession: string, enabled: boolean): AssayState {
 
 export const MASS_SPEC = new Set(["PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"]);
 
-const MODE = /^(Data-(in)?dependent acquisition|Label-free quantification)/;
+const MODE = /^(Data-(in)?dependent acquisition|Label-free quantification|Isobaric labelling|SILAC)/;
 
 // Assays with libraries assigned to them; else what the record's text names (for mass spectrometry, the experiment
 // type it names or implies, without acquisition modes).
@@ -203,7 +203,8 @@ export function ProtocolLine({ accession }: { accession: string }) {
     </div>
   );
 }
-// Acquisition and quantification modes describe how, not what: PXD008373 is phosphoproteomics, acquired by DDA.
+// Acquisition and quantification modes describe how, not what: PXD008373 is phosphoproteomics, acquired by DDA;
+// PXD023766 is proteomics, quantified by iTRAQ.
 export function AssayList({ accession, state }: { accession: string; state: AssayState }) {
   const data = state.data;
   return (
