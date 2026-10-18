@@ -150,8 +150,9 @@ def first_look(accession: str, factor: str = "", case: list[str] | None = None, 
     result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     if not result.get("available"):
         return {k: v for k, v in result.items() if k != "groups"} | {"factors": result.get("groups", {}).get("factors", [])}
-    check = volcano.paper_genes(accession, result)
-    if pathways:
+    genes_measured = result["feature"] == "gene"
+    check = volcano.paper_genes(accession, result) if genes_measured else {"available": False, "reason": "a metabolite table; the paper check reads genes"}
+    if pathways and genes_measured:
         try:
             result["pathways"] = volcano.pathways(result)
         except httpx.HTTPError as error:
@@ -160,7 +161,7 @@ def first_look(accession: str, factor: str = "", case: list[str] | None = None, 
     result.pop("groups")
     result["paper_check"] = {k: v for k, v in check.items() if k != "genes"} | {"genes": [
         {k: g[k] for k in ("gene", "log2fc", "q", "significant", "where", "sentence")} for g in check.get("genes", [])[:top]]}
-    columns = ["gene", "log2_fold_change", "minus_log10_p", "q"]
+    columns = [result["feature"], "log2_fold_change", "minus_log10_p", "q"]
     result["top_up"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] >= result["lfc"]][:top]
     result["top_down"] = [dict(zip(columns, g)) for g in genes if g[3] < result["q"] and g[1] <= -result["lfc"]][:top]
     return result
