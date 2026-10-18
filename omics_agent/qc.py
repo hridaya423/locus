@@ -120,6 +120,8 @@ def criteria(accession: str) -> dict:
             if any(key in q["key"] or q["key"] in key for q in quotes):
                 continue
             quotes.append({"text": sentence, "field": field, "key": key})
+    listed = {c["text"] for c in checklist or [] if c.get("text")}
+    quotes = [q for q in quotes if q["text"] not in listed]
     return {"quotes": [{k: q[k] for k in ("text", "field")} for q in quotes[:40]], "read": read, "checklist": checklist}
 
 
