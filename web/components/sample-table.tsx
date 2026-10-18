@@ -19,14 +19,23 @@ function saveCsv(name: string, header: string[], rows: string[][]) {
   URL.revokeObjectURL(url);
 }
 
-function Valued({ role, value }: { role?: "case" | "control"; value: string }) {
-  return role ? <span className={cn("font-medium", ROLE_TEXT[role])} title={`${role}: ${value}`}>{value}</span> : value;
+// A value of a charted factor filters the samples to it, as its bar does; cases and controls keep their colour.
+function Valued({ role, value, onFilter }: { role?: "case" | "control"; value: string; onFilter?: () => void }) {
+  const text = role ? <span className={cn("font-medium", ROLE_TEXT[role])} title={`${role}: ${value}`}>{value}</span> : value;
+  return onFilter ? (
+    <button type="button" onClick={onFilter} title={`Keep only samples with ${value}`} className="cursor-pointer underline decoration-transparent underline-offset-4 transition-colors duration-150 hover:decoration-current">{text}</button>
+  ) : text;
 }
 
 export function SampleTable({ dataset, samples, selection }: { dataset: string; samples: NonNullable<DatasetRecord["samples"]>; selection: Selection }) {
   const [all, setAll] = useState(false);
   const { active, rows, pending, error } = selection;
   const columns = useMemo(() => samples.columns.map((c, i) => [c, i] as const).filter(([, i]) => samples.rows.some((r) => r[i])), [samples]);
+  const factorOf = new Map((selection.design?.factors ?? []).map((f) => [f.column, f]));
+  const filterOf = (column: string, value: string) => {
+    const f = factorOf.get(column);
+    return f && value in f.levels && !selection.filters[f.name]?.includes(value) ? () => selection.toggle(f.name, value) : undefined;
+  };
   const shown = rows.slice(0, all || active ? ROWS_MAX : ROWS_SHOWN);
   return (
     <div className="grid gap-3">
@@ -57,7 +66,7 @@ export function SampleTable({ dataset, samples, selection }: { dataset: string; 
                     ) : n === 0 && samples.link && r[i] ? (
                       <a href={samples.link.replace("{}", r[i])} target="_blank" rel="noreferrer" className={LINK}>{r[i]}</a>
                     ) : (
-                      r[i] ? <Valued role={roleOf(selection.design?.comparison, c, r[i])} value={r[i]} /> : <span className="text-muted-foreground">–</span>
+                      r[i] ? <Valued role={roleOf(selection.design?.comparison, c, r[i])} value={r[i]} onFilter={filterOf(c, r[i])} /> : <span className="text-muted-foreground">–</span>
                     )}
                   </td>
                 ))}

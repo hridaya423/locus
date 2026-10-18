@@ -50,10 +50,9 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
         <p className="text-[13px] text-muted-foreground">
           {CONTROLLED.has(rec.source) ? (
             <>
-              <span className="font-medium text-foreground">Controlled access.</span> {repositoryName(rec.source)} releases these files only after its data access committee approves an application, made on{" "}
-              <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>the dataset&apos;s page</a>; locus offers no download.
+              <span className="font-medium text-foreground">Controlled access.</span> {repositoryName(rec.source)} releases these files only after its data access committee approves an application, made on the record linked at the top; locus offers no download.
             </>
-          ) : LISTED.has(rec.source) ? `${repositoryName(rec.source)} lists no files for this dataset.` : <>locus does not read {repositoryName(rec.source)}&apos;s file lists yet; the files are on <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>its page</a>.</>}
+          ) : LISTED.has(rec.source) ? `${repositoryName(rec.source)} lists no files for this dataset.` : `locus does not read ${repositoryName(rec.source)}'s file lists yet; the record linked at the top lists them.`}
         </p>
       )}
       {total > 0 && list.length > 1 && (

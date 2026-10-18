@@ -52,7 +52,7 @@ const COLLECT = `(() => {
     const seen = new Set();
     for (const tr of table.querySelectorAll('tbody tr')) [...tr.children].forEach((td, i) => {
       const v = td.textContent.trim();
-      if (!v || v === '–' || td.querySelector('a') || seen.has(i + v)) return;
+      if (!v || v === '–' || td.querySelector('a, button') || seen.has(i + v)) return;
       seen.add(i + v);
       doors.push({ kind: 'value opens nothing', where: section(table), what: heads[i] ?? 'column ' + i, example: v.slice(0, 60) });
     });
