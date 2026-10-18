@@ -100,8 +100,6 @@ const STRAND: Record<FacetStatus, Lane> = { same: "joined", related: "near", dif
 const GAP: Record<Lane, number> = { joined: 0, near: 6, apart: 18 };
 const DRAW = 0.9;
 const GRID = "relative grid grid-cols-[1fr_2.75rem_1fr] sm:grid-cols-[7.5rem_1fr_4rem_1fr]";
-// Each dataset's contrast is named in its own words, so both sides show even when the two are judged the same.
-const SHOWN_BOTH = new Set(["groups", "sizes", "contrast", "shared", "access", "sex", "disease"]);
 const WARN_ONLY = new Set(["sizes", "shared"]);
 // One-line labels keep every row a single line tall, so the whole comparison fits on a laptop screen.
 const SHORT: Record<string, string> = { layer: "Layer", groups: "Groups", tissue: "Tissue", build: "Genome", access: "Data", sex: "Sex", shared: "Shared", sizes: "Group size" };
@@ -248,11 +246,10 @@ function Strands({ comparison, a, b }: { comparison: Comparison; a: Hit; b: Hit 
           bars and shared samples only matter when there are some, so those rows appear only to warn. */}
       {comparison.facets.filter((f) => (f.required || f.a !== null || f.b !== null) && (!WARN_ONLY.has(f.key) || f.status === "differs")).map((f) => {
         const lane = STRAND[f.status];
-        const both = lane !== "joined" || SHOWN_BOTH.has(f.key);
         return (
           <div key={f.key} title={f.required || f.status === "same" ? undefined : f.note} className={cn(GRID, "border-t border-rule/70 py-2 text-sm leading-snug")}>
             <span className={cn("label col-start-1 row-start-1 text-right sm:row-span-2 sm:text-left", f.required && f.status !== "same" ? "text-foreground" : "text-muted-foreground")}>{SHORT[f.key] ?? f.label}</span>
-            <span className={cn("col-start-1 row-start-2 min-w-0 text-right sm:col-start-2 sm:row-start-1", !both && "invisible", lane === "joined" && "text-muted-foreground")}>
+            <span className={cn("col-start-1 row-start-2 min-w-0 text-right sm:col-start-2 sm:row-start-1", lane === "joined" && "text-muted-foreground")}>
               {cell(f, "a")}
               {f.key === "groups" && <Bars hit={a} />}
             </span>
