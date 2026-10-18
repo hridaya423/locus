@@ -87,7 +87,7 @@ function Segments({ text, from = 0, to = text.length, marks }: { text: string; f
       <mark
         key={a}
         data-match={[...(span?.slugs ?? []), ...(quoted ? ["quote"] : [])].join(" ")}
-        className={cn("bg-transparent text-inherit", span && "bg-signal/20", quoted && "underline decoration-signal decoration-2 underline-offset-4")}
+        className={cn("bg-transparent text-inherit", span && "bg-mark", quoted && "underline decoration-foreground/50 decoration-2 underline-offset-4")}
       >
         {text.slice(a, b)}
       </mark>
@@ -116,7 +116,7 @@ export function goToMatch(match: string) {
   marks[0].closest("details")?.setAttribute("open", "");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   marks[0].scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
-  if (!still) for (const el of marks) el.animate([{ backgroundColor: "color-mix(in oklab, var(--signal) 60%, transparent)" }, {}], { duration: 1400, easing: "ease-out" });
+  if (!still) for (const el of marks) el.animate([{ backgroundColor: "color-mix(in oklab, var(--foreground) 25%, var(--mark))" }, {}], { duration: 1400, easing: "ease-out" });
 }
 
 const CHIP = "flex items-baseline gap-1 rounded-[4px] border border-foreground/70 bg-card px-2 py-[3px] text-xs";
@@ -133,7 +133,8 @@ export function MatchedLine({ m }: { m: Matches }) {
     );
   }
   return (
-    <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-l-2 border-signal pl-3 text-[13px]">
+    <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-l-2 border-foreground/30 pl-3 text-[13px]">
+      <span className="basis-full text-muted-foreground">Highlighted: words from your search where this record uses them{m.why.quote ? "; underlined: the sentence locus quoted as its evidence" : ""}.</span>
       <span className="label text-muted-foreground">Matched for</span>
       {shown.map((g) => (
         <span key={g.check} className="flex flex-wrap items-baseline gap-1.5">
@@ -141,7 +142,7 @@ export function MatchedLine({ m }: { m: Matches }) {
           {g.found.map((t) => {
             const body = (
               <>
-                <span className="bg-signal/20">{t.term}</span>
+                <span className="bg-mark">{t.term}</span>
                 {t.count > 1 && <span className="font-mono text-[11px] tabular text-muted-foreground">×{t.count}</span>}
               </>
             );
@@ -157,7 +158,7 @@ export function MatchedLine({ m }: { m: Matches }) {
         <span className="flex min-w-0 items-baseline gap-1.5">
           <span className="text-muted-foreground">Evidence</span>
           <button type="button" onClick={() => goToMatch("quote")} className={cn(CHIP, "max-w-[28ch] cursor-pointer transition-colors duration-150 hover:bg-secondary")}>
-            <span className="truncate underline decoration-signal decoration-2 underline-offset-4">{m.quote}</span>
+            <span className="truncate underline decoration-foreground/50 decoration-2 underline-offset-4">{m.quote}</span>
           </button>
         </span>
       )}

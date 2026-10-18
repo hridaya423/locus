@@ -11,6 +11,7 @@
   --font-mono: var(--font-mono);
   --font-display: var(--font-instrument);
   --color-signal: var(--signal);
+  --color-mark: var(--mark);
   --color-control: var(--control);
   --color-rule: var(--rule);
   --color-warn: var(--warn);
@@ -79,7 +80,7 @@
   --chart-4: #77716A;
   --chart-5: #B9B3A8;
   --radius: 0.5rem;
-  --signal: #E8461A; --control: #2E5B4F; --rule: #D9D3C7;
+  --signal: #E8461A; --control: #2E5B4F; --rule: #D9D3C7; --mark: #F2E3A0;
   --warn: #3D3935; --warn-soft: #E3DED4;
 }
 
@@ -107,7 +108,7 @@
   --chart-3: #EFEBE3;
   --chart-4: #8F897F;
   --chart-5: #4A4640;
-  --signal: #FF5A24; --control: #7FB8A4; --rule: #2D2B28;
+  --signal: #FF5A24; --control: #7FB8A4; --rule: #2D2B28; --mark: #4D4425;
   --warn: #F0A080; --warn-soft: #3A2218;
 }
 
