@@ -34,7 +34,9 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 - Teach-back, in two sentences: Public omics repositories hide what was measured, who the samples are and whether the files are usable behind records written for submission, not for reuse, so researchers leave to read papers and download files before they know if a dataset fits. locus reads those records, protocols, papers and file headers for them, and shows the evidence on one page that agents can also query.
 - Whole-page clean: fixed tonight, a sentence quoted twice in Quality, three model notes on results, a record link repeated in Files, a download block that downloaded nothing.
 
-**Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`.
+**Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`, all recaptured from the final build at 05:10 and checked against their claims (three claims were corrected to match: SPP1 in 6 of 10 datasets, the list in 8 of 12, the metabolomics and cases-and-controls wording). Dictation is not captured: the headless browser has no microphone.
+
+**Found during the final review.** Your list across datasets and the gene links from First look mixed every search the browser had run ("all 33 GEO datasets of your search (mTOR inhibition)" after an IPF search); they now use the tab's last search. Paper pages now link each author to their contributor page.
 
 **Rerun.** API `OMICS_API_PORT=8010 uv run omics-api` (or `uv run python -c "import uvicorn; from omics_agent.api import app; uvicorn.run(app, port=8010)"`); web `cd web && OMICS_API_URL=http://localhost:8010 npx next dev -p 3010`. Harness `node scripts/harness.mjs`; door audit `node scripts/doors.mjs --seed 1`; crawl `node scripts/crawl.mjs --seed 7 --n 60`; captures `node scripts/captures.mjs --web http://localhost:3010 [--only slug]`; MCP check `uv run python scripts/mcp_check.py`; module self-checks `uv run python -m omics_agent.<module>`.
 
