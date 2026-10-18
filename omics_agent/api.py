@@ -267,6 +267,15 @@ def resolve_identifier(identifier: str) -> dict | None:
         raise HTTPException(502, "A repository did not answer. Please try again.")
 
 
+@app.get("/cite")
+def cite_paper(q: str = Query(min_length=6, max_length=300)) -> dict:
+    """The paper a citation-like query names (surname, year and a title word) and its locus datasets; {} when none."""
+    try:
+        return paper.cite(q) or {}
+    except httpx.HTTPError:
+        return {}
+
+
 @app.get("/person")
 def person_page(name: str = Query(min_length=3, max_length=120)) -> dict:
     """A contributor's papers in Europe PMC (author search by surname and initials), their journals, which papers have

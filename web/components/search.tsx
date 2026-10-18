@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { looksLikeIdentifier, rememberFound, resolve, search, type Plan, type Result } from "@/lib/api";
+import { cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, type Cited, type Plan, type Result } from "@/lib/api";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
@@ -131,6 +131,7 @@ export function Search() {
   const [reached, setReached] = useState<StepKey[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [result, setResult] = useState<Result | null>(null);
+  const [cited, setCited] = useState<{ question: string; paper: Cited } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -212,6 +213,7 @@ export function Search() {
     current.current?.abort();
     const controller = new AbortController();
     current.current = controller;
+    if (looksLikeCitation(question)) cite(question, controller.signal).then((paper) => paper && setCited({ question, paper }), () => {});
     const reset = () => {
       setQ(question);
       setPlan(null); setResult(null); setError(null); setReached([]); setCounts({}); setSeconds(0);
@@ -309,6 +311,7 @@ export function Search() {
       <AnimatePresence>{running && <Progress key="progress" reached={reached} counts={counts} seconds={seconds} />}</AnimatePresence>
       {error && <p className="rounded-lg border border-foreground/30 bg-card p-4 text-sm text-foreground">{error}</p>}
 
+      {cited?.question === q && <CitedPaper paper={cited.paper} />}
       {result && <Results result={result} />}
     </div>
   );
@@ -398,5 +401,30 @@ function Bands() {
         </span>
       ))}
     </motion.div>
+  );
+}
+
+// A query that reads like a citation names a paper; its locus datasets come first, while the search runs below.
+function CitedPaper({ paper }: { paper: Cited }) {
+  const first = paper.authors.split(", ")[0];
+  return (
+    <section className="grid gap-2 border-l-2 border-signal pl-4">
+      <p className="label text-muted-foreground">The paper you named</p>
+      <Link href={paper.path} className={cn("w-fit text-[15px] leading-snug", LINK)}>{paper.title}</Link>
+      <p className="text-[12.5px] text-muted-foreground">{first}{paper.authors.includes(",") && " et al."} · <span className="italic">{paper.journal}</span> {paper.year}</p>
+      <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px]">
+        {paper.datasets.length ? (
+          <>
+            <span className="text-muted-foreground">Its datasets in locus</span>
+            {paper.datasets.map((d) => (
+              <Link key={d.accession} href={datasetPath(d.accession)} className={cn("font-mono text-[12.5px]", LINK)} title={d.title}>{d.accession}</Link>
+            ))}
+            {paper.dataset_count > paper.datasets.length && <Link href={paper.path} className={MUTED_LINK}>+{paper.dataset_count - paper.datasets.length} more</Link>}
+          </>
+        ) : (
+          <span className="text-muted-foreground">No locus dataset cites it.</span>
+        )}
+      </p>
+    </section>
   );
 }

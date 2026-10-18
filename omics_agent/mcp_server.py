@@ -302,6 +302,17 @@ def get_paper(id: str, dataset_offset: int = 0) -> dict:
 
 
 @mcp.tool(annotations=READ_ONLY)
+def find_cited_paper(citation: str) -> dict:
+    """The paper an informal citation names, such as 'Philippe 2020 PNAS LARP1' or 'Ingolia et al. 2011 ribosome
+    profiling': first author's surname, year and at least one word of its title, matched in Europe PMC. Returns its
+    title, journal, year, authors, locus path and up to 6 locus datasets that cite it, or an error when nothing matches."""
+    try:
+        return paper.cite(citation) or {"error": "no paper matches a surname, a year and a title word in this text"}
+    except httpx.HTTPError as error:
+        return {"error": f"Europe PMC did not answer: {error}"}
+
+
+@mcp.tool(annotations=READ_ONLY)
 def get_person(name: str) -> dict:
     """A dataset contributor's track record: their papers in Europe PMC, newest first (up to 100; `matched` counts all),
     found by surname and initials, so a common name mixes people. Per paper: journal, year, preprint or not, citations,

@@ -198,6 +198,31 @@ def datasets(core: dict, named: list[dict], offset: int = 0) -> dict:
     }
 
 
+CITATION = re.compile(r"\b([A-Z][A-Za-zÀ-ÿ'-]+)(?:\s+et\s+al\.?)?,?\s+\(?((?:19|20)\d\d)\)?")
+FILLER = {"et", "al", "and", "the", "of", "in", "on", "for", "a", "an", "paper", "data", "dataset", "study"}
+
+
+def cite(text: str) -> dict | None:
+    """The paper a citation-like query names ('Philippe 2020 PNAS LARP1'): first author's surname and year, plus any other
+    word in its title. None unless Europe PMC's best match has one of the other words in its title."""
+    if not (m := CITATION.search(text)):
+        return None
+    surname, year = m[1], m[2]
+    words = [w for w in re.findall(r"[A-Za-z0-9][A-Za-z0-9'-]+", text) if w not in (surname, year) and w.lower() not in FILLER][:8]
+    if not words:
+        return None
+    query = f'AUTH:"{surname}" AND PUB_YEAR:{year} AND (' + " OR ".join(f'"{w}"' for w in words) + ")"
+    found = httpx.get(f"{EPMC}/search", params={"query": query, "format": "json", "resultType": "lite", "pageSize": 1}, timeout=30).json()["resultList"]["result"]
+    if not found or not any(w.lower() in found[0].get("title", "").lower() for w in words):
+        return None
+    core = found[0]
+    if not core.get("pmid") and not core.get("doi"):
+        return None
+    held = datasets(core, [])
+    return {"title": core["title"].rstrip("."), "journal": core.get("journalTitle", ""), "year": core.get("pubYear", ""), "authors": core.get("authorString", ""),
+            "path": path(core), "datasets": held["datasets"][:6], "dataset_count": held["dataset_count"]}
+
+
 def paper(identifier: str, offset: int = 0) -> dict:
     """The paper page for a PMID, PMCID or DOI; LookupError when Europe PMC does not know it. A full text that cannot be read
     leaves the availability statement and supplementary files unavailable, and the rest of the page intact."""

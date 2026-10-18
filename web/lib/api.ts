@@ -223,6 +223,17 @@ export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; fou
 // An identifier is one or two words with a digit (for "PMID: 123"); anything else is a question and never leaves the browser.
 export const looksLikeIdentifier = (text: string) => text.length <= 200 && text.trim().split(/\s+/).length <= 2 && /\d/.test(text);
 
+// "Philippe 2020 PNAS LARP1": a capitalised surname, optionally "et al.", then a year.
+export const looksLikeCitation = (text: string) => /\b[A-Z][A-Za-zÀ-ÿ'-]+(?:\s+et\s+al\.?)?,?\s+\(?(?:19|20)\d\d\)?/.test(text);
+export type Cited = { title: string; journal: string; year: string; authors: string; path: string; datasets: PaperDataset[]; dataset_count: number };
+
+export async function cite(text: string, signal?: AbortSignal): Promise<Cited | null> {
+  const res = await fetch(`${API}/cite?q=${encodeURIComponent(text)}`, { signal });
+  if (!res.ok) return null;
+  const body = await res.json();
+  return body.title ? body : null;
+}
+
 export async function resolve(text: string, signal?: AbortSignal): Promise<Resolved | null> {
   const res = await fetch(`${API}/resolve/${encodeURIComponent(text.trim())}`, { signal });
   if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`);
