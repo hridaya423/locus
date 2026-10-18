@@ -118,10 +118,19 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
         method = METHOD
     else:
         values = m if data["kind"] == "log scale" else np.log2(m + 1)
-        floor = np.nanpercentile(values[:, in_case | in_control], 25)
-        keep = (values[:, in_case | in_control] > floor).sum(axis=1) >= smaller
+        feature = data.get("feature", "gene")
+        if feature == "gene":
+            floor = np.nanpercentile(values[:, in_case | in_control], 25)
+            keep = (values[:, in_case | in_control] > floor).sum(axis=1) >= smaller
+            kept = "above the 25th percentile"
+        else:
+            # A metabolite panel or protein table is already what the authors could measure; a low concentration is not
+            # noise (ST003390's cysteic acid, p 4e-23, fell under a matrix-wide percentile).
+            measured = np.isfinite(m) & (m != 0) if data["kind"] != "log scale" else np.isfinite(m)
+            keep = measured[:, in_case | in_control].sum(axis=1) >= smaller
+            kept = "measured"
         logged = values[keep]
-        method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; {data.get('feature', 'gene')}s above the 25th percentile in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
+        method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; {feature}s {kept} in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
     a, b = logged[:, in_case], logged[:, in_control]
     # Protein tables leave unquantified values missing; every statistic skips them (count tables have none).
     lfc = np.nanmean(a, axis=1) - np.nanmean(b, axis=1)
