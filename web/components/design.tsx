@@ -68,6 +68,14 @@ export function useSelection(rec: DatasetRecord, designed: boolean) {
 }
 export type Selection = ReturnType<typeof useSelection>;
 
+// The cases and controls First look compares by default, so the charts, the table and the volcano name the same samples.
+export function roleOf(comparison: Design["comparison"], column: string, value: string): "case" | "control" | undefined {
+  if (comparison?.factor !== column) return undefined;
+  return comparison.case.includes(value) ? "case" : comparison.control.includes(value) ? "control" : undefined;
+}
+export const ROLE_TEXT = { case: "text-signal", control: "text-control" };
+const ROLE_BAR = { case: "bg-signal", control: "bg-control" };
+
 // The same design, compact, inside an opened result row.
 export function DesignView({ accession, source }: { accession: string; source: string }) {
   const state = useDesign(accession, source);
@@ -134,7 +142,7 @@ export function DesignBars({ rec, selection }: { rec: DatasetRecord; selection: 
       {d.factors.length > 0 ? (
         <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
           {(all ? d.factors : d.factors.slice(0, FACTORS_SHOWN)).map((f) => (
-            <Factor key={f.name} factor={f} counts={result?.counts[f.name]} unstated={result ? result.unstated[f.name] : f.unstated} chosen={filters[f.name]} selectable={columns.includes(f.column)} onToggle={(level) => selection.toggle(f.name, level)} />
+            <Factor key={f.name} factor={f} comparison={d.comparison} counts={result?.counts[f.name]} unstated={result ? result.unstated[f.name] : f.unstated} chosen={filters[f.name]} selectable={columns.includes(f.column)} onToggle={(level) => selection.toggle(f.name, level)} />
           ))}
         </div>
       ) : (
@@ -160,11 +168,11 @@ export function DesignBars({ rec, selection }: { rec: DatasetRecord; selection: 
 }
 
 type FactorProps = {
-  factor: Design["factors"][number]; counts?: Record<string, number>; unstated?: number; chosen?: string[]; selectable: boolean; onToggle: (level: string) => void;
+  factor: Design["factors"][number]; comparison: Design["comparison"]; counts?: Record<string, number>; unstated?: number; chosen?: string[]; selectable: boolean; onToggle: (level: string) => void;
 };
 
 // Levels of a factor with a choice show what adding them would bring (+n); the chosen ones show what they hold.
-function Factor({ factor, counts, unstated, chosen = [], selectable, onToggle }: FactorProps) {
+function Factor({ factor, comparison, counts, unstated, chosen = [], selectable, onToggle }: FactorProps) {
   const [open, setOpen] = useState(false);
   const levels = Object.entries(factor.levels);
   const most = Math.max(...levels.map(([, n]) => n));
@@ -178,15 +186,19 @@ function Factor({ factor, counts, unstated, chosen = [], selectable, onToggle }:
         {shown.map(([level, total]) => {
           const n = counts?.[level] ?? total;
           const on = chosen.includes(level);
+          const role = roleOf(comparison, factor.column, level);
           const row = (
             <>
-              <span className={cn("[overflow-wrap:anywhere]", on && "font-medium", n === 0 && "text-muted-foreground")}>{level}</span>
+              <span className={cn("[overflow-wrap:anywhere]", on && "font-medium", n === 0 && "text-muted-foreground")}>
+                {level}
+                {role && <span className={cn("ml-2 font-mono text-[11px]", ROLE_TEXT[role])}>{role}</span>}
+              </span>
               <span className="text-right font-mono text-[12px] tabular text-muted-foreground" title={chosen.length && !on ? `${n.toLocaleString()} more if ${level} is added` : undefined}>
                 {chosen.length && !on ? `+${n.toLocaleString()}` : n.toLocaleString()}
               </span>
               <span aria-hidden className="col-span-2 h-1">
                 <span className="block h-full rounded-full bg-rule" style={{ width: `${(total / most) * 100}%` }}>
-                  <span className={cn("block h-full rounded-full transition-[width] duration-200 motion-reduce:transition-none", chosen.length && !on ? "bg-foreground/35" : "bg-foreground/75")} style={{ width: `${(n / total) * 100}%` }} />
+                  <span className={cn("block h-full rounded-full transition-[width] duration-200 motion-reduce:transition-none", chosen.length && !on ? "bg-foreground/35" : role ? ROLE_BAR[role] : "bg-foreground/75")} style={{ width: `${(n / total) * 100}%` }} />
                 </span>
               </span>
             </>

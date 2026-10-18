@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Download, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import type { Selection } from "@/components/design";
+import { ROLE_TEXT, roleOf, type Selection } from "@/components/design";
 import { samplePath, type DatasetRecord } from "@/lib/api";
 
 const ROWS_SHOWN = 12;
@@ -17,6 +17,10 @@ function saveCsv(name: string, header: string[], rows: string[][]) {
   const link = Object.assign(document.createElement("a"), { href: url, download: name });
   link.click();
   URL.revokeObjectURL(url);
+}
+
+function Valued({ role, value }: { role?: "case" | "control"; value: string }) {
+  return role ? <span className={cn("font-medium", ROLE_TEXT[role])} title={`${role}: ${value}`}>{value}</span> : value;
 }
 
 export function SampleTable({ dataset, samples, selection }: { dataset: string; samples: NonNullable<DatasetRecord["samples"]>; selection: Selection }) {
@@ -53,7 +57,7 @@ export function SampleTable({ dataset, samples, selection }: { dataset: string; 
                     ) : n === 0 && samples.link && r[i] ? (
                       <a href={samples.link.replace("{}", r[i])} target="_blank" rel="noreferrer" className={LINK}>{r[i]}</a>
                     ) : (
-                      r[i] || <span className="text-muted-foreground">–</span>
+                      r[i] ? <Valued role={roleOf(selection.design?.comparison, c, r[i])} value={r[i]} /> : <span className="text-muted-foreground">–</span>
                     )}
                   </td>
                 ))}
