@@ -8,6 +8,7 @@ import { DesignView } from "@/components/design";
 import { EASE_OUT } from "@/lib/springs";
 import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
 import { Evidence, Methods, Ready } from "@/components/row-details";
+import { MASS_SPEC, ProtocolLine } from "@/components/assay";
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -300,6 +301,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                 )}
                 <Evidence hit={hit} onOpen={rememberScroll} />
                 {facts?.methods && <Methods methods={facts.methods} />}
+                {MASS_SPEC.has(hit.source) && <ProtocolLine accession={hit.accession} />}
                 {hit.source === "PRIDE" && <Ready accession={hit.accession} />}
                 <DesignView accession={hit.accession} source={hit.source} />
                 <details className="group/plan">

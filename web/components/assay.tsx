@@ -160,8 +160,8 @@ export function useAssays(accession: string, enabled: boolean): AssayState {
   return state;
 }
 
-const MASS_SPEC = new Set(["PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"]);
-// Acquisition and quantification modes describe how, not what: PXD008373 is phosphoproteomics, acquired by DDA.
+export const MASS_SPEC = new Set(["PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"]);
+
 const MODE = /^(Data-(in)?dependent acquisition|Label-free quantification)/;
 
 // Assays with libraries assigned to them; else what the record's text names (for mass spectrometry, the experiment
@@ -172,6 +172,37 @@ export const assayNames = (data?: Assays) => {
   return (assigned.length ? assigned : named).map((a) => a.assay.replace(/ \(.*\)$/, ""));
 };
 
+const EXCERPT = 180;
+
+// In an opened result row: what the protocol says was done, each with the phrase that says it (W6/32 for an
+// immunopeptidome), so the reader need not open the dataset to check the method.
+export function ProtocolLine({ accession }: { accession: string }) {
+  const { data } = useAssays(accession, true);
+  const shown = data?.assays.filter((a) => !MODE.test(a.assay) && a.evidence.length) ?? [];
+  if (!shown.length) return null;
+  return (
+    <div className="grid gap-1.5">
+      <span className="label text-muted-foreground">Read from the protocol</span>
+      <ul className="grid gap-1.5 text-[13px]">
+        {shown.map((a) => (
+          <li key={a.assay} className="grid gap-0.5">
+            <span><span className="font-medium">{a.assay}</span>{a.how === "inferred" && <span className="text-muted-foreground"> · inferred</span>}{a.from_paper && <span className="text-muted-foreground"> · from the paper</span>}</span>
+            {a.evidence.slice(0, 2).map((e) => {
+              const at = Math.max(0, e.text.indexOf(e.term ?? "") - 60);
+              const excerpt = (at ? "…" : "") + e.text.slice(at, at + EXCERPT) + (e.text.length > at + EXCERPT ? "…" : "");
+              return (
+                <span key={e.text} className="text-[12.5px] text-muted-foreground">
+                  “{excerpt}” <span className="font-mono text-[11.5px]">{e.field}</span>
+                </span>
+              );
+            })}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+// Acquisition and quantification modes describe how, not what: PXD008373 is phosphoproteomics, acquired by DDA.
 export function AssayList({ accession, state }: { accession: string; state: AssayState }) {
   const data = state.data;
   return (
