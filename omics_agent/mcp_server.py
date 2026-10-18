@@ -110,6 +110,9 @@ def why_matched(accession: str, terms: list[str], quote: str = "") -> dict:
     record's text, so the search found the dataset by other means. `quote` is an exact phrase, such as a search
     result's evidence."""
     return why.why(accession, terms, quote) or {"accession": accession, "error": "not in the locus index"}
+
+
+@mcp.tool(annotations=READ_ONLY)
 def classify_assays(accession: str) -> dict:
     """What a dataset really measured, read from its protocols, reagents, antibodies and instruments rather than the
     author's label: droplet vs plate single-cell, Ribo-seq vs TIS-seq (harringtonine/lactimidomycin), TMT, DIA,
@@ -125,6 +128,9 @@ def sample_qc(accession: str) -> dict:
     samples far from their group's median flagged; and the authors' own QC criteria (trimming, length selection, rRNA
     filtering, thresholds) quoted from the record's processing text and the paper's open-access methods, with fields."""
     return qc.sample_qc(accession)
+
+
+@mcp.tool(annotations=READ_ONLY)
 def get_table(accession: str) -> dict:
     """The finished, processed counts table locus can hand over for a GEO RNA-seq series (NCBI-generated raw counts,
     one pipeline for all of GEO): genes, samples, total reads, genome build, source URL and checksum. The zip with
@@ -177,12 +183,19 @@ def check_design(accession: str, factor: str = "", case: list[str] | None = None
 
 
 @mcp.tool(annotations=READ_ONLY)
-def check_list(items: str, accession: str = "") -> dict:
+def check_list(items: str, accession: str = "", across_datasets: list[str] | None = None, hint: str = "") -> dict:
     """A pasted gene or protein list (symbols, UniProt accessions or FASTA headers) checked against MitoCarta 3.0:
     how many are mitochondrial (the recovery an organelle IP should show), their sub-compartments, evidence and
     pathways; with a GEO accession, also each item's rank, log2 fold change and q in that dataset's first look and
-    the overlap with its significant genes against chance (hypergeometric p)."""
-    return lists.check(items, accession)
+    the overlap with its significant genes against chance (hypergeometric p). With across_datasets (up to 40 GEO
+    accessions; hint words such as the disease pick each one's case group), the same overlap in every dataset."""
+    result = lists.check(items, accession)
+    if across_datasets:
+        result["across"] = lists.across(items, across_datasets, hint)
+    return result
+
+
+@mcp.tool(annotations=READ_ONLY)
 def browse_datasets(field: str, value: str, source: str = "", offset: int = 0) -> dict:
     """Every locus dataset that shares one stated value from a dataset record: an organism ('Homo sapiens'), an
     instrument ('Illumina NovaSeq 6000', 'Q Exactive HF-X'), a data type or a keyword. Returns the total, counts per
