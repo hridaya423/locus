@@ -46,6 +46,11 @@ export const MOMENTS = [
   { slug: "your-list", steps: [["go", "/list?in=GSE124685"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN SDHB TOMM20 CYC1 P08574 ACTB GAPDH")], ["pause", 600], ["eval", submit("textarea")],
     ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 240000], ["pause", 2500]] },
   { slug: "zip-preview", steps: [["go", "/d/PXD047213"], ["wait", "!!document.querySelector('#files') && !/Reading /.test(document.body.innerText)", 120000], ["eval", scrollTo("#files")], ["pause", 1200], ["eval", click("Preview")], ["wait", "/inside the zip/.test(document.body.innerText)", 60000], ["pause", 2500]] },
+  { slug: "list-across", steps: [["go", "/"], ["eval", "(() => { localStorage.clear(); sessionStorage.clear(); return true })()"], ["go", `/?q=${encodeURIComponent(IPF_BULK)}`],
+    ["wait", "[...document.links].filter((a) => a.pathname.startsWith('/d/')).length > 3", 240000],
+    ["go", "/list"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN MMP1 COMP CXCL14 FHL2 SDHB TOMM20 CYC1 ACTB GAPDH")], ["pause", 500], ["eval", submit("textarea")],
+    ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 120000], ["pause", 800], ["eval", click("Check it in all")],
+    ["wait", "/Your list in [0-9]+ datasets/.test(document.body.innerText)", 400000], ["eval", scrollText("Your list in")], ["pause", 2500]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 
