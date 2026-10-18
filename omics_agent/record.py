@@ -545,12 +545,14 @@ def raw(accession: str, row: dict) -> Record:
     """The record with paper IDs unresolved; a repository that fails falls back to what locus stored."""
     token = _READ.set([])
     try:
-        rec = ADAPTERS.get(row["source"], _stored)(accession, row)
-    except (httpx.HTTPError, ET.ParseError, ValueError, KeyError) as error:
-        rec = _stored(accession, row)
-        rec.unmapped.append(f"live record unavailable: {type(error).__name__}")
-    rec.sources = list(dict.fromkeys(_READ.get() or [])) or ["locus's index (data/omics.db), harvested from the repository"]
-    _READ.reset(token)
+        try:
+            rec = ADAPTERS.get(row["source"], _stored)(accession, row)
+        except (httpx.HTTPError, ET.ParseError, ValueError, KeyError) as error:
+            rec = _stored(accession, row)
+            rec.unmapped.append(f"live record unavailable: {type(error).__name__}")
+        rec.sources = list(dict.fromkeys(_READ.get() or [])) or ["locus's index (data/omics.db), harvested from the repository"]
+    finally:
+        _READ.reset(token)
     return rec
 
 
