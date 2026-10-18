@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, record, sources, subset  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, preview, record, sources, subset  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -111,6 +111,8 @@ def dataset_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,
         raise HTTPException(502, f"The repository did not answer: {error}") from error
     if not found:
         raise HTTPException(404, f"{accession} is not in the index.")
+    for f in found["files"]:
+        f["preview"] = preview.previewable(f, accession)
     return found
 
 
@@ -132,6 +134,22 @@ def sample_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,3
 def files(accession: str = Path(pattern=r"^PXD\d{6}$")) -> dict:
     """The author-processed files of a PRIDE project and a summary of its raw files."""
     return sources.pride_files(accession)
+
+
+@app.get("/preview/{accession}")
+def file_preview(file: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """The columns, first rows and sample groups of one processed file in the dataset's record, read from its first bytes."""
+    try:
+        return preview.preview(accession, file)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except ValueError as error:
+        raise HTTPException(422, str(error))
+    except httpx.HTTPStatusError as error:
+        code = error.response.status_code
+        raise HTTPException(*(410, "The repository no longer serves this file (404).") if code == 404 else (502, f"The repository answered {code} for this file."))
+    except httpx.HTTPError:
+        raise HTTPException(502, "The repository did not answer.")
 
 
 def main() -> None:

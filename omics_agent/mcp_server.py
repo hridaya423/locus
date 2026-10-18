@@ -1,12 +1,13 @@
 from dataclasses import asdict
 
+import httpx
 from dotenv import load_dotenv
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index, subset  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, preview, record, subset  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -22,6 +23,7 @@ mcp = MCPServer(
         "matched, the authors' QC). get_download_plan and get_samplesheet prepare the data for download and for an "
         "nf-core/riboseq run. To pick samples by experimental factor (disease, tissue, treatment) and download only those, "
         "use filter_samples. Accessions come only from the repositories; never invent one."
+        "nf-core/riboseq run. list_files then preview_file look inside a dataset's processed tables without downloading them. Accessions come only from the repositories; never invent one."
     ),
 )
 
@@ -150,6 +152,39 @@ def compare_datasets(a: str, b: str, topic: str) -> dict:
         return asdict(agent.compare_datasets(a, b, topic))
     except LookupError as error:
         return {"error": str(error)}
+
+
+MAX_LISTED = 200
+
+
+@mcp.tool(annotations=READ_ONLY)
+def list_files(accession: str) -> dict:
+    """The files a dataset's repository lists, to find a `file_name` for preview_file: name, group, size in bytes, whether
+    the repository or locus counts it as processed, and whether preview_file can read it. Processed files come first; at
+    most 200 are returned and `total` is the full count."""
+    if not (row := record._row(accession)):
+        return {"accession": accession, "error": "not in the locus index"}
+    files = sorted(record.raw(accession, row).files, key=lambda f: not f["processed"])
+    return {"accession": accession, "total": len(files), "files": [
+        {"name": f["name"], "group": f["group"], "bytes": f["bytes"], "processed": f["processed"], "previewable": preview.previewable(f, accession)}
+        for f in files[:MAX_LISTED]]}
+
+
+@mcp.tool(annotations=READ_ONLY)
+def preview_file(accession: str, file_name: str) -> dict:
+    """Look inside one processed file of a dataset without downloading it: the columns with their inferred types and
+    numeric ranges, the first 20 rows, and the column count. Works for delimited tables (tab, comma, semicolon or space separated, gzipped or not),
+    GEO series matrices, mzTab, and small xlsx files. Reads only the first 256 KB of the file; `bytes_read`, `size` and
+    `url` say what was read, and `total_rows` is null unless the whole file was read. When the columns are samples, each
+    column carries its group (for example diagnosis: IPF or Control) from the dataset's sample table. `file_name` is a
+    name from list_files, for example "GSE86618_34816genes-540cells-tpm.txt.gz". `samples` says whether the columns
+    matched the sample table's accessions or titles."""
+    try:
+        return preview.preview(accession, file_name)
+    except (LookupError, ValueError) as error:
+        return {"accession": accession, "file": file_name, "error": str(error)}
+    except httpx.HTTPError as error:
+        return {"accession": accession, "file": file_name, "error": f"The repository did not answer: {error}"}
 
 
 def main() -> None:

@@ -108,7 +108,7 @@ export const SAMPLE_TYPE: Record<string, string> = {
   cell_line: "cell line", animal_or_organoid_model: "model system", unknown: "",
 };
 
-export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string };
+export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string; preview: boolean };
 export type DatasetRecord = {
   accession: string; source: string; url: string; title: string;
   texts: [string, string][]; facts: [string, string[]][];
@@ -170,5 +170,17 @@ export type Subset = {
 export async function subset(accession: string, filters: Filters, text: string, signal?: AbortSignal): Promise<Subset> {
   const res = await fetch(`${API}/subset/${accession}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ filters, text }), signal });
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
+export type FilePreview = {
+  file: string; url: string; format: string; sheet: string | null; skipped: number; bytes_read: number; size: number | null; complete: boolean;
+  rows_read: number; total_rows: number | null; column_count: number; columns: PreviewColumn[]; rows: string[][];
+  samples: { by: string | null; matched: number; of: number; factor: string | null; levels: Record<string, number>; keys?: string[]; looks_like?: string | null } | null;
+};
+
+export async function filePreview(accession: string, file: string, signal?: AbortSignal): Promise<FilePreview> {
+  const res = await fetch(`${API}/preview/${encodeURIComponent(accession)}?file=${encodeURIComponent(file)}`, { signal }).catch((e: Error) => {
+    throw e.name === "AbortError" ? e : Object.assign(new Error("locus could not reach its server."), { retry: true });
+  });
+  if (!res.ok) throw Object.assign(new Error((await res.json().catch(() => null))?.detail ?? `${res.status}`), { retry: res.status >= 500 });
   return res.json();
 }
