@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
-import { DesignBars } from "@/components/design";
+import { DesignBars, useSelection, type Selection } from "@/components/design";
 import { size } from "@/components/row-details";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
-import { SampleTable } from "@/components/sample-table";
+import { SampleTable, SelectionBar } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
 import { dataType } from "@/components/result-card";
@@ -133,13 +133,17 @@ function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord
   );
 }
 
+const DESIGNED = new Set(["GEO", "PRIDE", "iProX", "jPOST", "PanoramaPublic", "ENA", "ArrayExpress"]);
+
 function Body({ rec }: { rec: DatasetRecord }) {
+  const designed = DESIGNED.has(rec.source) && (rec.source !== "PRIDE" || rec.accession.startsWith("PXD"));
+  const selection = useSelection(rec, designed);
   return (
     <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
       <div className="grid min-w-0 content-start gap-16">
         <About rec={rec} />
-        <Samples rec={rec} />
-        <Files rec={rec} />
+        <Samples rec={rec} designed={designed} selection={selection} />
+        <Files rec={rec} selection={selection} />
       </div>
       <Aside rec={rec} />
     </div>
@@ -186,16 +190,14 @@ export function About({ rec }: { rec: DatasetRecord }) {
   );
 }
 
-const DESIGNED = new Set(["GEO", "PRIDE", "iProX", "jPOST", "PanoramaPublic", "ENA", "ArrayExpress"]);
-
-function Samples({ rec }: { rec: DatasetRecord }) {
-  const designed = DESIGNED.has(rec.source) && (rec.source !== "PRIDE" || rec.accession.startsWith("PXD"));
+function Samples({ rec, designed, selection }: { rec: DatasetRecord; designed: boolean; selection: Selection }) {
   return (
     <section className="grid content-start gap-8">
       <Heading id="samples" count={rec.samples ? rec.samples.rows.length.toLocaleString() : undefined}>Samples</Heading>
-      {designed && <DesignBars accession={rec.accession} source={rec.source} />}
+      {rec.samples && <SelectionBar rec={rec} selection={selection} />}
+      {designed && <DesignBars rec={rec} selection={selection} />}
       {rec.samples ? (
-        <SampleTable dataset={rec.accession} samples={rec.samples} />
+        <SampleTable dataset={rec.accession} samples={rec.samples} selection={selection} />
       ) : (
         <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} does not list individual samples{rec.files.some((f) => f.kind === "sample design") ? "; the sample design file is under Files" : ""}.</p>
       )}
