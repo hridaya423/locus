@@ -9,7 +9,7 @@ import { DesignBars, useSelection, type Selection } from "@/components/design";
 import { size } from "@/components/row-details";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { SampleTable, SelectionBar } from "@/components/sample-table";
-import { Files } from "@/components/files";
+import { CONTROLLED, Files } from "@/components/files";
 import { Aside } from "@/components/aside";
 import { AssayList, assayNames, useAssays, type AssayState } from "@/components/assay";
 import { QualitySection } from "@/components/qc";
@@ -100,7 +100,7 @@ function Header({ accession, rec, hit, assays }: { accession: string; rec: Datas
     ["Data type", measured.length ? <span title={`Read from the methods: ${measured.join(", ")}`}>{measured.slice(0, 2).join(", ")}{measured.length > 2 && <span className="text-muted-foreground"> +{measured.length - 2}</span>}</span> : dataType(rec?.modality ?? hit?.modality ?? "") || unknown],
     ["Organism", organism.length ? <span title={organism.join(", ")}>{organism[0]}{organism.length > 1 && <span className="text-muted-foreground"> +{organism.length - 1}</span>}</span> : unknown],
     ["Samples", samples ? <span className="tabular">{samples.toLocaleString()}</span> : unknown],
-    ["Files", rec ? (rec.files.length ? <span className="tabular">{rec.files.length.toLocaleString()} <span className="text-muted-foreground">· {bytes ? size(bytes) : "size not stated"}</span></span> : "none listed") : "…"],
+    ["Files", rec ? (rec.files.length ? <span className="tabular">{rec.files.length.toLocaleString()} <span className="text-muted-foreground">· {bytes ? size(bytes) : "size not stated"}</span></span> : CONTROLLED.has(rec.source) ? "controlled access" : "none listed") : "…"],
   ];
   return (
     <header className="grid gap-6">

@@ -23,6 +23,9 @@ function groups(files: RecordFile[]): Group[] {
     .sort((a, b) => Number(b.processed > 0) - Number(a.processed > 0));
 }
 
+// Repositories that release files only after a data access committee approves an application.
+export const CONTROLLED = new Set(["EGA", "dbGaP"]);
+
 // Repositories whose file lists locus reads; for the others an empty list says nothing about the repository.
 const LISTED = new Set(["GEO", "PRIDE", "ENA", "ArrayExpress", "MetabolomicsWorkbench"]);
 // A plan that only makes a folder and opens a web page downloads nothing.
@@ -45,7 +48,12 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
       <Heading id="files" count={rec.files.length ? `${rec.files.length.toLocaleString()} · ${size(total)}` : undefined}>Files</Heading>
       {list.length === 0 && (
         <p className="text-[13px] text-muted-foreground">
-          {LISTED.has(rec.source) ? `${repositoryName(rec.source)} lists no files for this dataset.` : <>locus does not read {repositoryName(rec.source)}&apos;s file lists yet; the files are on <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>its page</a>.</>}
+          {CONTROLLED.has(rec.source) ? (
+            <>
+              <span className="font-medium text-foreground">Controlled access.</span> {repositoryName(rec.source)} releases these files only after its data access committee approves an application, made on{" "}
+              <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>the dataset&apos;s page</a>; locus offers no download.
+            </>
+          ) : LISTED.has(rec.source) ? `${repositoryName(rec.source)} lists no files for this dataset.` : <>locus does not read {repositoryName(rec.source)}&apos;s file lists yet; the files are on <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>its page</a>.</>}
         </p>
       )}
       {total > 0 && list.length > 1 && (
