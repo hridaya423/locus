@@ -78,8 +78,13 @@ def fuse(*rankings: list[str]) -> list[str]:
     return sorted(score, key=score.get, reverse=True)
 
 
-def search(question: str, terms: list[str], sources: list[str], organism: str = "", limit: int = 300) -> list[str]:
-    return fuse(keyword_search(terms, sources, organism, limit), semantic_search(question, sources, organism, limit))[:limit]
+def search(question: str, terms: list[str], sources: list[str], organism: str = "", limit: int = 300, asked: str = "") -> list[str]:
+    """Keyword and meaning rankings fused; `asked`, the reader's own words, adds a second meaning ranking beside the
+    plan's ideal summary (the IPF Cell Atlas, GSE136831, ranks 26th by the question and outside 300 by the summary)."""
+    rankings = [keyword_search(terms, sources, organism, limit), semantic_search(question, sources, organism, limit)]
+    if asked:
+        rankings.append(semantic_search(asked, sources, organism, limit))
+    return fuse(*rankings)[:limit]
 
 
 def load(accessions: list[str]) -> list[Dataset]:

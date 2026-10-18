@@ -249,7 +249,7 @@ def gather(search_plan: dict, question: str) -> list[Dataset]:
         terms = search_plan["terms"] + search_plan.get("pride_keywords", [])
         # Embedding search matches study summaries best against summary-like text, so it uses the plan's ideal summary.
         meaning = search_plan.get("ideal_summary") or question
-        return index.load(index.search(meaning, terms, repositories, search_plan["organism"], INDEX_POOL))
+        return index.load(index.search(meaning, terms, repositories, search_plan["organism"], INDEX_POOL, asked=question))
     with ThreadPoolExecutor() as pool:
         results = pool.map(lambda r: REPOSITORIES[r](search_plan, POOL[r]), [r for r in repositories if r in REPOSITORIES])
     seen: dict[str, Dataset] = {}
