@@ -246,3 +246,15 @@ export async function designCheck(accession: string, pick: Pick, signal?: AbortS
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
+
+export type MitoGene = { symbol: string; description: string; evidence: string; compartment: string; pathways: string; tissues: string };
+export type ListRow = { item: string; mitocarta: MitoGene | null; dataset?: { rank: number; log2fc: number; q: number; coloured: boolean } };
+export type ListCheck = { items: number; mitocarta: number; recovery: number | null; compartments: Record<string, number>; rows: ListRow[];
+  source: { name: string; url: string; citation: string; genes: number };
+  dataset?: { accession: string; reason?: string; factor?: string; case?: string[]; control?: string[]; tested?: number; in_table?: number; coloured?: number; expected?: number; p?: number | null; method?: string } };
+
+export async function checkList(text: string, accession: string, signal?: AbortSignal): Promise<ListCheck> {
+  const res = await fetch(`${API}/list`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, accession }), signal });
+  if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail?.[0]?.msg ?? `${res.status}`);
+  return res.json();
+}

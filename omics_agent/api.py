@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, design_check, everywhere, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, design_check, everywhere, lists, record, sources, table, volcano  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -129,6 +129,20 @@ def design_checks(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,3
                   control: Annotated[list[str] | None, Query()] = None) -> dict:
     """Confounding with batch, unbalanced characteristics, different tissues and small groups for one comparison, and the smallest detectable change."""
     return design_check.check(accession, factor, case, control)
+
+
+class ListIn(BaseModel):
+    text: str = Field(max_length=200_000)
+    accession: str = Field(default="", pattern=r"^(GSE\d+)?$")
+    factor: str | None = None
+    case: list[str] | None = None
+    control: list[str] | None = None
+
+
+@app.post("/list")
+def your_list(body: ListIn) -> dict:
+    """A pasted gene or protein list against MitoCarta 3.0 and, given a GEO dataset, against its first-look comparison."""
+    return lists.check(body.text, body.accession, body.factor, body.case, body.control)
 
 
 @app.get("/record/{accession}")

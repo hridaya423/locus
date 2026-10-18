@@ -6,7 +6,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, design_check, everywhere, index, table, volcano  # noqa: E402  (needs the API key loaded first)
+from . import agent, design_check, everywhere, index, lists, table, volcano  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -142,6 +142,15 @@ def check_design(accession: str, factor: str = "", case: list[str] | None = None
     cases and controls from different tissues, groups under 3, each with its cross-table; batch-like characteristics
     found balanced; and the smallest fold change detectable at p < 0.05 with 80% power from the expression table."""
     return design_check.check(accession, factor or None, case, control)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def check_list(items: str, accession: str = "") -> dict:
+    """A pasted gene or protein list (symbols, UniProt accessions or FASTA headers) checked against MitoCarta 3.0:
+    how many are mitochondrial (the recovery an organelle IP should show), their sub-compartments, evidence and
+    pathways; with a GEO accession, also each item's rank, log2 fold change and q in that dataset's first look and
+    the overlap with its significant genes against chance (hypergeometric p)."""
+    return lists.check(items, accession)
 
 
 @mcp.tool(annotations=READ_ONLY)

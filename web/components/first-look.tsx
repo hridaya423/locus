@@ -4,6 +4,7 @@ import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { designCheck, foundAll, genePath, firstLook, paperCheck, type DesignCheck, tableDownload, tableSummary, type FirstLook, type Gene, type PaperCheck, type Pick, type TableSummary } from "@/lib/api";
 
@@ -330,6 +331,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
           )}
         </>
       )}
+      {look?.available && <Link href={`/list?in=${accession}`} className={cn("w-fit text-[13px]", MUTED_LINK)}>Check your own gene list in this comparison</Link>}
       {summary?.available && summary.source && (
         <a href={tableDownload(accession)} download className={cn("flex w-fit items-center gap-1.5 text-[13px] font-medium", LINK)}>
           <Download aria-hidden className="size-3.5" />
