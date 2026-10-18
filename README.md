@@ -2,7 +2,7 @@
 
 Find public omics datasets with a plain-English question, and see from the authors' own records whether each dataset fits.
 
-Researchers often spend days searching GEO, PRIDE and other repositories for data that already exists. Keyword search misses studies, and repository fields do not say whether the samples are matched, how many controls there are, or which assay was really used. locus searches 891,000 datasets in 18 repositories. It counts the case and control samples from the sample records, grades each dataset against the question, and writes the input files for the analysis pipeline.
+Researchers often spend days searching the public archives (GEO for gene activity, PRIDE for proteins, and others) for data that already exists. Keyword search misses studies, and repository fields do not say whether the samples are matched, how many controls there are, or which assay was really used. locus searches 891,000 datasets in 18 repositories. It counts the case and control samples from the sample records, grades each dataset against the question, and writes the input files for the analysis pipeline.
 
 ## In plain words
 

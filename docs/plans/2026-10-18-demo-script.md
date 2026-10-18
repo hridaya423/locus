@@ -1,64 +1,85 @@
-# Demo script: question → dataset → counts → differential expression (3 minutes)
+# Demo script: a question, a dataset, an answer (3 minutes)
 
-Rehearsed 17–18 October 2026 on pgx (ARM64, local vLLM model, no Anthropic key). Static fallback: the PNGs and
-`top_genes.tsv` in `docs/evidence/process/GSE273888/`, and the screenshot `web-results-panel.png` there.
+Rehearsed 18 October 2026 at 01:29 BST on pgx (the ARM workstation, local model, no API key), driving the web app in
+a browser against the API on port 8020. Measured: the search took 3 min 46 s with the question's plan and labels
+already cached (a never-seen question takes about 8 minutes); clicking **Process** showed the full results panel in
+4 seconds because the run is cached. Static fallback if anything breaks: the figures in
+`docs/evidence/process/GSE273888/plots/`, the table `top_genes.tsv`, and the screenshot `web-results-panel.png` there.
 
-Before the demo: the API on `OMICS_API_PORT=8020`, the web app on 3020 with `OMICS_API_URL=http://localhost:8020`, and
-`data/process/GSE273888/` already present so the Process button returns the cached run in seconds. The live search
-takes 8 minutes on the local model, so start it before the pitch or use the cached question below (the plan and the
-sample labels are cached per question, which makes a repeat run much faster).
+Words to use on stage, so no one needs to know the jargon: an **archive** is where scientists deposit their raw
+measurements (GEO for gene activity, PRIDE for proteins, ENA for raw sequencing reads). A **dataset** is one study's
+measurements. **Treated and untreated samples** are the two groups being compared. A **gene that changed** is one whose
+activity differs between the groups beyond what chance explains.
 
-## 0:00 – 0:40 Problem
+Before the demo: API on `OMICS_API_PORT=8020`; web app on 3020 started with `OMICS_API_URL=http://localhost:8020` and
+`EXTRA_DEV_ORIGINS=<pgx-ip>` (without it the page never becomes interactive over the IP); `data/process/GSE273888/`
+present. Submit the question before the pitch starts, or at 0:40 and talk over the wait.
 
-"A biologist with a question spends days in GEO and PRIDE, and when they find a study they still cannot see what it
-says without a bioinformatician and a cluster. locus searches 891,000 datasets in 18 repositories, counts the case and
-control samples from the sample records, and now runs the first analysis on a laptop."
+## 0:00 – 0:40 What is it for, what was not working
+
+"Every published study leaves its raw measurements in a public archive. A biologist with a question wants the right
+study, and then wants to know what it shows. Today that is days of keyword searching, counting samples by hand in each
+record, and then a pipeline, a cluster and a bioinformatician before a single gene is named. locus takes the question
+in plain English, finds the studies, counts the samples from the records, and now runs the first analysis on an ordinary
+computer."
 
 ## 0:40 – 1:20 Search
 
-Type (or, if the app is open on `localhost`, press the microphone and say): **bulk RNA-seq of human cells treated with an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle**. Over `http://<pgx-ip>:3020` the microphone is disabled with its reason: browsers allow speech recognition only on localhost or HTTPS.
+Type (or, if the app is open on `localhost`, press the microphone and say): **bulk RNA-seq of human cells treated with
+an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle**. Over `http://<pgx-ip>:3020` the microphone is
+disabled with its reason on hover: browsers allow speech recognition only on localhost or HTTPS.
 
-Point at the plan (terms: mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2; organism Homo sapiens; assay bulk
-RNA-seq) and at the table: 34 strong GEO hits with case and control counts. Open **GSE273888**: HeLa cells, 100 nM
-rapamycin, 3 treated and 3 untreated, paired-end reads on ENA. "The counts come from code reading the sample records;
-the model only chose which field marks treatment."
+While it runs, point at the plan chips: it understood the drug family (rapamycin, Torin1), the organism (human) and the
+kind of measurement (gene activity by sequencing). When the table appears (about 30 studies at the rehearsal; the
+number varies between runs), say: "every count here comes from code reading the sample records; the model only chose
+which field says treated or untreated." Open **GSE273888**: human cells, a drug called rapamycin, three treated and
+three untreated samples.
 
 ## 1:20 – 2:20 Process
 
-Click **Process**. Name the stages as they pass: contrast from the labels → GENCODE 46 salmon index (cached) → first
-2,000,000 reads of each FASTQ streamed from ENA → salmon → tximport gene counts and one `.count` file per sample →
-DESeq2 with apeglm shrinkage. On pgx the whole run took 3 minutes; the cached result appears at once.
+Click **Process**. The stages are listed as they pass; the cached run shows the finished panel in a few seconds. Say what
+each stage did when it ran for real (3 minutes on this machine): fetch the first two million reads of each sample from
+the archive; match them to the catalogue of human genes; count reads per gene; test which genes differ between the groups;
+draw the figures; write a summary and check every number in it.
 
 Show the panel:
 
-- PCA: the three untreated samples sit at PC1 ≈ −2.9, the three rapamycin samples at +2.9 (25% of variance).
-- Volcano and MA: 84 genes with padj < 0.05 out of 6,471 tested (44 up, 40 down).
-- Top genes: DDIT4 and SCD go down. Both are transcripts whose expression depends on mTORC1 (SCD through SREBP, DDIT4
-  through ATF4), so their fall after rapamycin is the expected direction. CCN2, CCN1 and THBS1 rise.
-- The paragraph under "Written by the model from the numbers above": the model wrote it from the computed numbers,
-  and code checked every number in it against the pipeline's output before it was shown.
-- Downloads: `GSM….count`, `counts.tsv`, `deseq2_results.tsv`, the PNGs and `manifest.json`; the slide-ready figures (300 dpi PNG and PDF: PCA, volcano, MA, sample-distance heatmap, top-gene counts) are under `plots/` and in `docs/evidence/process/GSE273888/plots/`.
+- The first plot: the three untreated samples on one side, the three treated on the other. "The replicates agree, and
+  the treatment is the biggest difference between the samples."
+- The next two plots: 84 genes changed out of 6,471 tested (44 up, 40 down); the most changed are labelled.
+- The table: DDIT4 and SCD went down. "Both are genes that textbooks link to the pathway this drug blocks, so the
+  direction is what a biologist would expect." CCN2, CCN1 and THBS1 went up.
+- The paragraph under "Written by the model from the numbers above": "The model wrote it from the numbers; code checked
+  every number in it against the computed output before it was shown. If it had invented one, the paragraph would have
+  been dropped and the panel would say so."
+- Downloads: the per-sample count files, the results table, the five figures as slide-ready PNG and PDF (PCA, volcano,
+  MA, sample-distance heatmap, top-gene counts) and `manifest.json`.
 
 ## 2:20 – 2:50 Honesty
 
-"Reads are subsampled: 2 million per FASTQ, so this is a preview of the study, not a reanalysis. The manifest records
-salmon 2.8.0, DESeq2 1.50.2, tximport 1.38.2, apeglm 1.32.0, GENCODE release 46, every run accession and the read cap.
-The same samplesheet goes to nf-core/rnaseq on a cluster for the full run. Everything shown is reproducible with one
-command: `uv run omics process GSE273888`."
+"We used two million reads per sample, so this is a preview of the study, not a reanalysis. The manifest records every
+tool and version, the reference catalogue, every sample and the read cap. The same inputs go to the standard cluster
+pipeline for the full run. Everything shown is one command: `uv run omics process GSE273888`."
 
 ## 2:50 – 3:00 Close
 
-"Question to differential expression in minutes, on a laptop, with every number traceable to a record or a tool."
+"From a question to the genes that changed, in minutes, on a laptop, with every number traceable to a record or a tool."
 
 ## Likely questions
 
-- *Is 2 million reads enough?* No for a publication; yes to see whether the conditions separate and which large effects
-  are there. The read cap is a flag (`--reads`) and is written in the manifest.
-- *Why salmon and not STAR?* A human STAR index needs about 32 GB; the salmon transcriptome index took 3.3 GB and
-  7 minutes on this machine. The contract (`docs/data-processing-contract.md`) keeps STAR for the HPC tier.
-- *Who chose the contrast?* Code: the most frequent control value against the most frequent case value of the field the
-  model labelled; at least 2 and at most 4 samples per side; every sample left out is listed with the reason.
-- *What about mouse, or more than two conditions?* Mouse uses GENCODE M35, the same path. Multi-factor designs are out
-  of scope for the laptop tier tonight.
-- *Did you reuse earlier code?* No. The riboseq-agent repository was read for ideas only; this pipeline was written in
-  the hackathon window under the Apache-2.0 licence of this repository.
+- *Is two million reads enough?* Not for a publication; enough to see whether the groups separate and which large
+  effects are there. The number is a flag (`--reads`) and is written in the manifest.
+- *Why this read-matching tool and not full genome alignment?* Full alignment of human data needs about 32 GB of memory;
+  the transcript index took 3.3 GB and 7 minutes here. The contract keeps full alignment for the cluster tier.
+- *Who chose which samples to compare?* Code: the most common control value against the most common treated value of
+  the field the model labelled; at least 2 and at most 4 samples per side; every sample left out is listed with the
+  reason.
+- *What about mouse, or more than two conditions?* Mouse works the same way with its own catalogue. Designs with more
+  than one factor are not handled.
+- *Does the search always return the same list?* No: the plan and the sample labels are cached, but the scoring stages
+  are not, so a repeat can rank or include studies differently (27 rows at the rehearsal, 34 the first time).
+- *Did you reuse earlier code?* No. Other repositories were read for ideas only; this pipeline was written in the
+  hackathon window under this repository's Apache-2.0 licence.
+- *What is not finished?* Protein studies get sample counts only when a curated sample table exists (about 28% of
+  PRIDE); ribosome-profiling processing is designed, not built; one comparison per dataset; the cluster tier is
+  nf-core, not ours. The full list is the README's "Limits" section.

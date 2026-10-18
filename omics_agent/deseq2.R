@@ -180,9 +180,9 @@ long <- do.call(rbind, lapply(seq_len(nrow(top6)), function(i) data.frame(
   count = normalized[top6$gene_id[i], ] + 0.5)))
 long$gene <- factor(long$gene, levels = top6$symbol)
 long$condition <- factor(long$condition, levels = c(reference, target))
-means <- aggregate(count ~ gene + condition, long, mean)
+gene_means <- aggregate(count ~ gene + condition, long, mean)
 counts_plot <- ggplot(long, aes(condition, count, colour = condition)) +
-  geom_crossbar(data = means, aes(y = count, ymin = count, ymax = count), width = 0.5, linewidth = 0.3, colour = "#52514e") +
+  geom_crossbar(data = gene_means, aes(y = count, ymin = count, ymax = count), width = 0.5, linewidth = 0.3, colour = "#52514e") +
   geom_jitter(width = 0.12, height = 0, size = 1.8, alpha = 0.9) +
   facet_wrap(~gene, nrow = 2, scales = "free_y") +
   scale_y_log10() + scale_colour_manual(values = COND, guide = "none") +
