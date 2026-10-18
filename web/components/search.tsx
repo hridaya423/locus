@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { flushSync } from "react-dom";
 import { ArrowUp, Check, LoaderCircle } from "lucide-react";
@@ -8,7 +9,7 @@ import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
 import { looksLikeIdentifier, rememberFound, resolve, search, type Plan, type Result } from "@/lib/api";
-import { LINK } from "@/components/page-kit";
+import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
 import { Results } from "@/components/results";
@@ -162,11 +163,19 @@ export function Search() {
   useLayoutEffect(() => {
     const el = field.current;
     if (!el) return;
-    // An empty field is sized to its example text, which wraps on phones.
-    if (!q) el.value = el.placeholder;
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-    el.value = q;
+    // An empty field is sized to its example text, which wraps on phones; the web font changes the wrap once loaded.
+    const fit = () => {
+      if (!q) el.value = el.placeholder;
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+      el.value = q;
+    };
+    fit();
+    let live = true;
+    document.fonts.ready.then(() => live && fit());
+    return () => {
+      live = false;
+    };
   }, [q]);
 
   useEffect(() => {
@@ -277,6 +286,13 @@ export function Search() {
           </span>
         </button>
       </form>
+
+      {idle && !voice.listening && !voice.problem && (
+        <p className="text-center text-[13px] text-muted-foreground">
+          Or paste a GSE, PXD, SRR, PMID or DOI to open its page, or{" "}
+          <Link href="/list" className={MUTED_LINK}>check your own gene or protein list</Link>.
+        </p>
+      )}
 
       {(voice.listening || voice.problem) && (
         <p className="text-sm text-muted-foreground" role="status">
