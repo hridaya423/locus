@@ -527,7 +527,7 @@ def _workbench(accession: str, row: dict) -> Record:
     factors = _entries(_cached(f"{accession}.mw-factors.json", f"{WORKBENCH}/study_id/{accession}/factors"))
     analyses = _entries(_cached(f"{accession}.mw-analysis.json", f"{WORKBENCH}/study_id/{accession}/analysis"))
     pairs = [dict(p.partition(":")[::2] for p in f.get("factors", "").split(" | ") if ":" in p) for f in factors]
-    keys = list(dict.fromkeys(k.strip() for p in pairs for k in p))
+    keys = [k for k in dict.fromkeys(k.strip() for p in pairs for k in p) if k.lower() not in ("accession", "title", "sample source")]
     if factors:
         rec.samples = {"columns": ["Accession", "Title", "Sample source", *keys], "link": "",
                        "rows": [[f.get("mb_sample_id", ""), f.get("local_sample_id", ""), f.get("sample_source", ""), *[p.get(k, "").strip() for k in keys]] for f, p in zip(factors, pairs)]}
