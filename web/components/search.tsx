@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
-import { ArrowUp, Check, LoaderCircle } from "lucide-react";
+import { ArrowUp, Check, LoaderCircle, Mic, Square } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,31 @@ import { Reticle, Wordmark } from "@/components/logo";
 const SHOWN = { opacity: 1, scale: 1, filter: "blur(0px)" };
 const HIDDEN = { opacity: 0, scale: 0.9, filter: "blur(4px)" };
 const iconSwap = motionTier.micro;
+
+// The browser's own speech recognition, which lib.dom does not type. Nothing leaves the page through our code.
+type Recognition = {
+  lang: string; interimResults: boolean; continuous: boolean; start(): void; stop(): void; abort(): void;
+  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null;
+  onend: (() => void) | null; onerror: ((e: { error: string }) => void) | null;
+};
+type RecognitionCtor = new () => Recognition;
+
+// Why voice cannot run here, or "" when it can: the API must exist and the page must be a secure context
+// (localhost or HTTPS; plain HTTP to another machine's address is not).
+function voiceSupport(): { ctor: RecognitionCtor | null; reason: string } {
+  const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor };
+  const ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+  if (!ctor) return { ctor: null, reason: "This browser has no speech recognition." };
+  if (!window.isSecureContext) return { ctor: null, reason: "Voice needs a secure page: open the app on localhost or over HTTPS." };
+  return { ctor, reason: "" };
+}
+
+const VOICE_ERRORS: Record<string, string> = {
+  "not-allowed": "The microphone was not allowed.",
+  "audio-capture": "No microphone was found.",
+  network: "Speech recognition could not reach its service.",
+  "no-speech": "No speech was heard.",
+};
 
 const STEPS = [
   { key: "plan", label: "Understanding the question" },
@@ -126,6 +151,45 @@ export function Search() {
   const [seconds, setSeconds] = useState(0);
   const field = useRef<HTMLTextAreaElement>(null);
   const current = useRef<AbortController | null>(null);
+  // Voice: the reason it is unavailable (read on the client only, so the server render matches), else idle or
+  // listening; the transcript is appended to what was typed.
+  const voiceReason = useSyncExternalStore(() => () => {}, () => voiceSupport().reason, () => "");
+  const [listening, setListening] = useState(false);
+  const voice: "idle" | "listening" | "unavailable" = voiceReason ? "unavailable" : listening ? "listening" : "idle";
+  const [voiceNote, setVoiceNote] = useState("");
+  const recognition = useRef<Recognition | null>(null);
+  const spokenBase = useRef("");
+
+  function stopListening() {
+    recognition.current?.stop();
+  }
+
+  function startListening() {
+    const { ctor } = voiceSupport();
+    if (!ctor) return;
+    const r = new ctor();
+    r.lang = navigator.language || "en-GB";
+    r.interimResults = true;
+    r.continuous = true;
+    spokenBase.current = q.trim();
+    r.onresult = (e) => {
+      const heard = Array.from(e.results, (result) => result[0].transcript).join(" ").replace(/\s+/g, " ").trim();
+      setQ([spokenBase.current, heard].filter(Boolean).join(" "));
+    };
+    r.onerror = (e) => setVoiceNote(VOICE_ERRORS[e.error] ?? `Voice stopped (${e.error}).`);
+    r.onend = () => { recognition.current = null; setListening(false); };
+    recognition.current = r;
+    setVoiceNote("");
+    setListening(true);
+    r.start();
+  }
+
+  useEffect(() => {
+    if (voice !== "listening") return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") stopListening(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [voice]);
 
   // Grow the field so the whole question stays readable after a search.
   useLayoutEffect(() => {
@@ -200,8 +264,25 @@ export function Search() {
           }}
           aria-label="Describe your research"
           placeholder="Lung fibrosis in humans, single-cell and proteomics, patients and controls"
-          className="block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 pr-16 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground"
+          className="block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 pr-28 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground"
         />
+        <span className="absolute bottom-2 right-[52px]" title={voice === "unavailable" ? voiceReason : voice === "listening" ? "Stop listening (Escape)" : "Ask by voice"}>
+          <button
+            type="button"
+            onClick={() => (voice === "listening" ? stopListening() : startListening())}
+            disabled={voice === "unavailable"}
+            aria-label={voice === "unavailable" ? `Voice unavailable: ${voiceReason}` : voice === "listening" ? "Stop listening" : "Ask by voice"}
+            aria-pressed={voice === "listening"}
+            data-voice={voice}
+            className={cn(
+              "relative grid size-10 place-items-center rounded-md border transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground disabled:cursor-not-allowed disabled:opacity-25",
+              voice === "listening" ? "border-[#eb6834] text-[#eb6834]" : "border-rule text-muted-foreground hover:border-foreground hover:text-foreground",
+            )}
+          >
+            {voice === "listening" && <span aria-hidden className="absolute inset-0 animate-ping rounded-md border-2 border-[#eb6834] opacity-60" />}
+            {voice === "listening" ? <Square className="size-3.5 fill-current" strokeWidth={2} /> : <Mic className="size-4" strokeWidth={2} />}
+          </button>
+        </span>
         <button
           type="submit"
           disabled={!q.trim()}
@@ -219,6 +300,11 @@ export function Search() {
         </button>
       </form>
 
+      {(voice === "listening" || voiceNote) && (
+        <p role="status" className="text-[13px] text-muted-foreground">
+          {voice === "listening" ? "Listening… the words appear above; press the button again or Escape to stop, then edit and search." : voiceNote}
+        </p>
+      )}
       {plan && <PlanChips plan={plan} />}
       <AnimatePresence>{running && <Progress key="progress" reached={reached} counts={counts} seconds={seconds} />}</AnimatePresence>
       {error && <p className="rounded-lg border border-foreground/30 bg-card p-4 text-sm text-foreground">{error}</p>}
