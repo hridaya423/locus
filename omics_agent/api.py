@@ -188,6 +188,18 @@ class ListIn(BaseModel):
 def your_list(body: ListIn) -> dict:
     """A pasted gene or protein list against MitoCarta 3.0 and, given a GEO dataset, against its first-look comparison."""
     return lists.check(body.text, body.accession, body.factor, body.case, body.control)
+
+
+class AcrossIn(BaseModel):
+    text: str = Field(max_length=200_000)
+    accessions: list[Annotated[str, StringConstraints(pattern=r"^GSE\d+$")]] = Field(max_length=40)
+    hint: str = Field(default="", max_length=300)
+
+
+@app.post("/list/across")
+def list_across(body: AcrossIn) -> dict:
+    """A pasted list against the cases-and-controls comparison of each GEO dataset: tested, significant, against chance."""
+    return lists.across(body.text, body.accessions, body.hint)
 @app.get("/browse")
 def browse_value(field: str, value: str, source: str = "", offset: int = 0) -> dict:
     """Every locus dataset that shares one stated value (organism, instrument, data type, keyword), newest first."""

@@ -3,13 +3,14 @@ quality check an organelle IP needs) and, given a dataset, against its first-loo
 
 import html
 import re
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from math import comb
 from pathlib import Path
 
 import httpx
 
-from . import volcano
+from . import everywhere, volcano
 
 MITOCARTA = "https://www.broadinstitute.org/files/shared/metabolism/mitocarta/human.mitocarta3.0.html"
 CITATION = "Rath S et al. MitoCarta3.0: an updated mitochondrial proteome now with sub-organelle localization and pathway annotations. Nucleic Acids Res 2021;49:D1541-D1547"
@@ -50,11 +51,30 @@ def _items(text: str) -> list[str]:
     return out[:5000]
 
 
+def _genes(text: str, mc: dict) -> tuple[list[str], callable]:
+    """The pasted items, one per gene (P08574 is CYC1; the first spelling is kept), and the gene each names."""
+    gene = lambda i: mc[i.upper()]["symbol"].upper() if i.upper() in mc else i.upper()
+    return list({gene(i): i for i in reversed(_items(text))}.values())[::-1], gene
+
+
+def _against(items: list[str], gene, look: dict) -> tuple[dict, dict[str, dict]]:
+    """How many items a first-look comparison tested and found significant, against chance (hypergeometric), and each
+    tested item's rank, change and q."""
+    ranks = {g[0].upper(): (n + 1, g) for n, g in enumerate(look["genes"])}
+    coloured = {g[0].upper() for g in look["genes"] if g[3] < look["q"] and abs(g[1]) >= look["lfc"]}
+    found = [i for i in items if gene(i) in ranks]
+    overlap = [i for i in found if gene(i) in coloured]
+    N, K, n, k = len(ranks), len(coloured), len(found), len(overlap)
+    p = sum(comb(K, j) * comb(N - K, n - j) for j in range(k, min(K, n) + 1)) / comb(N, n) if n and N else None
+    each = {i: {"rank": ranks[gene(i)][0], "log2fc": ranks[gene(i)][1][1], "q": ranks[gene(i)][1][3], "coloured": i in overlap} for i in found}
+    summary = {"accession": look["accession"], "factor": look["factor"], "case": look["case"], "control": look["control"], "tested": N,
+               "in_table": n, "coloured": k, "expected": round(n * K / N, 1) if N else None, "p": p, "method": look["method"]}
+    return summary, each
+
+
 def check(text: str, accession: str = "", factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None) -> dict:
     mc = mitocarta()
-    # An accession and its gene symbol name one gene (P08574 is CYC1); the first spelling is kept.
-    gene = lambda i: mc[i.upper()]["symbol"].upper() if i.upper() in mc else i.upper()
-    items = list({gene(i): i for i in reversed(_items(text))}.values())[::-1]
+    items, gene = _genes(text, mc)
     rows = [{"item": i, "mitocarta": mc.get(i.upper())} for i in items]
     hits = [r for r in rows if r["mitocarta"]]
     compartments: dict[str, int] = {}
@@ -66,21 +86,37 @@ def check(text: str, accession: str = "", factor: str | None = None, case: list[
     if accession:
         look = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
         if look.get("available"):
-            ranks = {g[0].upper(): (n + 1, g) for n, g in enumerate(look["genes"])}
-            coloured = {g[0].upper() for g in look["genes"] if g[3] < look["q"] and abs(g[1]) >= look["lfc"]}
-            found = [i for i in items if gene(i) in ranks]
-            overlap = [i for i in found if gene(i) in coloured]
-            N, K, n, k = len(ranks), len(coloured), len(found), len(overlap)
-            p = sum(comb(K, j) * comb(N - K, n - j) for j in range(k, min(K, n) + 1)) / comb(N, n) if n and N else None
+            result["dataset"], each = _against(items, gene, look)
             for r in rows:
-                if gene(r["item"]) in ranks:
-                    rank, g = ranks[gene(r["item"])]
-                    r["dataset"] = {"rank": rank, "log2fc": g[1], "q": g[3], "coloured": gene(r["item"]) in coloured}
-            result["dataset"] = {"accession": accession, "factor": look["factor"], "case": look["case"], "control": look["control"], "tested": N,
-                                 "in_table": n, "coloured": k, "expected": round(n * K / N, 1) if N else None, "p": p, "method": look["method"]}
+                if r["item"] in each:
+                    r["dataset"] = each[r["item"]]
         else:
             result["dataset"] = {"accession": accession, "reason": look.get("reason")}
     return result
+
+
+def across(text: str, accessions: list[str], hint: str = "") -> dict:
+    """The list against the first-look comparison of each GEO dataset (cases against controls, chosen as for one gene
+    everywhere): how many items each tested, how many are significant there against chance, and which."""
+    items, gene = _genes(text, mitocarta())
+
+    def one(accession: str) -> dict:
+        try:
+            pick = everywhere._pick(accession, hint)
+            if not pick:
+                return {"accession": accession, "reason": "no sample characteristic has a control-like group"}
+            look = volcano.compare(accession, pick["factor"], pick["case"], pick["control"])
+        except (httpx.HTTPError, ValueError, OSError, LookupError) as error:
+            return {"accession": accession, "reason": str(error)[:200]}
+        if not look.get("available"):
+            return {"accession": accession, "reason": look.get("reason")}
+        summary, each = _against(items, gene, look)
+        hits = sorted((i for i, e in each.items() if e["coloured"]), key=lambda i: each[i]["q"])
+        return summary | {"hits": [{"item": i, "log2fc": each[i]["log2fc"], "q": each[i]["q"]} for i in hits]}
+
+    with ThreadPoolExecutor(4) as pool:
+        rows = list(pool.map(one, accessions[:40]))
+    return {"items": len(items), "rows": rows, "compared": sum("tested" in r for r in rows)}
 
 
 if __name__ == "__main__":
@@ -90,4 +126,7 @@ if __name__ == "__main__":
     assert r["items"] == 7 and r["mitocarta"] == 5, [(x["item"], bool(x["mitocarta"])) for x in r["rows"]]
     ipf = check("COL1A1 COL3A1 MMP7 SPP1 ACTB GAPDH", "GSE124685")
     assert ipf["dataset"]["coloured"] >= 4, ipf["dataset"]
+    wide = across("COL1A1 COL3A1 MMP7 SPP1 ACTB GAPDH", ["GSE124685", "GSE150910", "GSE36892"], "ipf")
+    by = {r["accession"]: r for r in wide["rows"]}
+    assert by["GSE124685"]["coloured"] == ipf["dataset"]["coloured"] and "reason" in by["GSE36892"], wide
     print("lists self-check passed:", r["mitocarta"], "of", r["items"], "in MitoCarta;", ipf["dataset"])
