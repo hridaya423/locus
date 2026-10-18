@@ -158,6 +158,23 @@ def design(accession: str, source: str) -> dict | None:
     return None
 
 
+def people(accession: str, comparison: dict | None) -> dict | None:
+    """Distinct patients or donors in the sample table, in total and per compared group, when a column names them."""
+    rec = record.record(accession)
+    if not rec or not rec["samples"] or not rec["samples"]["rows"]:
+        return None
+    cols, rows = rec["samples"]["columns"], rec["samples"]["rows"]
+    i = next((n for n, c in enumerate(cols) if samples.DONOR.match(c.strip())), None)
+    named = [r for r in rows if i is not None and r[i]]
+    if i is None or not 2 <= len({r[i] for r in named}) < len(rows):
+        return None
+    out = {"field": cols[i], "total": len({r[i] for r in named}), "samples": len(rows)}
+    if comparison and comparison["factor"] in cols:
+        f = cols.index(comparison["factor"])
+        out |= {g: len({r[i] for r in named if r[f] in comparison[g]}) for g in ("case", "control")}
+    return out
+
+
 if __name__ == "__main__":
     rows = [{"Raw datafile name": f"x_{i}.raw", "Donor ": d, "Condition": c, "Duration, hours": h}
             for i, (d, c, h) in enumerate([(d, c, h) for d in ("F53", "M65", "F40") for c in ("Normoxia", "Hypoxia") for h in ("24", "48")])]

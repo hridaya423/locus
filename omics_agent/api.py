@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
-import httpx
 from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
@@ -88,7 +87,7 @@ def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za
     if not found:
         return {}
     comparison = volcano.groups(accession)["default"]
-    return found | {"comparison": comparison, "people": volcano.people(accession, comparison)}
+    return found | {"comparison": comparison, "people": design.people(accession, comparison)}
 
 
 class SubsetIn(BaseModel):

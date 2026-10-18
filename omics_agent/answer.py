@@ -54,7 +54,7 @@ def pick(plan: dict, hits: list[dict]) -> list[dict]:
     if best:
         f = best["facts"]
         d = f.get("donors")
-        fact = (f"{d['case']} case and {d['control']} control {d['field']}s across {f['case'] + f['control']} sample records" if d
+        fact = (f"{d['case']} case and {d['control']} control people across {f['case'] + f['control']} sample records" if d
                 else f"{f['case']} cases and {f['control']} controls, counted from {f['source']}")
         take(best, "cohort", fact, "samples")
 
