@@ -23,7 +23,7 @@ NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "
 
 # Pooled quality-control injections are neither cases nor controls (MTBLS10965: "pooled quality control sample").
 QC_SAMPLE = re.compile(r"quality control|\bQC\b|\bpooled\b|\bblank\b", re.I)
-CONTROL = re.compile(r"^(?:no|non)\b|control|healt?h?y|normal|\bwt\b|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
+CONTROL = re.compile(r"^(?:no|non)\b|control|healt?h?y|normal|\bwt\b|^wt(?![a-z])|empty vector|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
 METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
 Q, LFC = 0.05, 1.0
 # Metabolite levels move less than transcripts; a 1.5-fold change is the usual cut-off in metabolomics.

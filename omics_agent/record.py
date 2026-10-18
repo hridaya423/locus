@@ -378,13 +378,15 @@ def _pride_samples(rec: Record) -> None:
             continue
         keyed = [(c[0].strip(), c[1].strip()) for c in lines if len(c) >= 2 and RAW_EXTENSION.sub("", c[0].strip()) in raws and c[1].strip()]
         if len(keyed) >= 4:
-            rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for raw, n in keyed]}
+            rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for raw, n in keyed],
+                           "read_from": f"the authors' sample key, {f['name']}"}
             return
     # Else the raw files' own names, when they fall into a few groups of at least two (PXD017593: Mock1–3, CWMV-Infected1–3).
     # Fractions of one sample are not samples ('HeLa_rep1_F07').
     groups = Counter(stem(n) for n in raws)
     if 2 <= len(groups) <= 12 and min(groups.values()) >= 2 and not any(FRACTION.search(n) for n in raws):
-        rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for n, raw in sorted(raws.items())]}
+        rec.samples = {"columns": ["Accession", "named group", "Raw file"], "link": "", "rows": [[n, stem(n), raw] for n, raw in sorted(raws.items())],
+                       "read_from": "the raw file names"}
 
 
 def _pride_kinds(accession: str) -> list[dict]:

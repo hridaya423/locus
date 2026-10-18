@@ -145,7 +145,7 @@ def _record(accession: str, source: str) -> dict | None:
     rows = [dict(zip(table["columns"], r)) for r in table["rows"]]
     rows = [{k: v for k, v in r.items() if k not in NOT_SAMPLE and k != "No. of Samples"}
             for r in rows for _ in range(int(r.get("No. of Samples") or 1))]
-    label = {"MetabolomicsWorkbench": "Metabolomics Workbench sample factors", "PRIDE": "sample names in the authors' protein table"}.get(source, f"{source} sample table")
+    label = table.get("read_from") or {"MetabolomicsWorkbench": "Metabolomics Workbench sample factors", "PRIDE": "sample names in the authors' protein table"}.get(source, f"{source} sample table")
     return from_rows(rows, label)
 
 
