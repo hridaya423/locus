@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
-import { quality, samplePath, type DepthRow, type Quality } from "@/lib/api";
+import { datasetPath, quality, samplePath, type DepthRow, type Quality } from "@/lib/api";
 
 const QUOTES = 5;
 const BARS = 40;
@@ -112,7 +112,16 @@ export function QualitySection({ accession }: { accession: string }) {
           <p className="text-[12px] text-muted-foreground">Reads per sample from the {depth.source}. Flagged: {depth.rule}.</p>
         </div>
       ) : (
-        sequencing && <p className="text-[13px] text-muted-foreground">Depth per sample: {depth.reason}.</p>
+        sequencing && (
+          <p className="text-[13px] text-muted-foreground">
+            Depth per sample:{" "}
+            {depth.subseries ? (
+              <>a SuperSeries; its runs are in its SubSeries {depth.subseries.map((s, i) => <span key={s}>{i > 0 && ", "}<Link href={`${datasetPath(s)}#quality`} className={cn("font-mono text-[12.5px]", LINK)}>{s}</Link></span>)}.</>
+            ) : (
+              `${depth.reason}.`
+            )}
+          </p>
+        )
       )}
       {criteria.checklist && (
         <div className="grid gap-2">

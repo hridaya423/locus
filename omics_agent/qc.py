@@ -46,6 +46,9 @@ def depth(accession: str) -> dict:
     project = _project(rec)
     runs = record._runs(project) if project else []
     if not runs:
+        parts = [url.rpartition("acc=")[2] for label, url in rec["links"] if label == "SuperSeries of"]
+        if parts:
+            return {"available": False, "reason": f"a SuperSeries; its runs are in its SubSeries {', '.join(parts)}", "subseries": parts}
         return {"available": False, "reason": "the repository lists no sequencing runs with read counts"}
     titles = {r[0]: r[1] for r in (rec["samples"] or {}).get("rows", [])} if rec["source"] == "GEO" else {}
     types = assay.library_types(accession)[0] if rec["source"] == "GEO" else {}
