@@ -189,8 +189,25 @@ def _enrich(genes: tuple[str, ...]) -> list:
     return httpx.get(f"{ENRICHR}/enrich", params={"userListId": added["userListId"], "backgroundType": LIBRARY}, timeout=30).raise_for_status().json()[LIBRARY]
 
 
+UNIPROT = re.compile(r"[OPQ]\d[A-Z\d]{3}\d|[A-NR-Z]\d(?:[A-Z][A-Z\d]{2}\d){1,2}")
+FEW_PROTEINS = 1000
+
+
+def _not_genes(look: dict, universe: bool = True) -> str | None:
+    """Why a protein comparison cannot be read as genes: proteins named by UniProt ID, or too few tested for a genome-wide background."""
+    if look.get("feature") != "protein":
+        return None
+    if sum(bool(UNIPROT.fullmatch(g[0])) for g in look["genes"]) > len(look["genes"]) / 2:
+        return "the proteins are named by UniProt ID, not gene symbols"
+    if universe and look["tested"] < FEW_PROTEINS:
+        return f"{look['tested']:,} proteins were tested, too few to compare against a whole-genome background"
+    return None
+
+
 def pathways(look: dict) -> dict:
     """Reactome pathways over-represented among the most significant genes up and down, from Enrichr."""
+    if reason := _not_genes(look):
+        return {"available": False, "reason": reason}
     sides = {}
     for side, sign in (("up", 1), ("down", -1)):
         genes = [g[0].upper() for g in look["genes"] if g[3] < look["q"] and sign * g[1] >= look["lfc"] and not g[0].startswith("GeneID:")][:PATHWAY_GENES]
@@ -208,6 +225,8 @@ def pathways(look: dict) -> dict:
 def paper_genes(accession: str, look: dict) -> dict:
     """The genes the dataset's paper names in its results (open-access full text, methods left out), where each lands on
     this comparison, and whether the sentence naming it states the same direction."""
+    if reason := _not_genes(look, universe=False):
+        return {"available": False, "reason": reason}
     rec = record.record(accession)
     papers = [p["id"] for p in rec["papers"] if p.get("id")] if rec else []
     if not papers:
