@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import { browsePath, isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
+import { browsePath, datasetPath, isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 
@@ -88,14 +88,21 @@ export function Aside({ rec: full }: { rec: DatasetRecord }) {
       {rec.links.length > 0 && (
         <AsideSection title="Linked records">
           <ul className="grid gap-1.5 text-[13.5px]">
-            {rec.links.map(([label, url]) => (
-              <li key={url}>
-                <a href={url} target="_blank" rel="noreferrer" className={cn("group/link inline-flex items-center gap-1", LINK)}>
-                  {label}
-                  <ArrowUpRight aria-hidden className="size-3.5 text-muted-foreground group-hover/link:text-foreground" />
-                </a>
-              </li>
-            ))}
+            {rec.links.map(([label, url]) => {
+              const series = url.match(/[?&]acc=(GSE\d+)$/)?.[1];
+              return (
+                <li key={url}>
+                  {series ? (
+                    <Link href={datasetPath(series)} className={LINK}>{label} <span className="font-mono text-[12.5px]">{series}</span></Link>
+                  ) : (
+                    <a href={url} target="_blank" rel="noreferrer" className={cn("group/link inline-flex items-center gap-1", LINK)}>
+                      {label}
+                      <ArrowUpRight aria-hidden className="size-3.5 text-muted-foreground group-hover/link:text-foreground" />
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </AsideSection>
       )}
