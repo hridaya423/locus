@@ -7,7 +7,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, assay, browse, design_check, everywhere, index, lists, paper, person, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design, design_check, everywhere, index, lists, paper, person, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -235,7 +235,9 @@ def filter_samples(accession: str, filters: dict[str, list[str]], text: str = ""
     factor inside the selection (a factor's own filter is left out of its counts; `unstated` counts samples with no value
     for the factor), and the commands that download only those samples' files, with a note on what they leave out and the
     record fields they were read from. `commands` is null when the repository does not link samples to files; use
-    get_download_plan then. `truncated` says that `rows` holds fewer rows than `samples`."""
+    get_download_plan then. `truncated` says that `rows` holds fewer rows than `samples`. `comparison` names the factor
+    and levels locus treats as cases and controls (the groups its page marks and First look compares), and `people`
+    counts the distinct patients or donors behind the samples when a column names them."""
     try:
         found = subset.select(accession, filters, text)
     except (LookupError, ValueError) as error:
@@ -246,6 +248,7 @@ def filter_samples(accession: str, filters: dict[str, list[str]], text: str = ""
         "rows": [sheet["rows"][i] for i in found["rows"][:limit]], "truncated": len(found["rows"]) > limit,
         "unstated": found["unstated"],
         "counts": found["counts"], "downloads": found["downloads"],
+        "comparison": (comparison := volcano.groups(accession)["default"]), "people": design.people(accession, comparison),
     }
 
 
@@ -269,11 +272,13 @@ MAX_LISTED = 200
 def list_files(accession: str) -> dict:
     """The files a dataset's repository lists, to find a `file_name` for preview_file: name, group, size in bytes, whether
     the repository or locus counts it as processed, and whether preview_file can read it. Processed files come first; at
-    most 200 are returned and `total` is the full count."""
+    most 200 are returned and `total` is the full count. `read_from` lists the repository API requests the record was
+    read from."""
     if not (row := record._row(accession)):
         return {"accession": accession, "error": "not in the locus index"}
-    files = sorted(record.raw(accession, row).files, key=lambda f: not f["processed"])
-    return {"accession": accession, "total": len(files), "files": [
+    rec = record.raw(accession, row)
+    files = sorted(rec.files, key=lambda f: not f["processed"])
+    return {"accession": accession, "total": len(files), "read_from": rec.sources, "files": [
         {"name": f["name"], "group": f["group"], "bytes": f["bytes"], "processed": f["processed"], "previewable": preview.previewable(f, accession)}
         for f in files[:MAX_LISTED]]}
 
