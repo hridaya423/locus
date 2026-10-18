@@ -36,6 +36,8 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 - Teach-back, in two sentences: Public omics repositories hide what was measured, who the samples are and whether the files are usable behind records written for submission, not for reuse, so researchers leave to read papers and download files before they know if a dataset fits. locus reads those records, protocols, papers and file headers for them, and shows the evidence on one page that agents can also query.
 - Whole-page clean: fixed tonight, a sentence quoted twice in Quality, three model notes on results, a record link repeated in Files, a download block that downloaded nothing.
 
+**06:00 close.** No piece started after 05:45. Final check at 06:00 on the frozen build: harness 36 pages, 0 problems, median 325 ms; 25 MCP tools registered; MCP parity 24 of 24; working tree clean. A third `delegate_task` attempt at 05:33 also returned `parent_not_active`, so the builder/critic fan-out the bar asks for was not possible after 02:45 in this session.
+
 **Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`, all recaptured from the final build at 05:39 and checked against their claims (three claims were corrected to match: SPP1 in 6 of 10 datasets, the list in 8 of 12, the metabolomics and cases-and-controls wording). Dictation is not captured: the headless browser has no microphone.
 
 **Found during the final review.** Your list across datasets and the gene links from First look mixed every search the browser had run ("all 33 GEO datasets of your search (mTOR inhibition)" after an IPF search); they now use the tab's last search. Paper pages now link each author to their contributor page.
