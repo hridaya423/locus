@@ -7,14 +7,15 @@ from typing import Annotated
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
+import httpx
 from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, preview, record, sources, subset  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, paper, preview, record, resolve, sources, subset  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -150,6 +151,27 @@ def file_preview(file: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0
         raise HTTPException(*(410, "The repository no longer serves this file (404).") if code == 404 else (502, f"The repository answered {code} for this file."))
     except httpx.HTTPError:
         raise HTTPException(502, "The repository did not answer.")
+@app.get("/resolve/{identifier:path}")
+def resolve_identifier(identifier: str) -> dict | None:
+    """The locus page an accession, sample or run, PMID, PMCID or DOI names; null when the text is not an identifier."""
+    try:
+        return resolve.resolve(identifier)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except httpx.HTTPError:
+        raise HTTPException(502, "A repository did not answer. Please try again.")
+
+
+@app.get("/paper/{identifier:path}")
+def paper_page(identifier: str, offset: int = Query(0, ge=0)) -> dict:
+    """A paper's title, authors, abstract, data availability statement, supplementary files and the locus datasets that cite it,
+    `offset` datasets in."""
+    try:
+        return paper.paper(identifier, offset)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except httpx.HTTPError:
+        raise HTTPException(502, "Europe PMC did not answer. Please try again.")
 
 
 def main() -> None:

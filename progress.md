@@ -362,3 +362,10 @@ Critic moments (23:45; verdicts in /tmp/locus-night/critic-*/verdict.md: A FIX, 
 - Group the same study across repositories (E-MTAB-13568 / PRJEB70520, E-MTAB-16150 / PRJEB103803 identical titles not grouped).
 - "Commands to download everything" on pages with no files (MSV000093129, PXD023840); locus API failure blamed on the repository ("did not send the record").
 - Rule (user, 23:20): changes to data/ (re-embedding, FTS rebuilds, DB writes) only after a checkpoint: `cp -c data/omics.db data/checkpoints/omics.db.<time>` (APFS clone, instant) plus a line here naming it.
+- Dictate the question (mic in the search box), asked by the user at 23:05.
+
+## Done (paste anything, paper page, dictation; builder C, 17 Oct night)
+- `GET /resolve/{id}` + MCP `resolve_id`: GSE/GSM, SRR/ERR/DRR/SRX/SRP, PRJ*, PXD, E-*, MTBLS, MSV, PMID, PMCID, DOI (`omics_agent/resolve.py`). Search box and `/?q=` open the page; unknown identifier shows one line and an offer to search; `/GSE36892` redirects to `/?q=`.
+- `GET /paper/{id}` + MCP `get_paper` (`omics_agent/paper.py`, self-check in `__main__`), page `/p/<pmid or doi>` (`web/components/paper.tsx`); the dataset aside links each paper to it.
+- Microphone button (`web/components/dictation.tsx`) using SpeechRecognition; checked with the headless Chrome recognizer (error path) and a scripted recognizer (listening, interim text, final stop, denied, silence). Not checked: real speech.
+- Evidence: screenshots `/tmp/locus-night/shots/C`, harness `--pages` run `/tmp/locus-night/harness/C` (36 pages; the 2 problems are `/design/GSE179525` and `/design/GSE149204` returning 500, also in the baseline).
