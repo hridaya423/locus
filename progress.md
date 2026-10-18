@@ -18,13 +18,13 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 
 **Deleted.** "Protein/Gene data on the same tissue" (opened by all 3 experts, acted on by none; the same PXDs on every lung row). The unused repository chips under search results.
 
-**Reverted or stalled.** Critics B2, D3, E2, F2 and G stalled after the 00:32 disk-full incident and were cancelled at 02:35; from 02:45 `delegate_task` answered `parent_not_active` and the native Agent tool offers only an unversioned `sonnet` alias, which AGENTS.md forbids, so every piece after 02:45 was built and reviewed by the lead with scripts and screenshots, not by a fresh critic. Reverted: triage scale worded by topic (no gain, within noise); a third ranking by assay family (GSE136831 still outside the pool). Not fixed: retrieval misses above; cold GEO records can take 30–150 s (now within the proxy timeout, but slow).
+**Reverted or stalled.** Critics B2, D3, E2, F2 and G stalled after the 00:32 disk-full incident and were cancelled at 02:35; from 02:45 `delegate_task` answered `parent_not_active` and the native Agent tool offers only an unversioned `sonnet` alias, which AGENTS.md forbids, so every piece after 02:45 was built and reviewed by the lead with scripts and screenshots, not by a fresh critic. Reverted: triage scale worded by topic (no gain, within noise); a third ranking by assay family (GSE136831 still outside the pool); a triage cut of 80 (one more Opus pick, two fewer in q1's top ten). Not fixed: retrieval misses above; cold GEO records can take 30–150 s (now within the proxy timeout, but slow).
 
 **Surprises worth knowing.** Next's `/api` proxy gives up after 30 s and answers 500; raised to 300 s. Union merges had silently dropped three `@mcp.tool` decorators; `scripts/mcp_check.py` now fails on that.
 
 **MCP.** 9 tools at 22:30 → 25 now; added: why_matched, classify_assays, sample_qc, get_table, first_look (pathways, metabolites), gene_everywhere, check_design, check_list (across datasets), browse_datasets, filter_samples, list_files, preview_file (zips, mwTab), resolve_id, get_paper, find_cited_paper, get_person. API routes 7 → 26.
 
-**Spend.** Opus 5.5 assistant bar $3.91 of $5. Haiku 5.5 (search triage, screen and labels) is not metered separately; most searches tonight were cached, plus one uncached pass over the 8 questions at 03:05.
+**Spend.** Opus 5.5 assistant bar $3.91 of $5. Haiku 5.5 (search triage, screen and labels) is not metered separately; most searches tonight were cached; four recall-eval passes over the 8 questions (03:00–04:40) asked it only about candidates it had not seen before.
 
 **Final milestone review (05:00–06:30, by the lead; no fresh critic was available).**
 - Beats the assistant: Opus 5.5 with web search names good datasets but cannot count samples, read the methods or open files ("I couldn't confirm exact sample counts on GEO"). locus returns 15 of its 34 indexed picks and, for each dataset it returns, the counts, the assay evidence and the files. A wet-lab biologist would act on locus first for q1, q3, q5 and q6; an MS chemist for q4 and q8; for q2 and q7 Opus's picks are better (TrIP-seq is now found; GSE100007, PXD058312 are not).
@@ -34,7 +34,7 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 - Teach-back, in two sentences: Public omics repositories hide what was measured, who the samples are and whether the files are usable behind records written for submission, not for reuse, so researchers leave to read papers and download files before they know if a dataset fits. locus reads those records, protocols, papers and file headers for them, and shows the evidence on one page that agents can also query.
 - Whole-page clean: fixed tonight, a sentence quoted twice in Quality, three model notes on results, a record link repeated in Files, a download block that downloaded nothing.
 
-**Moments for the video.** `docs/moments.md`, 21 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`.
+**Moments for the video.** `docs/moments.md`, 23 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`.
 
 **Rerun.** API `OMICS_API_PORT=8010 uv run omics-api` (or `uv run python -c "import uvicorn; from omics_agent.api import app; uvicorn.run(app, port=8010)"`); web `cd web && OMICS_API_URL=http://localhost:8010 npx next dev -p 3010`. Harness `node scripts/harness.mjs`; door audit `node scripts/doors.mjs --seed 1`; crawl `node scripts/crawl.mjs --seed 7 --n 60`; captures `node scripts/captures.mjs --web http://localhost:3010 [--only slug]`; MCP check `uv run python scripts/mcp_check.py`; module self-checks `uv run python -m omics_agent.<module>`.
 
