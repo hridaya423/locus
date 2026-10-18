@@ -1,13 +1,16 @@
 """The answer at the top of a search: the two or three datasets to start with, each with the one counted fact that makes
 it the best on one axis, and where on its page that fact is shown. No model; every fact is read from the hit."""
 
-from concurrent.futures import ThreadPoolExecutor
+import struct
+from concurrent.futures import ThreadPoolExecutor, wait
 
 import httpx
 
-from . import table
+from . import preview, record, table
 
 CHECKED = 8
+MS_WAIT = 6
+MASS_SPEC = {"PRIDE", "MassIVE", "iProX", "jPOST", "PanoramaPublic", "PeptideAtlas"}
 
 
 def _norm(name: str) -> str:
@@ -26,6 +29,20 @@ def _has_table(accession: str) -> dict | None:
         return table.available(accession)
     except (httpx.HTTPError, ValueError):
         return None
+
+
+def _protein_table(accession: str) -> dict | None:
+    """The authors' search-engine table inside a zip of the record, as the preview reads it, or None."""
+    try:
+        rec = record.record(accession)
+        found = next((f for f in rec["files"] if preview.ZIP.search(f["name"]) and preview.previewable(f, accession)), None) if rec else None
+        if not found:
+            return None
+        look = preview.preview(accession, found["name"])
+    except (httpx.HTTPError, ValueError, LookupError, KeyError, struct.error):
+        return None
+    named = look.get("experiments") or {}
+    return {"file": found["name"], "member": look["member"]["path"].rsplit("/", 1)[-1], "samples": len(named.get("names") or []), "columns": look["column_count"]}
 
 
 def pick(plan: dict, hits: list[dict]) -> list[dict]:
@@ -64,6 +81,18 @@ def pick(plan: dict, hits: list[dict]) -> list[dict]:
     ready = next((h for h in geo if tables.get(h["accession"]) and h["accession"] not in {c["accession"] for c in chosen}), None)
     if ready:
         take(ready, "ready", f"a processed gene table from NCBI ({tables[ready['accession']]['build']}) with a first look on its page", "first-look")
+    else:
+        ms = [h for h in strong if h["source"] in MASS_SPEC and h["accession"] not in {c["accession"] for c in chosen}][:CHECKED]
+        # A cold PRIDE file list can take many seconds; the results do not wait for it. Late answers still warm the cache.
+        pool = ThreadPoolExecutor(4)
+        futures = {pool.submit(_protein_table, h["accession"]): h["accession"] for h in ms}
+        done, _ = wait(futures, timeout=MS_WAIT)
+        pool.shutdown(wait=False)
+        found = {futures[f]: f.result() for f in done}
+        if hit := next((h for h in ms if found.get(h["accession"])), None):
+            t = found[hit["accession"]]
+            samples = f", {t['samples']} samples named" if t["samples"] > 1 else ""
+            take(hit, "ready", f"the authors' protein table ({t['member']} in {t['file']}{samples}) opens on its page without a download", "files")
     return chosen[:3]
 
 
