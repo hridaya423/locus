@@ -11,6 +11,7 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { SampleTable, SelectionBar } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
+import { AssayList, assayNames, useAssays, type AssayState } from "@/components/assay";
 import { dataType } from "@/components/result-card";
 import { MarkedText, MarkedTitle, MatchedLine, goToMatch, hasMatch, useFound, useMatches, type Matches } from "@/components/matches";
 import { datasetRecord, repositoryName, type DatasetRecord, type Hit } from "@/lib/api";
@@ -21,6 +22,7 @@ export function DatasetPage({ accession }: { accession: string }) {
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const context = useFound(accession);
+  const assays = useAssays(accession, rec !== null);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -66,7 +68,7 @@ export function DatasetPage({ accession }: { accession: string }) {
         <p className="text-sm">locus has no dataset {accession}. <Link href="/" className={LINK}>Search instead</Link>.</p>
       ) : (
         <>
-          <Header accession={accession} rec={rec} hit={context?.hit} />
+          <Header accession={accession} rec={rec} hit={context?.hit} assays={assays} />
           {error ? (
             <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
               {error === "502" ? `${source ? repositoryName(source) : "The repository"} did not send the record.` : "locus could not read this record; its server failed."}
@@ -83,7 +85,8 @@ export function DatasetPage({ accession }: { accession: string }) {
   );
 }
 
-function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord | null; hit?: Hit }) {
+function Header({ accession, rec, hit, assays }: { accession: string; rec: DatasetRecord | null; hit?: Hit; assays: AssayState }) {
+  const measured = assayNames(assays.data);
   const source = rec?.source ?? hit?.source;
   const published = rec?.published ?? hit?.published;
   const samples = rec?.samples?.rows.length || rec?.sample_count || hit?.samples;
@@ -92,7 +95,7 @@ function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord
   const processed = rec?.files.filter((f) => f.processed).length ?? 0;
   const unknown = rec || hit ? "not stated" : "…";
   const figures: [string, React.ReactNode][] = [
-    ["Data type", dataType(rec?.modality ?? hit?.modality ?? "") || unknown],
+    ["Data type", measured.length ? <span title={`Read from the methods: ${measured.join(", ")}`}>{measured.slice(0, 2).join(", ")}{measured.length > 2 && <span className="text-muted-foreground"> +{measured.length - 2}</span>}</span> : dataType(rec?.modality ?? hit?.modality ?? "") || unknown],
     ["Organism", organism.length ? <span title={organism.join(", ")}>{organism[0]}{organism.length > 1 && <span className="text-muted-foreground"> +{organism.length - 1}</span>}</span> : unknown],
     ["Samples", samples ? <span className="tabular">{samples.toLocaleString()}</span> : unknown],
     ["Files", rec ? (rec.files.length ? <span className="tabular">{rec.files.length.toLocaleString()} <span className="text-muted-foreground">· {bytes ? size(bytes) : "size not stated"}</span></span> : "none listed") : "…"],
@@ -115,6 +118,7 @@ function Header({ accession, rec, hit }: { accession: string; rec: DatasetRecord
           </div>
         ))}
       </dl>
+      {rec && <AssayList accession={accession} state={assays} />}
       {rec && (
         <nav aria-label="Sections" className="flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
           {[["about", "About"], ["samples", "Samples"], ["files", processed ? `Files · ${processed} ready to use` : "Files"]].map(([id, label]) => (

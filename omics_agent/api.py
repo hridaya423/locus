@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, paper, preview, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, design, paper, preview, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -101,6 +101,12 @@ def sample_subset(body: SubsetIn, accession: str = Path(pattern=r"^[A-Za-z0-9][A
         raise HTTPException(404, str(error))
     except ValueError as error:
         raise HTTPException(422, str(error))
+@app.get("/assay/{accession}")
+def assays(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """What was measured, read from the methods text with the sentence for each call, and the author's label beside it."""
+    if not (found := assay.classify(accession)):
+        raise HTTPException(404, f"{accession} is not in the index.")
+    return found
 
 
 @app.get("/record/{accession}")
