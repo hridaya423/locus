@@ -169,7 +169,7 @@ def _title_groups(table: dict) -> None:
     """Many series state the group only in sample titles ('Psoriasis skin 1', 'Healthy control skin 2'). Titles without
     their trailing number become a column when that gives 2 to 12 groups of at least 2 samples that no column already gives."""
     title = table["columns"].index("Title")
-    groups = [re.sub(r"[\s_.#-]*(?:rep(?:licate)?[\s_.#-]*)?\d+$", "", r[title], flags=re.I).strip() for r in table["rows"]]
+    groups = [re.sub(r"[\s_.#-]*(?:rep(?:licate)?[\s_.#-]*)?\d+$", "", r[title], flags=re.I).strip(" ,;:_-") for r in table["rows"]]
     counts = {g: groups.count(g) for g in set(groups)}
     if not 2 <= len(counts) <= 12 or min(counts.values()) < 2 or "" in counts:
         return
