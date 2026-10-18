@@ -26,6 +26,14 @@ Read this first. Details, evidence paths and the incident log are in "Overnight 
 
 **Spend.** Opus 5.5 assistant bar $3.91 of $5. Haiku 5.5 (search triage, screen and labels) is not metered separately; most searches tonight were cached, plus one uncached pass over the 8 questions at 03:05.
 
+**Final milestone review (05:00–06:30, by the lead; no fresh critic was available).**
+- Beats the assistant: Opus 5.5 with web search names good datasets but cannot count samples, read the methods or open files ("I couldn't confirm exact sample counts on GEO"). locus returns 15 of its 34 indexed picks and, for each dataset it returns, the counts, the assay evidence and the files. A wet-lab biologist would act on locus first for q1, q3, q5 and q6; an MS chemist for q4 and q8; for q2 and q7 Opus's picks are better (TrIP-seq is now found; GSE100007, PXD058312 are not).
+- Interview tasks: 8 of 10 done without leaving locus, 2 partly, because the repositories do not hold the fact (see `docs/evaluation.md`).
+- Unseen datasets: GSE295540, E-MTAB-15294, MSV000090513 load without errors; the two gaps they exposed were fixed.
+- Hard questions, from the judges' fields (`docs/plans/2026-10-17-megaplan.md`): "Where does this number come from?" (Tsenkov, EMBL-EBI): the quote and field under each fact, and the list of API requests at the foot of each page. "Do you offer controlled data?" (Hasson, Apheris): EGA and dbGaP pages say controlled access and offer no download. "How do you know it is right?" (Mroz, CuspAI): `docs/evaluation.md`, failures included. Each is answerable on screen in under 30 seconds.
+- Teach-back, in two sentences: Public omics repositories hide what was measured, who the samples are and whether the files are usable behind records written for submission, not for reuse, so researchers leave to read papers and download files before they know if a dataset fits. locus reads those records, protocols, papers and file headers for them, and shows the evidence on one page that agents can also query.
+- Whole-page clean: fixed tonight, a sentence quoted twice in Quality, three model notes on results, a record link repeated in Files, a download block that downloaded nothing.
+
 **Moments for the video.** `docs/moments.md`, 21 moments, each with a 1280 px PNG and an MP4 in `docs/moments/`.
 
 **Rerun.** API `OMICS_API_PORT=8010 uv run omics-api` (or `uv run python -c "import uvicorn; from omics_agent.api import app; uvicorn.run(app, port=8010)"`); web `cd web && OMICS_API_URL=http://localhost:8010 npx next dev -p 3010`. Harness `node scripts/harness.mjs`; door audit `node scripts/doors.mjs --seed 1`; crawl `node scripts/crawl.mjs --seed 7 --n 60`; captures `node scripts/captures.mjs --web http://localhost:3010 [--only slug]`; MCP check `uv run python scripts/mcp_check.py`; module self-checks `uv run python -m omics_agent.<module>`.
