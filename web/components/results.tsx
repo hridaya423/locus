@@ -90,8 +90,8 @@ function StudyRow({ hits, counts, matched, topic, selected, toggle, select }: Gr
               )}
             </button>
           </td>
-          {counts && <CountCell value={best?.facts?.case} tone="signal" href={href} />}
-          {counts && <CountCell value={best?.facts?.control} tone="control" pooled={best?.facts?.mixed} href={href} />}
+          {counts && <CountCell value={best?.facts?.case} tone="signal" people={best?.facts?.donors?.case} href={href} />}
+          {counts && <CountCell value={best?.facts?.control} tone="control" pooled={best?.facts?.mixed} people={best?.facts?.donors?.control} href={href} />}
           <td className="overflow-hidden py-3 pl-2 text-right align-top font-mono text-[13px] tabular text-muted-foreground max-sm:invisible max-sm:p-0">{samples || "–"}</td>
           <td className="py-3 pl-1 align-top">
             <ChevronDown aria-hidden className={cn("mt-[2px] size-4 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />

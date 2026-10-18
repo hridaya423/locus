@@ -48,10 +48,15 @@ def pick(plan: dict, hits: list[dict]) -> list[dict]:
 
     counted = [h for h in strong if (h.get("facts") or {}).get("case") and (h["facts"].get("control"))]
     taken = {c["accession"] for c in chosen}
-    best = max((h for h in counted if h["accession"] not in taken), key=lambda h: min(h["facts"]["case"], h["facts"]["control"]), default=None)
+    # People, not records: 540 single-cell records from 9 patients count as 9.
+    size = lambda f: min(f["donors"]["case"], f["donors"]["control"]) if f.get("donors") else min(f["case"], f["control"])
+    best = max((h for h in counted if h["accession"] not in taken), key=lambda h: size(h["facts"]), default=None)
     if best:
         f = best["facts"]
-        take(best, "cohort", f"{f['case']} cases and {f['control']} controls, counted from {f['source']}", "samples")
+        d = f.get("donors")
+        fact = (f"{d['case']} case and {d['control']} control {d['field']}s across {f['case'] + f['control']} sample records" if d
+                else f"{f['case']} cases and {f['control']} controls, counted from {f['source']}")
+        take(best, "cohort", fact, "samples")
 
     geo = sorted((h for h in strong if h["source"] == "GEO"), key=lambda h: -min((h.get("facts") or {}).get("case") or 0, (h.get("facts") or {}).get("control") or 0))[:CHECKED]
     with ThreadPoolExecutor(4) as pool:

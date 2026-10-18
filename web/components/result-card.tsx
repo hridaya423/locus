@@ -61,7 +61,7 @@ export const rememberScroll = () => sessionStorage.setItem(SCROLL, String(window
 
 const TONE = { signal: "text-signal", control: "text-control" } as const;
 
-export function CountCell({ value, tone, pooled, href }: { value: number | null | undefined; tone: keyof typeof TONE; pooled?: number; href: string }) {
+export function CountCell({ value, tone, pooled, people, href }: { value: number | null | undefined; tone: keyof typeof TONE; pooled?: number; people?: number; href: string }) {
   if (value === null || value === undefined) {
     return (
       <td className="py-3 pl-2 text-right align-top font-mono text-[13px] text-muted-foreground" title="Not counted from sample records">
@@ -79,6 +79,11 @@ export function CountCell({ value, tone, pooled, href }: { value: number | null 
       >
         {value}
       </Link>
+      {people != null && people !== value && (
+        <div className="mt-0.5 whitespace-nowrap font-mono text-[11px] text-muted-foreground" title={`${value} sample records from ${people} people`}>
+          {people} {people === 1 ? "person" : "people"}
+        </div>
+      )}
       {pooled ? (
         <div className="mt-0.5 whitespace-nowrap font-mono text-[11px] text-muted-foreground" title="Libraries that pool patient and control cells, for example a multiplexed single-cell run">
           +{pooled} pooled
@@ -257,8 +262,8 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
             </button>
           </div>
         </td>
-        {counts && <CountCell value={facts?.case} tone="signal" href={`${page}#samples`} />}
-        {counts && <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} href={`${page}#samples`} />}
+        {counts && <CountCell value={facts?.case} tone="signal" people={facts?.donors?.case} href={`${page}#samples`} />}
+        {counts && <CountCell value={facts?.control} tone="control" pooled={facts?.mixed} people={facts?.donors?.control} href={`${page}#samples`} />}
         <td className="overflow-hidden py-3 pl-2 text-right align-top font-mono text-[13px] tabular text-muted-foreground max-sm:invisible max-sm:p-0">{hit.samples ?? "–"}</td>
         <td className="py-3 pl-1 align-top">
           <button type="button" onClick={toggle} aria-expanded={expanded} aria-label={`${expanded ? "Hide" : "Show"} details of ${hit.accession}`} className="relative grid cursor-pointer place-items-center before:absolute before:-inset-2 before:content-['']">

@@ -185,6 +185,21 @@ def resolve_labels(labels: dict, fields: dict[str, Counter]) -> dict:
     }
 
 
+DONOR = re.compile(r"^(?:patient|donor|subject|individual|participant)[ _-]?(?:id|number|no|code)?$", re.I)
+
+
+def donors(fields: dict[str, Counter], labels: dict, records: list[dict[str, str]], total: int) -> dict | None:
+    """Distinct people per group when a field names the patient or donor, so 540 single cells from 9 patients count as 9."""
+    field = next((f for f in fields if DONOR.match(f.strip()) and 2 <= len(fields[f]) < total), None)
+    if not field:
+        return None
+    people: dict[str, set] = {"case": set(), "control": set()}
+    for r in records:
+        if (group := group_of(r, labels)) in people and r.get(field):
+            people[group].add(r[field])
+    return {"case": len(people["case"]), "control": len(people["control"]), "field": field} if all(people.values()) else None
+
+
 def count(fields: dict[str, Counter], labels: dict, source: str, records: list[dict[str, str]] | None = None) -> dict:
     labels = resolve_labels(labels, fields)
     values = fields.get(labels["group_field"], Counter())
@@ -207,6 +222,7 @@ def count(fields: dict[str, Counter], labels: dict, source: str, records: list[d
         "assays": labels.get("assays", []),
         "library": dict(fields.get("library strategy", {})),
         "libraries": libs,
+        "donors": donors(fields, labels, records, total) if records and known else None,
         "source": f"{total} {source}",
     }
 

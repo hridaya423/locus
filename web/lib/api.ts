@@ -6,6 +6,7 @@ export type Facts = {
   sample_type: string; tissue: string; source: string; assays?: string[]; library?: Record<string, number>;
   libraries?: Record<string, Partial<Record<"case" | "control" | "mixed" | "other", number>>>;
   methods?: Record<string, { value: string; label: string; evidence: string; trusted: boolean }>;
+  donors?: { case: number; control: number; field: string } | null;
 };
 export type ReadyFiles = { processed: { name: string; kind: string; bytes: number; url: string }[]; more: number; raw: { files: number; bytes: number } };
 export type Paper = { title: string; journal: string; year: string; url: string };
