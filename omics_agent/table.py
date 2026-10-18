@@ -10,6 +10,7 @@ import hashlib
 import io
 import json
 import re
+import sys
 import zipfile
 from datetime import date
 from functools import lru_cache
@@ -20,6 +21,8 @@ import numpy as np
 
 from . import record
 
+# MaxQuant's protein tables hold sequence and ID lists longer than csv's 128 KB field default (PXD011513).
+csv.field_size_limit(sys.maxsize)
 DATA = Path.home() / "omics-data" / "ncbi-counts"
 MAX_BYTES = 200 * 1024**2
 LISTING = "https://www.ncbi.nlm.nih.gov/geo/download/?acc={}"
