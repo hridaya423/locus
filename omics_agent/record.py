@@ -544,6 +544,7 @@ def _workbench(accession: str, row: dict) -> Record:
 METABOLIGHTS_FILES = "https://www.ebi.ac.uk/metabolights/ws/studies/{}/files?include_raw_data=false"
 METABOLIGHTS_FTP = "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/{}/{}"
 ISA_COLUMN = re.compile(r"^(?:Factor Value|Characteristics)\[(.+)\]$")
+ION_MODE = re.compile(r"[_-](?:pos|neg|positive|negative)(?:[_-]?mode)?$", re.I)
 
 
 def _metabolights(accession: str, row: dict) -> Record:
@@ -563,8 +564,12 @@ def _metabolights(accession: str, row: dict) -> Record:
             keep = [i for i, h in enumerate(header) if ISA_COLUMN.match(h)]
             labels = list(dict.fromkeys(ISA_COLUMN.match(header[i])[1] for i in keep))
             first = {label: next(i for i in keep if ISA_COLUMN.match(header[i])[1] == label) for label in labels}
-            rec.samples = {"columns": ["Accession", *labels], "link": "",
-                           "rows": [[r[name], *[r[first[label]] for label in labels]] for r in rows[1:] if len(r) == len(header) and r[name]]}
+            table = [[r[name], *[r[first[label]] for label in labels]] for r in rows[1:] if len(r) == len(header) and r[name]]
+            # One plasma sample run in positive and negative ionisation is one subject (MTBLS352: SD-B00001, SD-B00001_NEG).
+            subjects = [ION_MODE.sub("", r[0]) for r in table]
+            if len(set(subjects)) < len({r[0] for r in table}):
+                labels, table = [*labels, "Subject"], [[*r, s] for r, s in zip(table, subjects)]
+            rec.samples = {"columns": ["Accession", *labels], "link": "", "rows": table}
     return rec
 
 

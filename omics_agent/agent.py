@@ -405,10 +405,11 @@ def _workbench_facts(dataset: Dataset) -> None:
     # Patients against controls only: a time course (Baseline against Follow-Up) is not a case-control count.
     if not rec or not rec["samples"] or not pick or not any(HEALTHY.search(lv) for lv in pick["control"]):
         return
-    i, rows = rec["samples"]["columns"].index(pick["factor"]), rec["samples"]["rows"]
-    case, control = sum(r[i] in pick["case"] for r in rows), sum(r[i] in pick["control"] for r in rows)
+    cols, rows = rec["samples"]["columns"], rec["samples"]["rows"]
+    i, who = cols.index(pick["factor"]), next((n for n, c in enumerate(cols) if samples.DONOR.match(c)), 0)
+    case, control = (len({r[who] for r in rows if r[i] in pick[g]}) for g in ("case", "control"))
     dataset.facts = {"case": case, "control": control, "mixed": 0, "has_control": control > 0, "sample_type": "unknown", "tissue": "", "assays": [],
-                     "library": {}, "libraries": {}, "source": f"{len(rows)} {'Metabolomics Workbench' if dataset.source == 'MetabolomicsWorkbench' else 'MetaboLights'} sample records ({pick['factor']})"}
+                     "library": {}, "libraries": {}, "source": f"{len(rows)} {'Metabolomics Workbench' if dataset.source == 'MetabolomicsWorkbench' else 'MetaboLights'} sample records ({pick['factor']}{', one per subject' if who else ''})"}
 
 
 def _fetch_samples(dataset: Dataset) -> None:
