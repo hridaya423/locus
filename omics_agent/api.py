@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, assay, design, design_check, everywhere, lists, paper, preview, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design, design_check, everywhere, lists, paper, preview, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -172,6 +172,10 @@ class ListIn(BaseModel):
 def your_list(body: ListIn) -> dict:
     """A pasted gene or protein list against MitoCarta 3.0 and, given a GEO dataset, against its first-look comparison."""
     return lists.check(body.text, body.accession, body.factor, body.case, body.control)
+@app.get("/browse")
+def browse_value(field: str, value: str, source: str = "", offset: int = 0) -> dict:
+    """Every locus dataset that shares one stated value (organism, instrument, data type, keyword), newest first."""
+    return browse.browse(field, value[:200], source, max(0, offset))
 
 
 @app.get("/record/{accession}")

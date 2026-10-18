@@ -269,6 +269,11 @@ export type FirstLook = { accession: string; available: boolean; reason?: string
 
 export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
   const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });
+export type Browse = { field: string; value: string; phrase: string; matched_in: string; source: string; total: number; offset: number; by_source: Record<string, number>;
+  datasets: { accession: string; source: string; title: string; samples: number | null; published: string | null; modality: string }[] };
+
+export async function browseValue(field: string, value: string, source: string, offset: number, signal?: AbortSignal): Promise<Browse> {
+  const res = await fetch(`${API}/browse?${new URLSearchParams({ field, value, source, offset: String(offset) })}`, { signal });
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
@@ -369,3 +374,4 @@ export async function checkList(text: string, accession: string, signal?: AbortS
   if (!res.ok) throw new Error((await res.json().catch(() => null))?.detail?.[0]?.msg ?? `${res.status}`);
   return res.json();
 }
+export const browsePath = (field: string, value: string) => `/browse?${new URLSearchParams({ field, value })}`;

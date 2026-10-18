@@ -8,7 +8,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, assay, design_check, everywhere, index, lists, paper, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design_check, everywhere, index, lists, paper, preview, qc, record, resolve, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -178,6 +178,11 @@ def check_list(items: str, accession: str = "") -> dict:
     pathways; with a GEO accession, also each item's rank, log2 fold change and q in that dataset's first look and
     the overlap with its significant genes against chance (hypergeometric p)."""
     return lists.check(items, accession)
+def browse_datasets(field: str, value: str, source: str = "", offset: int = 0) -> dict:
+    """Every locus dataset that shares one stated value from a dataset record: an organism ('Homo sapiens'), an
+    instrument ('Illumina NovaSeq 6000', 'Q Exactive HF-X'), a data type or a keyword. Returns the total, counts per
+    repository and 50 datasets per page, newest first, with where the value was matched."""
+    return browse.browse(field, value, source, offset)
 
 
 @mcp.tool(annotations=READ_ONLY)
