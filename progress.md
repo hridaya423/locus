@@ -230,6 +230,8 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - Surprise, fixed: three MCP tools (classify_assays, get_table, browse_datasets) had lost `@mcp.tool` in union merges, so 22 were registered, not 24. `uv run python scripts/mcp_check.py` now fails on any public function that is not a tool: 25 registered.
 - Harness h0335: 35 pages, 1 problem (the proxy timeout above). Crawls seed 11 and 13: 40 pages each, 0 problems.
 
+- 03:50–04:05, lead, from use sessions on q5, q6 and q8: immunopeptidomics rows say IMMUNOPEPTIDOME, not INTERACTOME, and an opened MS row quotes the protocol (W6/32 on PXD010450); Metabolomics Workbench adapter (sample factors, analyses, mwTab files with grouped preview) and a metabolite first look (ST003390: 80 metabolites, S-adenosylhomocysteine up, q 4e-31; 1.5-fold cut-off); ENA run tables gain each BioSample's varying attributes (PRJEB39707: 396 samples from 132 infants, three ages, sex), and ENA descriptions are unescaped.
+
 ### Moments
 (one line each: source · page · dataset · moment)
 Door audit baseline (seed 1, 30 datasets, 38 pages, 23:05): 5.97 outbound links per page, 20.03 values that open nothing per page.
