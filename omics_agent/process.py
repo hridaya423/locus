@@ -351,6 +351,7 @@ def _version(cmd: list[str]) -> str:
 def files_of(out: Path) -> list[dict]:
     """The downloadable outputs with sizes: the small tables, plots and manifest, plus every .count file."""
     names = [n for n in SMALL_FILES if (out / n).exists()] + sorted(p.name for p in out.glob("*.count"))
+    names += sorted(f"plots/{p.name}" for p in out.glob("plots/*") if p.suffix in (".png", ".pdf"))
     return [{"name": n, "bytes": (out / n).stat().st_size} for n in names]
 
 

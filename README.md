@@ -68,6 +68,8 @@ uv run omics-api                    # streaming API on http://localhost:8000 (do
 cd web && npm ci && npm run dev     # http://localhost:3000
 ```
 
+The microphone button in the search bar uses the browser's own speech recognition (no key, nothing sent by our code): press it, speak, and the transcript lands in the search box for you to edit before searching. Browsers allow this only in a secure context, so it works on `localhost` or over HTTPS, and the button is disabled with the reason when the app is opened over plain HTTP on another machine's address.
+
 The web app calls `/api` on its own origin, and Next.js forwards it to port 8000, so the app also works through a tunnel such as ngrok.
 
 If port 8000 is taken, set `OMICS_API_PORT` in `.env` and point the web app at it with `OMICS_API_URL`. To open the dev server from another machine by its IP address, list that address in `EXTRA_DEV_ORIGINS`:
@@ -129,7 +131,7 @@ uv run omics process GSE273888 --topic "mTOR inhibitor, rapamycin"
 | `<GSM>.count` | One per sample: `gene_id<TAB>count`, integer, HTSeq-style |
 | `counts.tsv`, `normalized_counts.tsv` | Genes × samples, raw and DESeq2-normalised |
 | `deseq2_results.tsv`, `top_genes.tsv` | Shrunken log2 fold changes, p-values and adjusted p-values for the chosen contrast |
-| `pca.png`, `volcano.png`, `ma.png` and the same as JSON | The three plots |
+| `plots/` | Five figures as 300 dpi PNG and vector PDF: PCA with sample labels and per-condition hulls, volcano (adjusted p, thresholds drawn, top genes labelled), MA, a sample-to-sample distance heatmap and normalised counts of the top six genes. `pca.png`, `volcano.png` and `ma.png` at the top level are copies for the web panel, which reads the same data from the JSON files |
 | `manifest.json` | Tool versions, reference release, samples, runs, read cap, timings and the samples left out, with the reason |
 | `explanation.md` | A short paragraph the model wrote from the numbers above. Code checks every number in it against the pipeline's output and drops the paragraph if one was invented; the note under it says what happened |
 

@@ -137,13 +137,13 @@ def process_status(accession: str = Path(pattern=r"^GSE\d+$")) -> dict:
             "result": state["result"] if state["stage"] == "done" else None, "error": state["error"]}
 
 
-@app.get("/process/{accession}/files/{name}")
-def process_file(accession: str = Path(pattern=r"^GSE\d+$"), name: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,80}$")) -> FileResponse:
-    """One output of a finished run: a .count file, a results table, a plot or the manifest."""
+@app.get("/process/{accession}/files/{name:path}")
+def process_file(accession: str = Path(pattern=r"^GSE\d+$"), name: str = Path(pattern=r"^(plots/)?[A-Za-z0-9][A-Za-z0-9_.-]{0,80}$")) -> FileResponse:
+    """One output of a finished run: a .count file, a results table, a plot (top level or under plots/) or the manifest."""
     path = process.out_dir(accession) / name
-    if name not in {f["name"] for f in process.files_of(path.parent)} or not path.is_file():
+    if name not in {f["name"] for f in process.files_of(process.out_dir(accession))} or not path.is_file():
         raise HTTPException(404, f"{accession} has no file {name}")
-    return FileResponse(path, filename=name)
+    return FileResponse(path, filename=path.name)
 
 
 @app.get("/files/{accession}")

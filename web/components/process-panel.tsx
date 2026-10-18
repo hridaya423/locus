@@ -79,7 +79,8 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-const COLOURS = ["var(--control)", "var(--signal)"];
+// The same blue/orange pair as the R figures (validated colourblind-safe categorical slots 1 and 2).
+const COLOURS = ["#2a78d6", "#eb6834"];
 const dot = (fill: string) => ({ fill, fillOpacity: 0.75, stroke: "none" });
 
 function Pca({ accession, result }: { accession: string; result: ProcessResult }) {
@@ -131,7 +132,7 @@ function Genes({ accession, file, title, x, y, xLabel, yLabel, zero }: {
           content={({ payload }) => (payload?.[0] ? <div className="rounded border border-rule bg-card px-2 py-1 text-[11px]">{(payload[0].payload as GenePoint).gene}</div> : null)}
         />
         <Scatter name="other" data={rest} {...dot("var(--muted-foreground)")} fillOpacity={0.35} />
-        <Scatter name="padj < 0.05" data={hits} {...dot("var(--signal)")} />
+        <Scatter name="padj < 0.05" data={hits} {...dot("#eb6834")} />
       </ScatterChart>
       <span className="block w-[300px] whitespace-normal text-[11px] leading-snug text-muted-foreground">{xLabel} vs {yLabel}; orange: padj &lt; 0.05</span>
     </Panel>
@@ -140,7 +141,7 @@ function Genes({ accession, file, title, x, y, xLabel, yLabel, zero }: {
 
 function Results({ accession, result }: { accession: string; result: ProcessResult }) {
   const c = result.contrast;
-  const downloads = result.files.filter((f) => /\.(count|tsv|json|png)$/.test(f.name) && !/^(samples|result)\./.test(f.name));
+  const downloads = result.files.filter((f) => /\.(count|tsv|json|png|pdf|md)$/.test(f.name) && !/^(samples|result)\./.test(f.name));
   return (
     <div className="grid gap-3">
       <p className="text-sm">
