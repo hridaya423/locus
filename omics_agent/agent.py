@@ -596,12 +596,18 @@ def paper_details(ids: list[str]) -> dict[str, dict]:
     return found
 
 
+PAPER_LAG = 3
+
+
 def add_papers(hits: list[dict]) -> None:
-    """Attach the linked paper (title, journal, year) to each hit."""
-    first = {h["accession"]: next(iter(h["papers"]), None) for h in hits}
-    found = paper_details([p for p in first.values() if p])
+    """Attach the dataset's own paper (title, journal, year) to each hit: of its linked papers, the newest that is not
+    years older than the dataset. An older paper is a method it cites (PRJEB44790, 2021, links a 1993 J Nutr paper)."""
+    linked = {h["accession"]: [p for p in h["papers"] if p != "pmid:1"][:4] for h in hits}
+    found = paper_details(list({p for ps in linked.values() for p in ps}))
     for h in hits:
-        h["paper"] = found.get(first[h["accession"]])
+        year = int((h.get("published") or "0")[:4] or 0)
+        own = [found[p] for p in linked[h["accession"]] if p in found and int(found[p].get("year") or 0) >= year - PAPER_LAG]
+        h["paper"] = max(own, key=lambda x: int(x.get("year") or 0), default=None)
 
 
 def _pmid_for_doi(doi: str) -> str | None:
