@@ -14,5 +14,12 @@ Raw material for the demo video. Each moment is one thing a researcher would ret
 | "I saw the first rows of a 28 MB matrix, with each column labelled IPF or control, without downloading it." | Preview from the first bytes, columns matched to samples. | GSE86618 | `file-preview.png`, `file-preview.mp4` |
 | "I pasted a PMID and got the paper, what it deposited and what it reused." | Any identifier lands on its locus page. | PMID 35680905 | `paste-paper.png`, `paste-paper.mp4` |
 | "Every value on the page opens the other datasets that share it." | Doors become pages. | PXD010450 → Immunopeptidome | `doors-browse.png`, `doors-browse.mp4` |
+| "The IPF and control bars were coloured, and so was every row of the table; the volcano compared the same samples." | Cases and controls are named once and marked everywhere on the page. | GSE173357 | `cases-controls.png`, `cases-controls.mp4` |
+| "I clicked the contact's name and saw 42 papers, 13 as last author, the journals, and the 6 datasets in locus." | A contributor's track record without leaving locus. | GSE132703 → Carson C Thoreen | `contributor.png`, `contributor.mp4` |
+| "The genes up in IPF came back as extracellular matrix and collagen pathways, with the genes behind each." | The first look says what the top genes do, from Enrichr, with its background stated. | GSE124685 | `pathways.png`, `pathways.mp4` |
+| "It told me the authors state footprint length and rRNA removal but never periodicity or replicate agreement." | QC is checked against what a Ribo-seq expert looks for, and gaps are named. | GSE132703 | `ribo-checks.png`, `ribo-checks.mp4` |
+| "The PRIDE record never says mito-IP; locus found it in the paper's methods and said so." | Assays are read from the paper when the record leaves them out, and labelled as such. | PXD058312 | `mito-ip-paper.png`, `mito-ip-paper.mp4` |
+| "Before I trusted the volcano, it warned that diagnosis partly goes with batch and institution, and that a 1.13× change is detectable." | The design is checked before the numbers are read. | GSE150910 | `design-check.png`, `design-check.mp4` |
+| "I pasted my protein list: 4 of 11 are mitochondrial, and 6 rank among the IPF genes, against 0.6 by chance." | Bring your own list: MitoCarta recovery and its rank in a dataset. | /list against GSE124685 | `your-list.png`, `your-list.mp4` |
 
-Not yet captured: design check (GSE150910: diagnosis partly goes with institution, plate balanced, 1.13× detectable), your list against MitoCarta 3.0, dictation.
+Not captured: dictation (needs real speech; the headless browser has no microphone).
