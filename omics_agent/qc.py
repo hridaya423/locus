@@ -17,6 +17,15 @@ QC_WORD = re.compile(r"\b(?:trimm|adapter|filter|discard|exclud|retain|length|qu
 CRITERION = re.compile(r"(?:≥|>=|<=|≤|>|<|at least|more than|fewer than|less than|minimum|maximum|cut-?off|threshold|only)\s*(?:of\s*)?\S{0,12}\s*\d"
                        r"|\d+\s*(?:-|–|to)\s*\d+\s*(?:nt|bp|nucleotides)\b|\d+\s*(?:nt|bp|nucleotides|reads|%)(?!\w)", re.I)
 QC_CHECK = re.compile(r"\bFastQC\b|\bMultiQC\b|\bfastp\b|\bTrimmomatic\b|\bcutadapt\b|periodicity|quality control|\bQC\b", re.I)
+# The checks a translation scientist looks for in a Ribo-seq study (jurilw: footprint length, periodicity, reads in CDS).
+RIBO_CHECKS = [
+    ("Footprint length", re.compile(r"\b\d{2}\s*(?:-|–|to)\s*\d{2}\s*(?:nt|nucleotides?|bp)\b|footprint (?:length|size)|read lengths? (?:of|between|from)", re.I)),
+    ("Three-nucleotide periodicity", re.compile(r"periodicit|in-?frame|reading frame|P-site|\bframe\b", re.I)),
+    ("Reads in coding sequences", re.compile(r"\bCDS\b|coding (?:sequence|region)s?|\bORFs?\b", re.I)),
+    ("rRNA removal", re.compile(r"\brRNA\b|ribosomal RNA", re.I)),
+    ("Replicate agreement", re.compile(r"replicates?.{0,60}(?:correlat|agree|reproducib)|(?:correlat|reproducib).{0,60}replicates?", re.I)),
+    ("PCR duplicates (UMI)", re.compile(r"\bUMIs?\b|unique molecular identifier|de-?duplicat|PCR duplicates?", re.I)),
+]
 ANALYSIS = re.compile(r"sequenc|analys|profil|librar|bioinformat|process|read|align|mapp|footprint|quantif|statistic|quality", re.I)
 
 
@@ -92,6 +101,11 @@ def criteria(accession: str) -> dict:
         methods = assay._methods(paper)
         texts += [(f"Paper methods: {p['section']}", p["text"]) for p in methods.get("paragraphs", []) if ANALYSIS.search(p["section"] or "")]
         read.append("paper methods (Europe PMC open-access text)" if methods.get("available") else f"paper methods not readable: {methods.get('reason', 'not stated')}")
+    checklist = None
+    if assay.RIBOSOME_PROFILING.search(" ".join(t for _, _, t in assay._texts(rec))):
+        sentences = [(field, s) for field, text in texts for s in assay._sentences(text) if len(s) <= 600]
+        checklist = [next(({"check": name, "stated": True, "text": s, "field": f} for f, s in sentences if rx.search(s)), {"check": name, "stated": False})
+                     for name, rx in RIBO_CHECKS]
     quotes: list[dict] = []
     for field, text in texts:
         for sentence in assay._sentences(text):
@@ -101,7 +115,7 @@ def criteria(accession: str) -> dict:
             if any(key in q["key"] or q["key"] in key for q in quotes):
                 continue
             quotes.append({"text": sentence, "field": field, "key": key})
-    return {"quotes": [{k: q[k] for k in ("text", "field")} for q in quotes[:40]], "read": read}
+    return {"quotes": [{k: q[k] for k in ("text", "field")} for q in quotes[:40]], "read": read, "checklist": checklist}
 
 
 def sample_qc(accession: str) -> dict:

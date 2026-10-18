@@ -87,7 +87,7 @@ export function QualitySection({ accession }: { accession: string }) {
   if (!data) return <p className="text-[13px] text-muted-foreground">Reading run tables and methods for quality…</p>;
   const { depth, criteria } = data;
   const sequencing = depth.sequencing !== false;
-  if (!depth.available && criteria.quotes.length === 0) return null;
+  if (!depth.available && criteria.quotes.length === 0 && !criteria.checklist) return null;
   const quotes = all ? criteria.quotes : criteria.quotes.slice(0, QUOTES);
   const topUps = depth.available ? depth.rows.filter((r) => r.top_up_of) : [];
   return (
@@ -113,6 +113,29 @@ export function QualitySection({ accession }: { accession: string }) {
         </div>
       ) : (
         sequencing && <p className="text-[13px] text-muted-foreground">Depth per sample: {depth.reason}.</p>
+      )}
+      {criteria.checklist && (
+        <div className="grid gap-2">
+          <h3 className="text-[13px] font-medium">Ribo-seq checks the methods state</h3>
+          <dl className="grid border-t border-rule text-[12.5px]">
+            {criteria.checklist.map((c) => (
+              <div key={c.check} className="grid gap-x-6 gap-y-0.5 border-b border-rule py-2 sm:grid-cols-[13rem_minmax(0,1fr)]">
+                <dt className={cn("font-medium", !c.stated && "text-muted-foreground")}>{c.check}</dt>
+                <dd className="min-w-0">
+                  {c.stated ? (
+                    <>
+                      <span className="line-clamp-2" title={c.text}>{c.text}</span>
+                      <span className="font-mono text-[11.5px] text-muted-foreground">{c.field}</span>
+                    </>
+                  ) : (
+                    <span className="text-warn">not stated</span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {criteria.quotes.length === 0 && <p className="text-[12px] text-muted-foreground">Looked for in: {criteria.read.join("; ")}.</p>}
+        </div>
       )}
       {criteria.quotes.length > 0 && (
         <div className="grid gap-3">

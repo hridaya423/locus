@@ -313,7 +313,7 @@ export type Quality = {
   accession: string;
   depth: { available: boolean; reason?: string; sequencing?: boolean; project?: string; rows: DepthRow[]; outliers: number; top_ups: number; rule: string; source: string;
     groups: Record<string, { samples: number; median_reads: number; min_reads: number; max_reads: number; flagged: boolean }> };
-  criteria: { quotes: { text: string; field: string }[]; read: string[] };
+  criteria: { quotes: { text: string; field: string }[]; read: string[]; checklist: { check: string; stated: boolean; text?: string; field?: string }[] | null };
 };
 
 export async function quality(accession: string, signal?: AbortSignal): Promise<Quality> {
