@@ -136,7 +136,7 @@ def _match(sentence: str, study_text: str) -> list[tuple[str, str, str]]:
 def _texts(rec: dict) -> list[tuple[str, list[str], str]]:
     """(field, samples, text) for every methods-bearing text of a dataset, each text once with every GEO sample that states it."""
     out = [(label, [], text) for label, text in rec["texts"]]
-    out += [(label, [], v) for label, values in rec["facts"] if label in {"Instrument", "Instruments", "Quantification", "Experiment type", "Experiment types", "Platforms", "Study type", "Library strategy"} for v in values]
+    out += [(label, [], v) for label, values in rec["facts"] if label in {"Instrument", "Instruments", "Quantification", "Experiment type", "Experiment types", "Platforms", "Study type", "Library strategy", "Data type"} for v in values]
     if rec["source"] == "GEO":
         samples.geo_records(rec["accession"])
         by_text: dict[str, tuple[str, list[str]]] = {}
