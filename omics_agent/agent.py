@@ -390,7 +390,7 @@ def _geo_facts(topic: str, dataset: Dataset) -> None:
         dataset.facts = samples.count(fields, labels, "GEO sample records", samples.geo_samples(dataset.accession))
 
 
-HEALTHY = re.compile(r"control|healthy|normal|non-?diabet|donor|tolerant|\bNGT\b|\bNC\b", re.I)
+HEALTHY = re.compile(r"control|healt?h?y|normal|non-?diabet|donor|tolerant|\bNGT\b|\bNC\b", re.I)
 
 
 def _workbench_facts(dataset: Dataset) -> None:
