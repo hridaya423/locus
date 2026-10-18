@@ -210,6 +210,16 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - Next: three critics on the integrated build (X1 samples/files/quality/design; X2 assays/pairs/why/paste-paper/doors; X3 table/first look/gene everywhere/answer/list) — briefs in /tmp/locus-night/group-brief.md; delegate_task returned parent_not_active from a notification-started turn.
 - Lesson: after a disk-full event, child agent sessions can hang without failing; check thread updatedAt, not only task status.
 
+### Lead pieces after 02:45 (delegate_task returns parent_not_active; the native Agent tool offers only the unversioned `sonnet` alias, which AGENTS.md forbids, so the lead built and reviewed these)
+- Crawl (`scripts/crawl.mjs`, 60 random pages, seed 7): 4 problems. Fixed: /qc 500 when Europe PMC sends no full text (GSE105263, GSE88008; fd1c985); duplicate React keys when two protocols share a type (E-MTAB-1216); one false alarm (an abstract containing "failed"; the crawl now skips lines over 200 characters).
+- Search question in the URL: a search writes `/?q=`, a shared link reruns it, back from a dataset restores it (wet-lab session moment). Checked with a CDP script: shared link → results, dataset → back → same results and URL.
+- Rung 2, cases and controls: the factor charts and the sample table colour the case and control levels First look compares (`/design` returns `comparison`). GSE173357 ipf/normal; GSE150910 leaves chp unmarked; PXD010450 and E-MTAB-1216 show no marks.
+- Linked GEO series (SuperSeries of, SubSeries of) open their locus page and name the accession (GSE173357 had two links both labelled "SuperSeries of").
+- Rung 5, contributor page `/a/<name>` (task audit 5, jurilw "what else has this lab published"): Europe PMC author search, last-author count, supplementary files, journals, and the locus datasets of those papers. `GET /person`, MCP `get_person`. Carson C Thoreen: 42 papers, 13 last author, 16 with supplementary files, 6 locus datasets; 2.8 s cold.
+- Rung 16, pathways: Reactome terms from Enrichr for the top 200 genes each way under the volcano; method line names Enrichr's genome background. `GET /first-look/{gse}/pathways`, MCP `first_look(pathways=True)`. GSE124685: extracellular matrix organisation (23 genes, q 8.7e-12) leads.
+- Milestone gate against Opus (q2): Opus led with TrIP-seq GSE69352; locus ranked it first in retrieval but graded it partial because its libraries lack Ribo-seq. Fixed: a missing matched assay no longer fails a study whose text names another assay the plan accepts. q2 now ranks GSE69352, GSE73467, GSE78241, GSE201308, GSE326349 strong (all polysome isoform studies). GSE100007 (Opus's second) is not in the retrieval pool of 300; not fixed.
+- Harness after these (h0330, before the search fix was live): 36 pages, 0 problems, median 326 ms.
+
 ### Moments
 (one line each: source · page · dataset · moment)
 Door audit baseline (seed 1, 30 datasets, 38 pages, 23:05): 5.97 outbound links per page, 20.03 values that open nothing per page.
