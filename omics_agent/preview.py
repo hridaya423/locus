@@ -274,6 +274,13 @@ SAMPLE_KEY = re.compile(r"^(geo_accession|accession|title|run|sample|sample titl
 ACCESSION = re.compile(r"^([A-Z]{3,5})\d+$")
 
 
+def _sample_of(header: str, names: set[str]) -> str | None:
+    """The sample a column belongs to: its whole name, or the name a MaxQuant column ends with ('LFQ intensity XAD_3')."""
+    if header in names:
+        return header
+    return max((n for n in names if header.endswith(" " + n)), key=len, default=None)
+
+
 def _groups(headers: list[str], table: dict | None, samples: list[dict] | None = None) -> tuple[dict | None, list[str | None]]:
     """Which sample each column is, matched only on a sample accession or a title that is unique in the sample table, and the
     leading grouping factor of those samples. The first column is the feature identifier and is not matched. When no
@@ -289,7 +296,7 @@ def _groups(headers: list[str], table: dict | None, samples: list[dict] | None =
     for i, c in enumerate(cols):
         values = [r[i] for r in table["rows"] if r[i]]
         if SAMPLE_KEY.match(c) and len(values) == len(set(values)):
-            keys[i] = sum(1 for v in values if v in set(ids))
+            keys[i] = len({_sample_of(h, set(values)) for h in ids} - {None})
     key = max(keys, key=keys.get, default=None)
     if key is None or keys[key] < 2:
         prefixes = [m.group(1) for h in ids if (m := ACCESSION.match(h))]
@@ -297,15 +304,18 @@ def _groups(headers: list[str], table: dict | None, samples: list[dict] | None =
         return {"by": None, "matched": 0, "of": len(ids), "keys": [cols[i] for i in keys], "looks_like": looks, "factor": None, "levels": {}}, []
     rows = [dict(zip(cols, r)) for r in table["rows"]]
     factors = (design.from_rows([{c: v for c, v in r.items() if c != cols[key]} for r in rows], "") or {}).get("factors", [])
-    summary = {"by": cols[key], "matched": keys[key], "of": len(ids), "factor": None, "levels": {}}
+    names = {r[cols[key]] for r in rows}
+    owner = [_sample_of(h, names) if i else None for i, h in enumerate(headers)]
+    summary = {"by": cols[key], "matched": sum(1 for o in owner if o), "of": len(ids), "factor": None, "levels": {}}
     if not factors:
         return summary, []
     factor = next(c for c in cols if design._clean(c) == factors[0]["name"])
     level = {r[cols[key]]: r[factor] for r in rows}
-    groups = [level.get(h) if i else None for i, h in enumerate(headers)]
+    groups = [level.get(o) for o in owner]
+    # Samples per group, not columns: a MaxQuant table has several columns for each sample.
     counts: dict[str, int] = {}
-    for g in groups:
-        if g:
+    for o in dict.fromkeys(o for o in owner if o):
+        if g := level.get(o):
             counts[g] = counts.get(g, 0) + 1
     return summary | {"factor": design._clean(factor), "levels": counts}, groups
 
