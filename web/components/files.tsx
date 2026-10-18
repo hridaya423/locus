@@ -23,6 +23,11 @@ function groups(files: RecordFile[]): Group[] {
     .sort((a, b) => Number(b.processed > 0) - Number(a.processed > 0));
 }
 
+// Repositories whose file lists locus reads; for the others an empty list says nothing about the repository.
+const LISTED = new Set(["GEO", "PRIDE", "ENA", "ArrayExpress", "MetabolomicsWorkbench"]);
+// A plan that only makes a folder and opens a web page downloads nothing.
+const downloads = (plan: string) => plan.split("\n").some((l) => l.trim() && !/^(#|mkdir\b|cd\b|open\b)/.test(l.trim()));
+
 export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Selection }) {
   const list = useMemo(() => groups(rec.files), [rec.files]);
   const total = list.reduce((n, g) => n + g.bytes, 0);
@@ -38,7 +43,11 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
   return (
     <section className="grid content-start gap-8">
       <Heading id="files" count={rec.files.length ? `${rec.files.length.toLocaleString()} · ${size(total)}` : undefined}>Files</Heading>
-      {list.length === 0 && <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} lists no files for this dataset.</p>}
+      {list.length === 0 && (
+        <p className="text-[13px] text-muted-foreground">
+          {LISTED.has(rec.source) ? `${repositoryName(rec.source)} lists no files for this dataset.` : <>locus does not read {repositoryName(rec.source)}&apos;s file lists yet; the files are on <a href={rec.url} target="_blank" rel="noreferrer" className={MUTED_LINK}>its page</a>.</>}
+        </p>
+      )}
       {total > 0 && list.length > 1 && (
         <figure className="grid gap-3">
           <div aria-hidden className="flex h-2 gap-[2px] overflow-hidden rounded-full">
@@ -57,7 +66,7 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
         </figure>
       )}
       {list.map((g) => <FileGroup key={g.name} group={g} accession={rec.accession} />)}
-      {rec.download_plan && !nothing && (
+      {plan && downloads(plan) && !nothing && (
         <details id="download-commands" className="group/plan scroll-mt-16">
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
             {picked?.commands ? `Commands to download the ${selection?.result?.samples.toLocaleString()} selected samples` : "Commands to download everything"}
