@@ -113,7 +113,7 @@ export const SAMPLE_TYPE: Record<string, string> = {
 
 export type RecordFile = { name: string; url: string; group: string; bytes: number | null; processed: boolean; kind: string; preview: boolean };
 export type DatasetRecord = {
-  accession: string; source: string; url: string; title: string;
+  accession: string; source: string; url: string; title: string; sources?: string[];
   texts: [string, string][]; facts: [string, string[]][];
   people: { role: string; name: string; affiliation?: string; email?: string; phone?: string; web?: string }[];
   papers: { title: string; journal: string; year: string; url: string; id?: string }[];

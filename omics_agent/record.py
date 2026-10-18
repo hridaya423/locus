@@ -10,8 +10,10 @@ import json
 import re
 import sqlite3
 import xml.etree.ElementTree as ET
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from urllib.parse import urlencode
 
 import httpx
 
@@ -44,6 +46,7 @@ class Record:
     samples: dict | None = None
     files: list[dict] = field(default_factory=list)
     unmapped: list[str] = field(default_factory=list)
+    sources: list[str] = field(default_factory=list)
 
     def fact(self, label: str, *values) -> None:
         stated = list(dict.fromkeys(str(v).strip() for v in values if v not in (None, "") and str(v).strip()))
@@ -54,7 +57,17 @@ class Record:
         self.files.append({"name": name, "url": url, "group": group, "bytes": size, "processed": processed, "kind": kind})
 
 
+# Every repository request a record is built from, so its page can show where each fact was read.
+_READ: ContextVar[list[str] | None] = ContextVar("read", default=None)
+
+
+def _note(url: str, params: dict | None = None) -> None:
+    if (read := _READ.get()) is not None:
+        read.append(url + (f"?{urlencode(params)}" if params else ""))
+
+
 def _cached(name: str, url: str, params: dict | None = None, ncbi: bool = False) -> str:
+    _note(url, params)
     path = CACHE / name
     if not path.exists():
         response = sources.ncbi_get(url, params or {}) if ncbi else httpx.get(url, params=params, timeout=90, follow_redirects=True).raise_for_status()
@@ -99,6 +112,8 @@ GEO_SKIPPED = {"geo_accession", "platform_organism", "platform_taxid", "sample_o
 
 def _geo(accession: str, row: dict) -> Record:
     samples.geo_files(accession)
+    for target in ("self", "gsm"):
+        _note(samples.GEO_SAMPLES, {"acc": accession, "targ": target, "form": "text", "view": "brief"})
     series: dict[str, list[str]] = {}
     for line in (samples.CACHE / f"{accession}.series.txt").read_text().splitlines():
         key, _, value = line.partition(" = ")
@@ -314,6 +329,7 @@ def _pride(accession: str, row: dict) -> Record:
     rec.links.append(("ProteomeXchange", f"https://proteomecentral.proteomexchange.org/cgi/GetDataset?ID={accession}"))
 
     sources.pride_files(accession)
+    _note(sources.PRIDE_FILES.format(accession), {"pageSize": 1000})
     kinds = {f["url"]: f["kind"] for f in _pride_kinds(accession)}
     for f in json.loads((sources.PRIDE_FILES_CACHE / f"{accession}.json").read_text()):
         ftp = next((loc["value"] for loc in f.get("publicFileLocations", []) if loc["value"].startswith("ftp://")), None)
@@ -527,12 +543,15 @@ def _row(accession: str) -> dict | None:
 
 def raw(accession: str, row: dict) -> Record:
     """The record with paper IDs unresolved; a repository that fails falls back to what locus stored."""
+    token = _READ.set([])
     try:
-        return ADAPTERS.get(row["source"], _stored)(accession, row)
+        rec = ADAPTERS.get(row["source"], _stored)(accession, row)
     except (httpx.HTTPError, ET.ParseError, ValueError, KeyError) as error:
         rec = _stored(accession, row)
         rec.unmapped.append(f"live record unavailable: {type(error).__name__}")
-        return rec
+    rec.sources = list(dict.fromkeys(_READ.get() or [])) or ["locus's index (data/omics.db), harvested from the repository"]
+    _READ.reset(token)
+    return rec
 
 
 def record(accession: str) -> dict | None:

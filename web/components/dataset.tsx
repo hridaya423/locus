@@ -145,6 +145,7 @@ function Body({ rec }: { rec: DatasetRecord }) {
         <QualitySection accession={rec.accession} />
         {(rec.source === "GEO" || rec.source === "MetabolomicsWorkbench") && <FirstLookSection accession={rec.accession} />}
         <Files rec={rec} selection={selection} />
+        {rec.sources && rec.sources.length > 0 && <ReadFrom sources={rec.sources} />}
       </div>
       <Aside rec={rec} />
     </div>
@@ -212,6 +213,22 @@ function Samples({ rec, designed, selection }: { rec: DatasetRecord; designed: b
         </>
       )}
     </section>
+  );
+}
+
+// Provenance: the repository requests this page was built from, each one a URL that can be opened and rerun.
+function ReadFrom({ sources }: { sources: string[] }) {
+  return (
+    <details className="group/src text-[12px] text-muted-foreground">
+      <summary className={cn("w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
+        This page was read from {sources.length === 1 ? "one repository request" : `${sources.length} repository requests`}
+      </summary>
+      <ul className="mt-2 grid gap-1 font-mono text-[11.5px]">
+        {sources.map((s) => (
+          <li key={s} className="truncate">{s.startsWith("http") ? <a href={s} target="_blank" rel="noreferrer" className={MUTED_LINK}>{s}</a> : s}</li>
+        ))}
+      </ul>
+    </details>
   );
 }
 
