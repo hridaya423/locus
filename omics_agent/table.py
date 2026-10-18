@@ -82,6 +82,22 @@ MATRIX = re.compile(r"count|expr|matrix|tpm|fpkm|rpkm|cpm|abundance", re.I)
 RAW_FIRST = re.compile(r"raw[_ .-]?count|counts?\b|read[_ .-]?count", re.I)
 
 
+TITLE_PART = re.compile(r"[;,\s]+")
+
+
+def _in_title(header: str, rows: list[list[str]]) -> str | None:
+    """The one sample whose title holds this column name as a whole part ('OE_p1_1683' in 'mammary gland epithelial cells,
+    OE_p1_1683'), starts with it ('CW1' in 'CW1_pMB229'), or whose last part ends the name ('read_count_control1')."""
+    h = header.strip().strip('"')
+    if len(h) < 2:
+        return None
+    def fits(title: str) -> bool:
+        parts = [t for t in TITLE_PART.split(title) if t]
+        return h in parts or re.match(rf"{re.escape(h)}[_ .-]", title) is not None or (len(parts[-1]) >= 3 and re.search(rf"[_ .-]{re.escape(parts[-1])}$", h) is not None) if parts else False
+    found = [r[0] for r in rows if fits(r[1])]
+    return found[0] if len(found) == 1 else None
+
+
 def _authors_matrix(accession: str) -> dict | None:
     """The authors' own gene x sample table from the series' supplementary files, when its columns are the samples."""
     rec = record.record(accession)
@@ -94,7 +110,7 @@ def _authors_matrix(accession: str) -> dict | None:
             by_name.setdefault(re.sub(r"\W", "", key).lower(), r[0])
     organism = next((v[0] for label, v in rec["facts"] if label == "Organism"), "")
     candidates = [f for f in rec["files"] if f["group"] == "Supplementary files" and MATRIX.search(f["name"]) and re.search(r"\.(csv|tsv|txt)(\.gz)?$", f["name"])
-                  and (f["bytes"] or 0) <= MAX_BYTES and not re.search(r"design|annotation|metadata|sample", f["name"], re.I)]
+                  and (f["bytes"] or 0) <= MAX_BYTES and not re.search(r"design|annotation|metadata|sample[_ .-]?(?:sheet|info|table|list|key)", f["name"], re.I)]
     for f in sorted(candidates, key=lambda f: (not RAW_FIRST.search(f["name"]), f["bytes"] or 0)):
         path = _fetch(f["url"], SUPPLEMENTARY / accession / f["name"]) if f["name"].endswith(".gz") else None
         if path is None:
@@ -102,12 +118,18 @@ def _authors_matrix(accession: str) -> dict | None:
         with gzip.open(path, "rt", errors="replace") as fh:
             text = fh.read()
         lines = [l for l in text.splitlines() if l and not l.startswith("#")]
-        delimiter = "\t" if lines[0].count("\t") >= lines[0].count(",") else ","
-        table_rows = list(csv.reader(lines, delimiter=delimiter))
+        delimiter = "\t" if lines[0].count("\t") >= max(lines[0].count(","), 1) else "," if "," in lines[0] else " "
+        table_rows = list(csv.reader(lines, delimiter=delimiter, skipinitialspace=delimiter == " "))
         header = table_rows[0]
-        mapped = {i: by_name.get(re.sub(r"\W", "", h).lower()) for i, h in enumerate(header)}
+        # A header row without a name for the gene column (GSE215228) is one short of its data rows.
+        if len(table_rows) > 1 and len(header) == len(table_rows[1]) - 1:
+            header = ["", *header]
+        mapped = {i: by_name.get(re.sub(r"\W", "", h).lower()) or _in_title(h, rows) for i, h in enumerate(header)}
+        if len(set(mapped.values()) - {None}) < len([g for g in mapped.values() if g]):
+            mapped = {i: by_name.get(re.sub(r"\W", "", h).lower()) for i, h in enumerate(header)}
         columns = [i for i, g in mapped.items() if g]
-        if len(columns) < max(4, 0.8 * len(rows)):
+        # Half the samples is enough: the page says how many of the record's samples have data (GSE159882: 30 of 40).
+        if len(columns) < max(4, 0.5 * len(rows)):
             continue
         body = [r for r in table_rows[1:] if len(r) == len(header)]
         if not body:
