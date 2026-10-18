@@ -390,21 +390,25 @@ def _geo_facts(topic: str, dataset: Dataset) -> None:
         dataset.facts = samples.count(fields, labels, "GEO sample records", samples.geo_samples(dataset.accession))
 
 
+HEALTHY = re.compile(r"control|healthy|normal|non-?diabet|donor|tolerant|\bNGT\b|\bNC\b", re.I)
+
+
 def _workbench_facts(dataset: Dataset) -> None:
-    """Cases and controls counted from a Metabolomics Workbench study's sample factors: the factor with a control-like
-    level, as its dataset page marks them."""
+    """Cases and controls counted from a Metabolomics Workbench or MetaboLights study's sample table: the factor with a
+    control-like level, as its dataset page marks them."""
     from . import record, volcano
 
     try:
         rec, pick = record.record(dataset.accession), volcano.groups(dataset.accession)["default"]
     except (httpx.HTTPError, ValueError, KeyError):
         return
-    if not rec or not rec["samples"] or not pick:
+    # Patients against controls only: a time course (Baseline against Follow-Up) is not a case-control count.
+    if not rec or not rec["samples"] or not pick or not any(HEALTHY.search(lv) for lv in pick["control"]):
         return
     i, rows = rec["samples"]["columns"].index(pick["factor"]), rec["samples"]["rows"]
     case, control = sum(r[i] in pick["case"] for r in rows), sum(r[i] in pick["control"] for r in rows)
     dataset.facts = {"case": case, "control": control, "mixed": 0, "has_control": control > 0, "sample_type": "unknown", "tissue": "", "assays": [],
-                     "library": {}, "libraries": {}, "source": f"{len(rows)} Metabolomics Workbench sample factors ({pick['factor']})"}
+                     "library": {}, "libraries": {}, "source": f"{len(rows)} {'Metabolomics Workbench' if dataset.source == 'MetabolomicsWorkbench' else 'MetaboLights'} sample records ({pick['factor']})"}
 
 
 def _fetch_samples(dataset: Dataset) -> None:
@@ -429,7 +433,7 @@ def add_facts(search_plan: dict, candidates: list[Dataset]) -> None:
     # Fetching is rate-limited; labelling is not, so every labelling call runs at once.
     with ThreadPoolExecutor(max_workers=len(geo) or 1) as workers:
         list(workers.map(lambda d: _geo_facts(topic, d), geo))
-    workbench = [d for d in candidates if d.source == "MetabolomicsWorkbench"][:MAX_FACTS]
+    workbench = [d for d in candidates if d.source in ("MetabolomicsWorkbench", "MetaboLights")][:MAX_FACTS]
     with ThreadPoolExecutor(max_workers=8) as workers:
         list(workers.map(_workbench_facts, workbench))
 

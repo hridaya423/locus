@@ -132,7 +132,7 @@ function Header({ accession, rec, hit, assays }: { accession: string; rec: Datas
   );
 }
 
-const DESIGNED = new Set(["GEO", "PRIDE", "iProX", "jPOST", "PanoramaPublic", "ENA", "ArrayExpress", "MetabolomicsWorkbench"]);
+const DESIGNED = new Set(["GEO", "PRIDE", "iProX", "jPOST", "PanoramaPublic", "ENA", "ArrayExpress", "MetabolomicsWorkbench", "MetaboLights"]);
 
 function Body({ rec }: { rec: DatasetRecord }) {
   const designed = DESIGNED.has(rec.source) && (rec.source !== "PRIDE" || rec.accession.startsWith("PXD"));

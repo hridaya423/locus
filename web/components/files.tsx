@@ -27,7 +27,7 @@ function groups(files: RecordFile[]): Group[] {
 export const CONTROLLED = new Set(["EGA", "dbGaP"]);
 
 // Repositories whose file lists locus reads; for the others an empty list says nothing about the repository.
-const LISTED = new Set(["GEO", "PRIDE", "ENA", "ArrayExpress", "MetabolomicsWorkbench"]);
+const LISTED = new Set(["GEO", "PRIDE", "ENA", "ArrayExpress", "MetabolomicsWorkbench", "MetaboLights"]);
 // A plan that only makes a folder and opens a web page downloads nothing.
 const downloads = (plan: string) => plan.split("\n").some((l) => l.trim() && !/^(#|mkdir\b|cd\b|open\b)/.test(l.trim()));
 

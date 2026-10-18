@@ -21,6 +21,8 @@ NOT_GENES = {"SET", "CAT", "MAX", "REST", "CAMP", "PIGS", "HAS", "TAT", "SHE", "
              "BAD", "CAST", "COPD", "IPF", "MAP", "MARCH", "SEPT", "PC", "TNF", "AGO", "ATM", "BID", "CAP", "CAR", "COIL", "DO", "GC", "HR", "IMP",
              "MAL", "NHS", "PAH", "PIN", "POLE", "RAN", "RET", "SDS", "STAR", "TEC", "TH", "TOP", "WARS", "FAT", "SRY", "CPM", "DNA", "RNA", "PCR"}
 
+# Pooled quality-control injections are neither cases nor controls (MTBLS10965: "pooled quality control sample").
+QC_SAMPLE = re.compile(r"quality control|\bQC\b|\bpooled\b|\bblank\b", re.I)
 CONTROL = re.compile(r"control|healthy|normal|\bwt\b|wild[- ]?type|vehicle|dmso|untreated|mock|baseline|donor|non-?diseased|sham|ctrl|\bnc\b", re.I)
 METHOD = "Welch's t-test on log2(CPM + 1); genes with CPM ≥ 1 in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
 Q, LFC = 0.05, 1.0
@@ -54,8 +56,9 @@ def groups(accession: str, present: set[str] | None = None) -> dict:
             factors.append({"name": name, "levels": dict(sorted(levels.items(), key=lambda kv: -kv[1])), "nuisance": bool(NUISANCE.search(name))})
     default = None
     for f in sorted((f for f in factors if not f["nuisance"]), key=lambda f: not PREFER.search(f["name"])):
-        controls = [lv for lv in f["levels"] if CONTROL.search(lv) and f["levels"][lv] >= 2]
-        cases = [lv for lv in f["levels"] if lv not in controls and f["levels"][lv] >= 2]
+        usable = [lv for lv in f["levels"] if f["levels"][lv] >= 2 and not QC_SAMPLE.search(lv)]
+        controls = [lv for lv in usable if CONTROL.search(lv)]
+        cases = [lv for lv in usable if lv not in controls]
         if controls and cases:
             default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}
             break

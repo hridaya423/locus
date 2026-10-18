@@ -153,7 +153,7 @@ def design(accession: str, source: str) -> dict | None:
         return _geo(accession)
     if source in ("PRIDE", "iProX", "jPOST", "PanoramaPublic") and accession.startswith("PXD"):
         return _pride(accession)
-    if source in ("ENA", "ArrayExpress", "MetabolomicsWorkbench"):
+    if source in ("ENA", "ArrayExpress", "MetabolomicsWorkbench", "MetaboLights"):
         return _record(accession, source)
     return None
 

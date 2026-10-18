@@ -5,7 +5,9 @@ Each adapter names every source field it reads and every field it leaves out on 
 record lands in `unmapped`, and the self-check fails on it, so a field the repository page shows is never silently lost.
 """
 
+import csv
 import html
+import io
 import json
 import re
 import sqlite3
@@ -514,7 +516,34 @@ def _workbench(accession: str, row: dict) -> Record:
     return rec
 
 
-ADAPTERS = {"GEO": _geo, "PRIDE": _pride, "ENA": _ena, "ArrayExpress": _arrayexpress, "MetabolomicsWorkbench": _workbench}
+METABOLIGHTS_FILES = "https://www.ebi.ac.uk/metabolights/ws/studies/{}/files?include_raw_data=false"
+METABOLIGHTS_FTP = "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/{}/{}"
+ISA_COLUMN = re.compile(r"^(?:Factor Value|Characteristics)\[(.+)\]$")
+
+
+def _metabolights(accession: str, row: dict) -> Record:
+    """What locus stored, plus the study's files (metabolite assignment tables first) and its ISA-Tab sample sheet:
+    each sample's characteristics and factor values."""
+    rec = _stored(accession, row)
+    listing = json.loads(_cached(f"{accession}.mtbls-files.json", METABOLIGHTS_FILES.format(accession))).get("study", [])
+    for f in sorted((f for f in listing if not f.get("directory")), key=lambda f: not f["file"].startswith("m_")):
+        name = f["file"]
+        group = "Metabolite tables" if name.startswith("m_") else "Study metadata (ISA-Tab)" if f.get("type", "").startswith("metadata") else "Other files"
+        rec.file(name, METABOLIGHTS_FTP.format(accession, name), group, None, name.startswith("m_"), "metabolite assignment file" if name.startswith("m_") else "")
+    sheet = next((f["file"] for f in listing if f["file"].startswith("s_") and f["file"].endswith(".txt")), None)
+    if sheet:
+        rows = list(csv.reader(io.StringIO(_cached(f"{accession}.{sheet}", METABOLIGHTS_FTP.format(accession, sheet))), delimiter="\t"))
+        if rows and "Sample Name" in rows[0]:
+            header, name = rows[0], rows[0].index("Sample Name")
+            keep = [i for i, h in enumerate(header) if ISA_COLUMN.match(h)]
+            labels = list(dict.fromkeys(ISA_COLUMN.match(header[i])[1] for i in keep))
+            first = {label: next(i for i in keep if ISA_COLUMN.match(header[i])[1] == label) for label in labels}
+            rec.samples = {"columns": ["Accession", *labels], "link": "",
+                           "rows": [[r[name], *[r[first[label]] for label in labels]] for r in rows[1:] if len(r) == len(header) and r[name]]}
+    return rec
+
+
+ADAPTERS = {"GEO": _geo, "PRIDE": _pride, "ENA": _ena, "ArrayExpress": _arrayexpress, "MetabolomicsWorkbench": _workbench, "MetaboLights": _metabolights}
 
 
 def _paper_links(ids: list) -> list[dict]:
