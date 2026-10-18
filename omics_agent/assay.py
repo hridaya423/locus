@@ -72,7 +72,8 @@ BACKGROUND = re.compile(r"\bto date\b|\bpreviously\b|\bprevious (?:stud|work|met
 TIS, RIBO, RNA, SMALL = "TIS-seq (initiating ribosomes)", "Ribo-seq (elongating ribosomes)", "RNA-seq", "Small RNA-seq"
 WORD = lambda words: re.compile(rf"(?<![A-Za-z])(?:{words})(?![A-Za-z])", re.I)
 TIS_WORDS = WORD(r"harr|harringtonine|HAR|HHT|LTM|lactimidomycin|retapamulin|Ret|TIS|GTI|QTI|TI-?seq")
-FOOT_WORDS = WORD(r"ribo|riboseq|ribo-?seq|RPFs?|RFP|fp|footprints?|monosomes?|StRP|80S|ribosome profiling")
+FOOT_WORDS = WORD(r"ribo|riboseq|ribo-?seq|RPFs?|RFP|RP|fp|footprints?|monosomes?|disomes?|trisomes?|TTS|TTS-?seq|StRP|80S|ribosome profiling")
+INPUT_WORDS = WORD(r"IN|input")
 CHX_WORDS = WORD(r"CHX|cycloheximide")
 SMALL_WORDS = WORD(r"s(?:mall ?)?RNA(?:-?seq)?|miRNA(?:-?seq)?|ncRNA(?:-?seq)?")
 RNA_WORDS = WORD(r"RNA|mRNA|TotRNA|total ?RNA|RNA-?seq|RNAseq|mRNA-?seq|poly-?A\+?")
@@ -167,6 +168,8 @@ def _libraries(rec: dict, study: str) -> dict[str, dict]:
         kind, why = None, "undetermined: no library word in its title or characteristics, and its protocol is shared"
         if hit := _library_word(p["title"]):
             kind, why = hit[0], f"title: {hit[1]}"
+        elif INPUT_WORDS.search(p["title"]):
+            kind, why = None, "undetermined: an input library, which can be total RNA or ribosome input"
         elif hit := _library_word(p["words"]):
             kind, why = hit[0], f"characteristics: {hit[1]}"
         elif p["protocol"] and not everyone and len(calls := {a for a, h, _ in _match(p["protocol"], study) if a in (TIS, RIBO)}) == 1:
