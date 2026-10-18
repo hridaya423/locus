@@ -36,6 +36,11 @@ EXPERIMENTAL = re.compile(r"cell line|cell type|strain|genotype|treatment|time|d
 PREFER = re.compile(r"disease|diagnosis|condition|treatment|genotype|group|phenotype|state|status|infection|agent|stimul|drug|knock|strain|tissue type", re.I)
 
 
+def _keyed_control(level: str, about: str) -> bool:
+    """A sample-name prefix the description keys to a control group: PXD047213's 'XAD1—XAD18 --- HCC adjacent normal tissues'."""
+    return bool(re.search(rf"\b{re.escape(level)}\d*\b[^,;.\n]{{0,60}}?\b(?:adjacent|normal|control|healthy)\b", about, re.I))
+
+
 def groups(accession: str, present: set[str] | None = None) -> dict:
     """The sample table's factors that could split cases from controls, counted over the samples that have data, and the
     default comparison: only a non-nuisance factor with a control-like level; no default otherwise."""
@@ -54,10 +59,11 @@ def groups(accession: str, present: set[str] | None = None) -> dict:
                 levels[r[i]] = levels.get(r[i], 0) + 1
         if 2 <= len(levels) <= 12 and sum(n >= 2 for n in levels.values()) >= 2:
             factors.append({"name": name, "levels": dict(sorted(levels.items(), key=lambda kv: -kv[1])), "nuisance": bool(NUISANCE.search(name))})
+    about = " ".join(text for _, text in rec.get("texts", []))
     default = None
     for f in sorted((f for f in factors if not f["nuisance"]), key=lambda f: not PREFER.search(f["name"])):
         usable = [lv for lv in f["levels"] if f["levels"][lv] >= 2 and not QC_SAMPLE.search(lv)]
-        controls = [lv for lv in usable if CONTROL.search(lv)]
+        controls = [lv for lv in usable if CONTROL.search(lv)] or [lv for lv in usable if _keyed_control(lv, about)]
         cases = [lv for lv in usable if lv not in controls]
         if controls and cases:
             default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}
