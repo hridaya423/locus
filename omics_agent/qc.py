@@ -28,6 +28,7 @@ RIBO_CHECKS = [
 ]
 # Chromatography set-up has lengths and sizes but is not a quality criterion (PXD008373: "15cm length × 75μm column").
 HARDWARE = re.compile(r"\bcolumns?\b|\bC18\b|nano-?LC|EASY-?n?LC|flow rate|reconstituted|\bbeads?\b", re.I)
+MS_SECTION = re.compile(r"\bMS\b|mass spec|proteom|LC-?MS|peptide|phospho", re.I)
 ANALYSIS = re.compile(r"sequenc|analys|profil|librar|bioinformat|process|read|align|mapp|footprint|quantif|statistic|quality", re.I)
 
 
@@ -104,7 +105,8 @@ def criteria(accession: str) -> dict:
     paper = next((p["id"] for p in rec["papers"] if p.get("id") and p["id"] != "pmid:1"), None)
     if paper:
         methods = assay._methods(paper)
-        texts += [(f"Paper methods: {p['section']}", p["text"]) for p in methods.get("paragraphs", []) if ANALYSIS.search(p["section"] or "")]
+        texts += [(f"Paper methods: {p['section']}", p["text"]) for p in methods.get("paragraphs", []) if ANALYSIS.search(p["section"] or "")
+                  and not (rec["source"] not in assay.MS_SOURCES and MS_SECTION.search(p["section"] or ""))]
         read.append("paper methods (Europe PMC open-access text)" if methods.get("available") else f"paper methods not readable: {methods.get('reason', 'not stated')}")
     checklist = None
     if assay.RIBOSOME_PROFILING.search(" ".join(t for _, _, t in assay._texts(rec))):
