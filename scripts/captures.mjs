@@ -60,6 +60,9 @@ export const MOMENTS = [
   { slug: "provenance", steps: [["go", "/d/GSE132703"], ["wait", "/This page was read from/.test(document.body.innerText) && !/Reading |Asking Enrichr|testing…/.test(document.body.innerText)", 180000], ["pause", 1500],
     ["eval", "(() => { const s = [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)); s.click(); s.scrollIntoView({ block: 'center' }); return true })()"], ["pause", 1200],
     ["eval", "(() => { [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)).scrollIntoView({ block: 'center' }); return true })()"], ["pause", 1500]] },
+  { slug: "protein-volcano", steps: [["go", "/d/PXD047213"], ["wait", "!!document.querySelector('#first-look') && /choose two groups|Compare/.test(document.querySelector('#first-look').parentElement.innerText)", 240000],
+    ["eval", "(() => { const b = [...document.querySelectorAll('button')].find((e) => e.textContent.trim() === 'Compare'); b?.click(); return true })()"], ["wait", "/proteins tested/.test(document.body.innerText)", 240000],
+    ["eval", scrollTo("#first-look")], ["pause", 3000]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 

@@ -89,22 +89,25 @@ def _head(url: str) -> tuple[bytes, int | None]:
     return data[:READ], int(total) if total.isdigit() else None
 
 
-def _ranged(url: str, header: str) -> tuple[bytes, int] | None:
-    with httpx.stream("GET", url, headers={"Range": header, "Accept-Encoding": "identity"}, timeout=60, follow_redirects=True) as r:
+def _ranged(url: str, header: str, cap: int = 4 * READ) -> tuple[bytes, int] | None:
+    with httpx.stream("GET", url, headers={"Range": header, "Accept-Encoding": "identity"}, timeout=120, follow_redirects=True) as r:
         if r.status_code != 206 or "/" not in r.headers.get("content-range", ""):
             return None
         data = b""
         for chunk in r.iter_raw():
             data += chunk
-            if len(data) >= 4 * READ:
+            if len(data) >= cap:
                 break
         return data, int(r.headers["content-range"].rpartition("/")[2])
 
 
-def _zip_member(url: str) -> tuple[bytes, bool, str, int]:
+MAX_MEMBER = 200 * 1024**2
+
+
+def _zip_member(url: str, whole: bool = False) -> tuple[bytes, bool, str, int]:
     """The first bytes of the most useful table inside a zip, inflated, without downloading the zip: two Range reads, one
-    for the central directory and one for the start of the member. Returns the bytes, whether they are the whole member,
-    its path and how many files the zip holds."""
+    for the central directory and one for the start of the member; with `whole`, the entire member (up to 200 MB
+    unpacked). Returns the bytes, whether they are the whole member, its path and how many files the zip holds."""
     files = paper.directory(lambda header: _ranged(url, header))
     if not files:
         raise ValueError("locus could not read this zip's list of files (the server ignores Range, or it is a zip64 archive).")
@@ -112,15 +115,18 @@ def _zip_member(url: str) -> tuple[bytes, bool, str, int]:
     pick = next((f for rx in MEMBERS for f in tables if rx.search(f["path"])), max(tables, key=lambda f: f["size"], default=None))
     if not pick or pick["method"] not in (0, 8):
         raise ValueError(f"The zip holds {len(files)} files and no table locus can read.")
-    head = _ranged(url, f"bytes={pick['offset']}-{pick['offset'] + 30 + 1024 + READ}")
+    if whole and pick["size"] > MAX_MEMBER:
+        raise ValueError(f"{pick['path']} is larger than 200 MB unpacked, so locus reads only its first bytes.")
+    span = 30 + 1024 + (pick["compressed"] if whole else READ)
+    head = _ranged(url, f"bytes={pick['offset']}-{pick['offset'] + span}", cap=span + 1 if whole else 4 * READ)
     if not head or head[0][:4] != b"PK\x03\x04":
         raise ValueError("locus could not read the start of the table inside the zip.")
     name, extra = struct.unpack_from("<HH", head[0], 26)
-    raw = head[0][30 + name + extra:][:min(pick["compressed"], 4 * READ)]
+    raw = head[0][30 + name + extra:][:pick["compressed"] if whole else min(pick["compressed"], 4 * READ)]
     if pick["method"] == 0:
         return raw, len(raw) >= pick["size"], pick["path"], len(files)
     inflater = zlib.decompressobj(-15)
-    data = inflater.decompress(raw, MAX_INFLATED)
+    data = inflater.decompress(raw, 0 if whole else MAX_INFLATED)
     return data, inflater.eof, pick["path"], len(files)
 
 

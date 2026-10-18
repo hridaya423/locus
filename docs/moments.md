@@ -27,5 +27,6 @@ Raw material for the demo video. Each moment is one thing a researcher would ret
 | "For phosphoproteomics it told me to start with the study whose protein table I could open right there: 36 samples named, inside a 1.6 GB zip." | The answer works for mass spectrometry too, from what the files hold. | Search "Phosphoproteomics of human liver cancer against normal liver tissue" | `ms-start-with.png`, `ms-start-with.mp4` |
 | "It warned me the 540 'samples' were cells from 9 patients, and that only a 7.8-fold change would be detectable." | locus checks the statistics a reviewer would, before the reader trusts a volcano. | GSE86618 | `nested-people.png`, `nested-people.mp4` |
 | "The page lists the exact repository API calls it was built from; I can rerun any of them." | Provenance for every fact, from the repository's own API. | GSE132703 | `provenance.png`, `provenance.mp4` |
+| "PRIDE gives no sample groups, yet locus read 36 samples from the protein table's columns and drew a protein volcano: liver enzymes like ADH1B and FABP1 higher in XAD." | The first look works on proteomics too, straight from the authors' MaxQuant table. | PXD047213 | `protein-volcano.png`, `protein-volcano.mp4` |
 
 Not captured: dictation (needs real speech; the headless browser has no microphone).

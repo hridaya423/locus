@@ -25,6 +25,8 @@ CHECKS = [
     ("design check, power in people", lambda: m.check_design("GSE86618"), lambda r: r["power"]["unit"] == "people"),
     ("MetaboLights samples, cases and controls", lambda: m.filter_samples("MTBLS352", {}), lambda r: r["comparison"]["case"] == ["T2D patients"] and r["samples"] == 730),
     ("first look on a MetaboLights MAF", lambda: m.first_look("MTBLS8644", top=2), lambda r: r["feature"] == "metabolite" and r["tested"] > 100),
+    ("PRIDE protein volcano from proteinGroups.txt", lambda: m.first_look("PXD047213", "named group", ["XAD"], ["XC"], top=3),
+     lambda r: r["feature"] == "protein" and r["top_up"][0]["protein"] == "HBB"),
     ("get the table (metabolites)", lambda: m.get_table("ST003390"), lambda r: r.get("available")),
     ("first look with pathways", lambda: m.first_look("GSE124685", pathways=True, top=5), lambda r: r["pathways"]["sides"]["up"]["terms"][0]["term"].startswith("Extracellular")),
     ("first look on metabolites", lambda: m.first_look("ST003390", top=3), lambda r: r["feature"] == "metabolite" and r["up"] >= 1),

@@ -145,7 +145,9 @@ def get_table(accession: str) -> dict:
 @mcp.tool(annotations=READ_ONLY)
 def first_look(accession: str, factor: str = "", case: list[str] | None = None, control: list[str] | None = None, top: int = 25, pathways: bool = False) -> dict:
     """A first differential look at a GEO RNA-seq series from its fetched counts, or at a Metabolomics Workbench study
-    (ST…) from its mwTab or a MetaboLights study (MTBLS…) from its metabolite assignment file (feature: metabolite; 1.5-fold cut-off): features up and down between
+    (ST…) from its mwTab, a MetaboLights study (MTBLS…) from its metabolite assignment file, or a PRIDE
+    study (PXD…) from MaxQuant's proteinGroups.txt in its search zip (groups from the sample names; pass factor
+    "named group" and two of its levels) (feature: metabolite; 1.5-fold cut-off): features up and down between
     two groups of samples defined by one sample characteristic (factor) and its levels. Without a factor, locus picks
     the characteristic with a control-like level. Returns group sizes, the method, counts of significant genes, the
     top genes each way with log2 fold change, -log10 p and BH q, and paper_check: the genes the dataset's paper names
@@ -154,7 +156,7 @@ def first_look(accession: str, factor: str = "", case: list[str] | None = None, 
     result = volcano.compare(accession, factor, case, control) if factor else volcano.compare(accession)
     if not result.get("available"):
         return {k: v for k, v in result.items() if k != "groups"} | {"factors": result.get("groups", {}).get("factors", [])}
-    genes_measured = result["feature"] == "gene"
+    genes_measured = result["feature"] in ("gene", "protein")
     check = volcano.paper_genes(accession, result) if genes_measured else {"available": False, "reason": "a metabolite table; the paper check reads genes"}
     if pathways and genes_measured:
         try:

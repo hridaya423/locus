@@ -285,7 +285,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
     return () => ctrl.abort();
   }, [accession, look]);
   const paths = answered?.look === look ? answered.data : null;
-  const unit = look?.feature ?? (/^(ST|MTBLS)/.test(accession) ? "metabolite" : "gene");
+  const unit = look?.feature ?? (/^(ST|MTBLS)/.test(accession) ? "metabolite" : accession.startsWith("PXD") ? "protein" : "gene");
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;
@@ -360,7 +360,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
                   <TopList accession={accession} title={`Higher in ${look.case.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] > 0)} tone="signal" feature={unit} />
                   <TopList accession={accession} title={`Higher in ${look.control.join(", ")}`} genes={look.genes.filter((g) => hits(g) && g[1] < 0)} tone="control" feature={unit} />
                 </div>
-                {unit !== "gene" ? null : paths?.available === false ? (
+                {unit === "metabolite" ? null : paths?.available === false ? (
                   <p className="text-[12.5px] text-muted-foreground">Pathways: {paths.reason}.</p>
                 ) : (
                   <div className="grid gap-3">

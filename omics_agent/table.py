@@ -212,6 +212,43 @@ def _metabolights_matrix(accession: str) -> dict | None:
     }
 
 
+def _pride_matrix(accession: str) -> dict | None:
+    """A PRIDE study's proteins x samples table from MaxQuant's proteinGroups.txt inside its search zip (the whole member,
+    up to 200 MB): LFQ intensities where present, else intensities; decoys, contaminants and site-only groups removed;
+    a zero is a missing value and stays missing. Values are log2 intensities; proteins quantified in fewer than half of
+    the samples are left out. Proteins are named by their first gene name, else their first protein ID."""
+    from . import preview
+
+    rec = record.record(accession)
+    found = next((f for f in rec["files"] if preview.ZIP.search(f["name"]) and f["group"] in ("Search", "Result")), None) if rec and rec["samples"] else None
+    if not found:
+        return None
+    data, whole, member, _ = preview._zip_member(found["url"], whole=True)
+    if not member.endswith("proteinGroups.txt") or not whole:
+        return None
+    rows = list(csv.reader(io.StringIO(data.decode("utf-8", errors="replace")), delimiter="\t"))
+    header, body = rows[0], [r for r in rows[1:] if len(r) == len(rows[0])]
+    names = {r[0] for r in rec["samples"]["rows"]}
+    lfq = {h[len("LFQ intensity "):]: i for i, h in enumerate(header) if h.startswith("LFQ intensity ") and h[len("LFQ intensity "):] in names}
+    columns = lfq or {h[len("Intensity "):]: i for i, h in enumerate(header) if h.startswith("Intensity ") and h[len("Intensity "):] in names}
+    if len(columns) < 4:
+        return None
+    flag = lambda r, name: name in header and r[header.index(name)] == "+"
+    body = [r for r in body if not any(flag(r, f) for f in ("Reverse", "Potential contaminant", "Contaminant", "Only identified by site"))]
+    label = lambda r: next((r[header.index(k)].split(";")[0] for k in ("Gene names", "Majority protein IDs", "Protein IDs") if k in header and r[header.index(k)]), "")
+    value = lambda v: float(v) if re.fullmatch(r"[\d.]+(?:[eE][-+]?\d+)?", v) and float(v) > 0 else np.nan
+    matrix = np.array([[value(r[i]) for i in columns.values()] for r in body])
+    keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
+    names_kept = [label(r) for r, k in zip(body, keep) if k]
+    return {
+        "accession": accession, "samples": list(columns), "gene_ids": names_kept, "matrix": np.log2(matrix[keep]),
+        "kind": "log scale", "symbols": names_kept, "genes": {}, "feature": "protein",
+        "organism": next((v[0] for lbl, v in rec["facts"] if lbl == "Organism"), "not stated"),
+        "source": {"url": found["url"], "file": found["name"], "build": f"{member}, {'LFQ intensity' if lfq else 'intensity'} columns",
+                   "pipeline": "the authors' MaxQuant search", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data), "genes_url": ""},
+    }
+
+
 @lru_cache(maxsize=8)
 def counts(accession: str) -> dict | None:
     """A genes x samples matrix with gene symbols and where it came from: NCBI's raw counts, else the authors' own table;
@@ -220,6 +257,8 @@ def counts(accession: str) -> dict | None:
         return _workbench_matrix(accession)
     if re.fullmatch(r"MTBLS\d+", accession):
         return _metabolights_matrix(accession)
+    if re.fullmatch(r"PXD\d+", accession):
+        return _pride_matrix(accession)
     if not (found := available(accession)):
         return _authors_matrix(accession)
     path = _fetch(found["url"], DATA / found["file"])

@@ -11,6 +11,7 @@ import io
 import json
 import re
 import sqlite3
+import struct
 import xml.etree.ElementTree as ET
 from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
@@ -339,7 +340,31 @@ def _pride(accession: str, row: dict) -> Record:
             url = _https(ftp)
             group = f["fileCategory"]["value"].capitalize()
             rec.file(f["fileName"], url, group, f.get("fileSizeBytes"), url in kinds, kinds.get(url, ""))
+    _pride_samples(rec)
     return rec
+
+
+def _pride_samples(rec: Record) -> None:
+    """PRIDE lists no samples, but a search-engine table names them in its columns ('Intensity XAD_3'). Those names become
+    the sample table, grouped by name without the trailing number, read once from the table's first bytes and cached."""
+    from . import preview
+
+    path = CACHE / f"{rec.accession}.experiments.json"
+    if not path.exists():
+        found = next((f for f in rec.files if preview.ZIP.search(f["name"]) and f["group"] in ("Search", "Result")), None)
+        if not found:
+            return
+        try:
+            data, _, member, _ = preview._zip_member(found["url"])
+            named = preview.experiments(data.decode("utf-8", errors="replace").split("\n", 1)[0].rstrip("\r").split("\t"))
+        except (httpx.HTTPError, ValueError, struct.error):
+            return
+        path.write_text(json.dumps({"file": found["name"], "member": member, "names": (named or {}).get("names", [])}))
+    names = json.loads(path.read_text())["names"]
+    if len(names) < 2:
+        return
+    stem = lambda n: re.sub(r"[_ .-]*\d+$", "", n) or n
+    rec.samples = {"columns": ["Accession", "named group"], "link": "", "rows": [[n, stem(n)] for n in names]}
 
 
 def _pride_kinds(accession: str) -> list[dict]:

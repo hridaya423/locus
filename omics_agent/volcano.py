@@ -69,7 +69,9 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
             within: tuple[str, str] | None = None) -> dict:
     data = table.counts(accession)
     if not data:
-        reason = "no gene by sample table: neither NCBI's counts nor the authors' files" if accession.startswith("GSE") else "no metabolite by sample table whose columns are the samples"
+        reason = ("no gene by sample table: neither NCBI's counts nor the authors' files" if accession.startswith("GSE")
+                  else "no MaxQuant protein table with intensities for at least 4 named samples" if accession.startswith("PXD")
+                  else "no metabolite by sample table whose columns are the samples")
         return {"accession": accession, "available": False, "reason": reason}
     rec = record.record(accession)
     present = set(data["samples"])
@@ -110,13 +112,15 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
         method = METHOD
     else:
         values = m if data["kind"] == "log scale" else np.log2(m + 1)
-        floor = np.percentile(values[:, in_case | in_control], 25)
+        floor = np.nanpercentile(values[:, in_case | in_control], 25)
         keep = (values[:, in_case | in_control] > floor).sum(axis=1) >= smaller
         logged = values[keep]
         method = f"Welch's t-test on the authors' {'log-scale' if data['kind'] == 'log scale' else 'normalised values, log2(x + 1)'}; {data.get('feature', 'gene')}s above the 25th percentile in at least as many samples as the smaller group; Benjamini–Hochberg FDR"
     a, b = logged[:, in_case], logged[:, in_control]
-    lfc = a.mean(axis=1) - b.mean(axis=1)
-    t, p = stats.ttest_ind(a, b, axis=1, equal_var=False)
+    # Protein tables leave unquantified values missing; every statistic skips them (count tables have none).
+    lfc = np.nanmean(a, axis=1) - np.nanmean(b, axis=1)
+    t, p = stats.ttest_ind(a, b, axis=1, equal_var=False, nan_policy="omit")
+    p = np.asarray(p, dtype=float)
     p = np.nan_to_num(p, nan=1.0)
     q = stats.false_discovery_control(p)
     symbols = [str(s) if not str(s).isdigit() else f"GeneID:{s}" for s in np.array(data["symbols"])[keep]]
