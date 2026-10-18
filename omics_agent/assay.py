@@ -119,6 +119,9 @@ def _match(sentence: str, study_text: str) -> list[tuple[str, str, str]]:
     found = []
     for assay, how, rx in COMPILED:
         if m := rx.search(sentence):
+            # Earlier work, not this dataset: ST004136's 'previous 16S rRNA sequencing' on a GC-MS study.
+            if re.search(r"\b(?:previous|earlier|prior)\s+(?:\S+\s+){0,2}$", sentence[:m.start()], re.I):
+                continue
             if assay.startswith(("TIS", "Ribo-seq")) and how == "inferred" and not RIBOSOME_PROFILING.search(study_text):
                 continue
             if assay == "Phosphoproteomics" and how == "inferred" and not re.search(r"phospho(?:peptide|proteom|site|rylat)", study_text, re.I):
