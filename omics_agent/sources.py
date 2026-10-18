@@ -257,7 +257,10 @@ def paper_methods(paper: str) -> dict:
     if not record.get("pmcid") or record.get("isOpenAccess") != "Y":
         return head | {"available": False, "reason": "no open-access full text"}
     xml = httpx.get(f"https://www.ebi.ac.uk/europepmc/webservices/rest/{record['pmcid']}/fullTextXML", timeout=60)
-    root = ElementTree.fromstring(xml.content)
+    try:
+        root = ElementTree.fromstring(xml.raise_for_status().content)
+    except (httpx.HTTPStatusError, ElementTree.ParseError):
+        return head | {"available": False, "reason": f"Europe PMC did not send the full text (HTTP {xml.status_code})"}
     sections = [
         s for s in root.iter("sec")
         if "method" in (s.get("sec-type") or "") or re.search(r"method|materials|experimental procedures", s.findtext("title") or "", re.I)
