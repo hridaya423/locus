@@ -56,15 +56,9 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
           </figcaption>
         </figure>
       )}
-<<<<<<< HEAD
-      {list.map((g) => <FileGroup key={g.name} group={g} />)}
+      {list.map((g) => <FileGroup key={g.name} group={g} accession={rec.accession} />)}
       {rec.download_plan && !nothing && (
         <details id="download-commands" className="group/plan scroll-mt-16">
-=======
-      {list.map((g) => <FileGroup key={g.name} group={g} accession={rec.accession} />)}
-      {rec.download_plan && (
-        <details className="group/plan">
->>>>>>> t3/d788bbfb
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
             {picked?.commands ? `Commands to download the ${selection?.result?.samples.toLocaleString()} selected samples` : "Commands to download everything"}
             <ChevronDown aria-hidden className="size-3.5 transition-transform duration-200 group-open/plan:rotate-180" />

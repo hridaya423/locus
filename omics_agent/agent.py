@@ -9,11 +9,7 @@ from pathlib import Path
 import anthropic
 import httpx
 
-<<<<<<< HEAD
-from . import assay, compare, index, methods, samples, samplesheet, store
-=======
-from . import answer, compare, index, methods, samples, samplesheet, store
->>>>>>> feat/answer
+from . import answer, assay, compare, index, methods, samples, samplesheet, store
 from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
 PLANNER = "claude-sonnet-5-5"

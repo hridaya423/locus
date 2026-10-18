@@ -4,12 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-<<<<<<< HEAD
-import { isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
-=======
-import Link from "next/link";
-import { browsePath, type DatasetRecord } from "@/lib/api";
->>>>>>> feat/browse
+import { browsePath, isPaperId, paperPath, type DatasetRecord } from "@/lib/api";
 
 const VALUES_SHOWN = 6;
 

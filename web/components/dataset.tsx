@@ -11,12 +11,9 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { SampleTable, SelectionBar } from "@/components/sample-table";
 import { Files } from "@/components/files";
 import { Aside } from "@/components/aside";
-<<<<<<< HEAD
 import { AssayList, assayNames, useAssays, type AssayState } from "@/components/assay";
 import { QualitySection } from "@/components/qc";
-=======
 import { FirstLookSection } from "@/components/first-look";
->>>>>>> feat/your-list
 import { dataType } from "@/components/result-card";
 import { MarkedText, MarkedTitle, MatchedLine, goToMatch, hasMatch, useFound, useMatches, type Matches } from "@/components/matches";
 import { datasetRecord, repositoryName, type DatasetRecord, type Hit } from "@/lib/api";
@@ -144,18 +141,10 @@ function Body({ rec }: { rec: DatasetRecord }) {
     <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
       <div className="grid min-w-0 content-start gap-16">
         <About rec={rec} />
-<<<<<<< HEAD
         <Samples rec={rec} designed={designed} selection={selection} />
-        <Files rec={rec} selection={selection} />
-=======
-        <Samples rec={rec} />
-<<<<<<< HEAD
         <QualitySection accession={rec.accession} />
-=======
         {rec.source === "GEO" && <FirstLookSection accession={rec.accession} />}
->>>>>>> feat/your-list
-        <Files rec={rec} />
->>>>>>> feat/qc
+        <Files rec={rec} selection={selection} />
       </div>
       <Aside rec={rec} />
     </div>

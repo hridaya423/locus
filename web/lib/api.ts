@@ -199,6 +199,9 @@ export type Subset = {
 export async function subset(accession: string, filters: Filters, text: string, signal?: AbortSignal): Promise<Subset> {
   const res = await fetch(`${API}/subset/${accession}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ filters, text }), signal });
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+
 export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
 export type FilePreview = {
   file: string; url: string; format: string; sheet: string | null; skipped: number; bytes_read: number; size: number | null; complete: boolean;
@@ -259,6 +262,10 @@ export type Assays = { accession: string; source: string; assays: Assay[]; unass
 
 export async function assays(accession: string, signal?: AbortSignal): Promise<Assays> {
   const res = await fetch(`${API}/assay/${encodeURIComponent(accession)}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
 export type TableSummary = { accession: string; available: boolean; reason?: string; genes?: number; samples?: number; reads?: number; organism?: string;
   source?: { url: string; file: string; build: string; pipeline: string; sha256: string; bytes: number } };
 export type Gene = [symbol: string, lfc: number, minusLog10P: number, q: number];
@@ -269,6 +276,10 @@ export type FirstLook = { accession: string; available: boolean; reason?: string
 
 export async function tableSummary(accession: string, signal?: AbortSignal): Promise<TableSummary> {
   const res = await fetch(`${API}/table/${encodeURIComponent(accession)}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}
+
 export type Browse = { field: string; value: string; phrase: string; matched_in: string; source: string; total: number; offset: number; by_source: Record<string, number>;
   datasets: { accession: string; source: string; title: string; samples: number | null; published: string | null; modality: string }[] };
 
