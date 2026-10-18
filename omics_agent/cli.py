@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import re
 import sys
 
@@ -75,6 +76,8 @@ def main() -> None:
     args = parser.parse_args()
 
     load_dotenv()
+    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("LOCAL_LLM_URL")):
+        sys.exit("locus needs a model: set ANTHROPIC_API_KEY, or LOCAL_LLM_URL and LOCAL_LLM_MODEL for a local server, in .env (see .env.example).")
     from . import agent
 
     log = lambda msg: print(msg, file=sys.stderr)

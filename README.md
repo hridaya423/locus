@@ -4,6 +4,14 @@ Find public omics datasets with a plain-English question, and see from the autho
 
 Researchers often spend days searching GEO, PRIDE and other repositories for data that already exists. Keyword search misses studies, and repository fields do not say whether the samples are matched, how many controls there are, or which assay was really used. locus searches 891,000 datasets in 18 repositories. It counts the case and control samples from the sample records, grades each dataset against the question, and writes the input files for the analysis pipeline.
 
+## In plain words
+
+**What it is for.** Scientists publish the raw measurements behind their papers in public archives: GEO (gene activity), PRIDE (proteins), ENA (raw sequencing reads) and others. A biologist with a question wants the right study from those archives, and then wants to know what it shows. locus takes the question in plain English, finds the studies, and for a gene-expression study runs the first analysis on an ordinary computer: which genes changed between the two conditions, with the figures a paper would show.
+
+**What was not working.** Archive search is by keyword, so a question phrased differently from the authors' title misses the study. The archives do not say how many diseased and healthy samples a study has, or whether the samples are matched; people open each record and count by hand, and chatbots guess. And a found dataset is still raw files: turning them into "these genes changed" takes a pipeline, a cluster and someone who knows how to run both.
+
+**What we made better.** locus plans the search from the question (synonyms, organism, the kinds of measurement that can answer it), counts cases and controls from the sample records with code, and shows which check a dataset fails. New in this hackathon: one click, or one command, takes a bulk RNA-seq study from the archive to counts per gene, a differential-expression table, five figures and a short written summary, in about three minutes on a laptop, with every tool version and every sample recorded so someone else can check it. Proteomics studies get sample counts read from their sample tables too, with "unknown" shown rather than a guess when the table does not say.
+
 ## What it does
 
 - **Search.** It plans the search from your question, with synonyms, organism, the assays that can answer it, and the assays that must come from the same samples. Then it searches a local index of 18 repositories with keywords and embeddings.
@@ -115,7 +123,7 @@ Get the zip from the result row in the web app, from `GET /samplesheet/{accessio
 
 ## Process a dataset
 
-For a GEO bulk RNA-seq series with counted case and control samples, locus can run the laptop-tier pipeline from `docs/data-processing-contract.md` on your own machine: the first 2,000,000 reads of each FASTQ are streamed from ENA, quantified with salmon against GENCODE transcripts, summed to gene counts with tximport, and tested with DESeq2 (`~ condition`, apeglm shrinkage, alpha 0.05). Reads are subsampled, so the result is a preview of the study, not a reanalysis; the manifest says so.
+For a GEO bulk RNA-seq study (gene activity measured by sequencing) with counted case and control samples, locus can run the laptop-tier pipeline from `docs/data-processing-contract.md` on your own machine. In plain terms: it fetches the first 2,000,000 sequencing reads of each sample from ENA (the European archive of raw reads), matches them to the known human or mouse transcripts with salmon (a fast read-counting tool) using the GENCODE reference (the standard catalogue of genes), sums the counts per gene with tximport, and tests which genes differ between the two conditions with DESeq2 (the standard statistical method for this), with apeglm shrinkage so that small, noisy fold changes are not overstated. "padj" in the outputs is the adjusted p-value: the chance a gene's change is a fluke, corrected for testing thousands of genes at once; the usual cut-off is 0.05. Reads are subsampled, so the result is a preview of the study, not a reanalysis; the manifest says so.
 
 It needs [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) and one environment (bioconda has builds for linux-64, linux-aarch64 and osx-arm64):
 
@@ -175,12 +183,36 @@ For controlled-access data (EGA, dbGaP), locus links to the access request. It d
 
 ## Limits
 
+What a judge or a reviewer should know before trusting a result. None of these is hidden in the output; the manifest, the notes and the count lines say so.
+
+**Processing a dataset**
+
+- Reads are subsampled: the first 2,000,000 reads of each file. Enough to see whether the conditions separate and which large changes are there, not enough for a publication-grade gene list. The number is a flag (`--reads`) and is written in the manifest.
+- One comparison per dataset: the most frequent control value against the most frequent case value of one field, at most 4 samples per side. Multi-factor designs, time courses and paired designs are not modelled.
+- Only the first sequencing run of each sample is used; human (GENCODE 46) and mouse (M35) are the only references.
+- Transcript-level quantification without decoy sequences; no genome alignment, no bigWig tracks. The HPC tier in the contract is nf-core/rnaseq, which this repository does not run.
+- The written summary is model text. Every number in it is checked against the pipeline's output and the paragraph is dropped if one was invented, but the sentences around the numbers (for example what a gene "is known to" do) are the model's and are labelled as such.
+- Which field marks case and control is the model's choice; code counts, but a wrong field gives a wrong contrast. The manifest names the field and the values.
+- The worked example (GSE273888) was run on one machine; the figures were looked at, the biology was not reviewed by a wet-lab scientist.
+
+**Search and counts**
+
 - Sample counts are counts of sample records, not of patients. One patient can have several libraries.
+- On a machine without the local index, locus searches the live GEO, PRIDE and CELLxGENE APIs only, not all 18 repositories. The demo machine has no index.
+- The first two stages of a search (candidate scoring and the four checks) are not cached, so repeating a question can rank or include datasets differently; the plan and the sample labels are cached.
+- Results on the local model (Qwen via vLLM) have not been compared with the Claude runs in `docs/evidence/`; a search takes 4–8 minutes on it.
 - Counts exist for GEO, CELLxGENE and the PRIDE projects with a curated SDRF in [bigbio/sdrf-annotated-datasets](https://github.com/bigbio/sdrf-annotated-datasets) (about 28% of PRIDE; clone it shallow into `data/sdrf/`), or an SDRF the project itself lists in PRIDE. For those, locus counts individuals, samples and runs separately and leaves pooled, QC and reference channels out; a missing individual column shows as "unknown", never as a sample count. Other PRIDE projects have no counts.
 - The model labels can change between runs, so a count can appear in one run and be missing in the next.
 - A broad search term can count related diseases as cases.
 - Most ENA, EGA, MetaboLights, NODE and dbGaP records have no species, so they pass every species filter.
 - Rows from OmicsDI and ENA have no linked paper.
+- Proteomics sample tables (SDRF) cover about 28% of PRIDE; where the table covers only part of a study, the counts are for the table, not the paper (PXD027637 in `docs/evidence/sdrf/` is an example).
+
+**Not built**
+
+- Ribo-seq processing and translational efficiency (ΔTE) are designed in `docs/data-processing-contract.md`, not built; the samplesheet export only writes the inputs for nf-core/riboseq.
+- No single-cell, proteomics or metabolomics processing; the pipeline is bulk RNA-seq only.
+- Voice input uses the browser's own speech recognition, which browsers allow only on `localhost` or over HTTPS; over plain HTTP to another machine the button is disabled and says why.
 
 ## Layout
 
