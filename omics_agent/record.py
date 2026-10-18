@@ -204,7 +204,7 @@ def _run_files(rec: Record, run: dict) -> None:
 # Sample attributes that describe the submission or the location, not how samples differ.
 SAMPLE_NOISE = re.compile(r"^ENA-|_units$|^(?:latitude|longitude|elevation|geo_loc_name|collection_(?:timestamp|date|device|method)|tube_id|sampledescription|"
                           r"physical_specimen\w*|irb_\w+|env_\w+|empo_\d|scientific_name|organism|host scientific name|host_taxid|host_common_name|dna_extracted|"
-                          r"description|title|alias|sample_name|anonymized_name|qiita_\w+|submitted_to_insdc)$", re.I)
+                          r"description|title|alias|sample_name|anonymized_name|qiita_\w+|submitted_to_insdc|INSDC \w+ accession|\w*secondary.accession)$", re.I)
 SAMPLE_BATCH, MAX_SAMPLES, SAMPLE_COLUMNS = 100, 1000, 12
 
 
