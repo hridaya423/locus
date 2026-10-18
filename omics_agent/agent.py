@@ -488,7 +488,7 @@ def grade(search_plan: dict, datasets: list[Dataset], verdicts: dict[str, dict])
     hits = []
     for dataset in datasets:
         v = verdicts[dataset.accession]
-        checks = _relevant_checks(_apply_facts(v, dataset.facts, search_plan), search_plan)
+        checks = _relevant_checks(_apply_facts(v, dataset.facts, search_plan, dataset.text), search_plan)
         fit = _grade(checks)
         if fit == "none":
             continue
@@ -502,12 +502,16 @@ def grade(search_plan: dict, datasets: list[Dataset], verdicts: dict[str, dict])
     return sorted(hits, key=lambda h: rank[h["fit"]])
 
 
-def _apply_facts(checks: dict, facts: dict | None, search_plan: dict) -> dict:
-    """Counted sample facts replace the model's reading of the summary."""
+def _apply_facts(checks: dict, facts: dict | None, search_plan: dict, text: str = "") -> dict:
+    """Counted sample facts replace the model's reading of the summary. Missing one of the matched assays fails the data
+    type unless the study's own text names another assay the plan accepts (TrIP-seq's polysome fractions, GSE69352)."""
     checks = dict(checks)
     norm = lambda name: re.sub(r"[^a-z0-9]", "", name.lower())
     counted = {norm(a) for a in (facts or {}).get("libraries") or (facts or {}).get("assays", [])}
-    if counted and any(norm(a) not in counted for a in search_plan.get("matched_assays", [])):
+    matched = {norm(a) for a in search_plan.get("matched_assays", [])}
+    alternatives = {norm(a) for a in search_plan.get("assays", [])} - matched - {"rnaseq"}
+    named = {norm(found[0]) for sentence in assay._sentences(text) for found in assay._match(sentence, text)}
+    if counted and not matched <= counted and not alternatives & named:
         checks["data_type"] = "no"
     if facts and facts["has_control"] is not None:
         checks["controls"] = "yes" if facts["has_control"] else "no"
