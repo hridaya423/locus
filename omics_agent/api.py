@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, design, paper, preview, record, resolve, sources, subset  # noqa: E402  (needs the API key loaded first)
+from . import agent, design, paper, preview, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -128,6 +128,19 @@ def sample_record(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,3
         raise HTTPException(502, f"The repository did not answer: {error}") from error
     if not found:
         raise HTTPException(404, f"locus has no sample pages for {accession}.")
+    return found
+
+
+class WhyIn(BaseModel):
+    terms: list[Annotated[str, StringConstraints(max_length=200)]] = Field(max_length=60)
+    quote: Annotated[str, StringConstraints(max_length=1000)] = ""
+
+
+@app.post("/why/{accession}")
+def why_matched(body: WhyIn, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """Where the search's terms and its quote appear in one dataset's own record: spans with character offsets, by field."""
+    if not (found := why.why(accession, body.terms, body.quote)):
+        raise HTTPException(404, f"{accession} is not in the index.")
     return found
 
 

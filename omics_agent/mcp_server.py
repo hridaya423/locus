@@ -8,7 +8,7 @@ from mcp.types import ToolAnnotations
 
 load_dotenv()
 
-from . import agent, index, paper, preview, record, resolve, subset  # noqa: E402  (needs the API key loaded first)
+from . import agent, index, paper, preview, record, resolve, subset, why  # noqa: E402  (needs the API key loaded first)
 from .sources import Dataset, download_plan, paper_methods  # noqa: E402
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
@@ -100,6 +100,17 @@ def get_methods(accession: str) -> dict:
     if not d or not d.papers:
         return {"accession": accession, "available": False, "reason": "no linked paper"}
     return {"accession": accession} | paper_methods(d.papers[0])
+
+
+@mcp.tool(annotations=READ_ONLY)
+def why_matched(accession: str, terms: list[str], quote: str = "") -> dict:
+    """Where search terms (and, optionally, a quote) appear in one dataset's own record, to check why a search returned
+    it. Case-insensitive, whole-word, with plurals and hyphen variants (scRNA-seq, scRNAseq, single-cell RNA sequencing).
+    Returns each term's count and first place, and the matched spans by field (Title, Summary, Overall design,
+    protocols, facts) with character offsets into that field's text. A term with a count of zero is not in the
+    record's text, so the search found the dataset by other means. `quote` is an exact phrase, such as a search
+    result's evidence."""
+    return why.why(accession, terms, quote) or {"accession": accession, "error": "not in the locus index"}
 
 
 @mcp.tool(annotations=READ_ONLY)

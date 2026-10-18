@@ -127,13 +127,14 @@ export async function datasetRecord(accession: string, signal?: AbortSignal): Pr
 }
 
 // What a search found out about each dataset, kept so the dataset page can show it, also in a new tab.
-export type Found = { hit: Hit; topic: string; matched: string[] };
+export type Found = { hit: Hit; topic: string; terms: string[]; assays: string[]; matched: string[] };
 const FOUND = "locus:found";
 
 export function rememberFound(result: Result) {
   const topic = result.plan.terms.join(", ");
   const matched = result.plan.matched_assays ?? [];
-  const found = Object.fromEntries(result.datasets.map((hit) => [hit.accession, { hit, topic, matched }]));
+  const { terms, assays } = result.plan;
+  const found = Object.fromEntries(result.datasets.map((hit) => [hit.accession, { hit, topic, terms, assays, matched }]));
   try {
     localStorage.setItem(FOUND, JSON.stringify(found));
   } catch {}
@@ -145,6 +146,33 @@ export function found(accession: string): Found | null {
   } catch {
     return null;
   }
+}
+
+// Where the search's terms and quote sit in a dataset's record. Offsets count Unicode code points.
+export type Spot = { field: string; kind: "title" | "text" | "fact"; index: number; start: number; end: number };
+export type Why = {
+  accession: string;
+  terms: { term: string; count: number; first: Spot | null }[];
+  fields: { field: string; kind: Spot["kind"]; index: number; matches: { start: number; end: number; terms: string[] }[] }[];
+  quote: Spot | null;
+};
+
+const asked = new Map<string, Promise<Why>>();
+
+// The dataset page and its result row ask the same question; they share one answer.
+export function why(accession: string, terms: string[], quote: string): Promise<Why> {
+  const body = JSON.stringify({ terms, quote });
+  const key = `${accession} ${body}`;
+  let answer = asked.get(key);
+  if (!answer) {
+    answer = fetch(`${API}/why/${encodeURIComponent(accession)}`, { method: "POST", headers: { "content-type": "application/json" }, body }).then((res) => {
+      if (!res.ok) throw new Error(`${res.status}`);
+      return res.json();
+    });
+    answer.catch(() => asked.delete(key));
+    asked.set(key, answer);
+  }
+  return answer;
 }
 
 export const datasetPath = (accession: string) => `/d/${encodeURIComponent(accession)}`;
