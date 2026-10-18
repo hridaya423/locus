@@ -11,6 +11,7 @@ import io
 import json
 import re
 import sys
+import warnings
 import zipfile
 from datetime import date
 from functools import lru_cache
@@ -160,6 +161,14 @@ def _workbench_matrix(accession: str) -> dict | None:
     numbers = lambda r: [float(r[i]) if i < len(r) and re.fullmatch(r"-?[\d.]+(?:[eE]-?\d+)?", r[i].strip()) else np.nan for i in columns]
     body = [r for r in rows if r and r[0]]
     matrix = np.array([numbers(r) for r in body])
+    # A sample measured twice is one sample: ST000255's mwTab has 84 columns for its 42 samples (BP009 BP009 …).
+    names = list(dict.fromkeys(header[i] for i in columns))
+    repeated = len(names) < len(columns)
+    if repeated:
+        with np.errstate(all="ignore"), warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            matrix = np.column_stack([np.nanmean(matrix[:, [k for k, i in enumerate(columns) if header[i] == n]], axis=1) for n in names])
+        columns = [header.index(n) for n in names]
     keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
     matrix, names = matrix[keep], [r[0] for r, k in zip(body, keep) if k]
     kind = "log scale" if np.nanmin(matrix) < 0 else "normalised, linear"
@@ -167,7 +176,7 @@ def _workbench_matrix(accession: str) -> dict | None:
     return {
         "accession": accession, "samples": [local[header[i]] for i in columns], "gene_ids": names, "matrix": np.nan_to_num(matrix, nan=0.0), "kind": kind,
         "symbols": names, "genes": {}, "organism": next((v[0] for label, v in rec["facts"] if label == "Organism"), "not stated"), "feature": "metabolite",
-        "source": {"url": f["url"], "file": f["name"], "build": f"as the authors quantified it{f' ({units})' if units else ''}", "pipeline": "the authors' mwTab metabolite table",
+        "source": {"url": f["url"], "file": f["name"], "build": f"as the authors quantified it{f' ({units})' if units else ''}{'; repeated columns of one sample averaged' if repeated else ''}", "pipeline": "the authors' mwTab metabolite table",
                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "bytes": path.stat().st_size, "genes_url": ""},
     }
 
