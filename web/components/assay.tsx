@@ -160,7 +160,12 @@ export function useAssays(accession: string, enabled: boolean): AssayState {
   return state;
 }
 
-export const assayNames = (data?: Assays) => data?.assays.filter((a) => a.samples?.length).map((a) => a.assay.replace(/ \(.*\)$/, "")) ?? [];
+// Assays with libraries assigned to them; otherwise those the record's own text names (not only inferred, not only in the paper).
+export const assayNames = (data?: Assays) => {
+  const assigned = data?.assays.filter((a) => a.samples?.length) ?? [];
+  const named = data?.assays.filter((a) => a.how === "named" && !a.from_paper) ?? [];
+  return (assigned.length ? assigned : named).map((a) => a.assay.replace(/ \(.*\)$/, ""));
+};
 
 export function AssayList({ accession, state }: { accession: string; state: AssayState }) {
   const data = state.data;

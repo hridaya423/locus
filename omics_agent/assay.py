@@ -227,6 +227,8 @@ def classify(accession: str) -> dict | None:
 
     if SINGLE_CELL & set(found):
         found.pop("RNA-seq", None)
+    if "ChIP-chip (tiling array)" in found:
+        found.pop("ChIP-seq", None)
     libraries = {}
     unassigned = []
     if rec["source"] == "GEO" and any(a in (TIS, RIBO) for a in found):
