@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { DesignView } from "@/components/design";
 import { EASE_OUT } from "@/lib/springs";
 import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
-import { Evidence, Methods, Partners, Ready } from "@/components/row-details";
+import { Evidence, Methods, Ready } from "@/components/row-details";
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -201,7 +201,6 @@ type RowProps = {
 
 export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, counts }: RowProps) {
   const [expanded, setExpanded] = useState(false);
-  const [partnersOpen, setPartnersOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [sheet, setSheet] = useState<"idle" | "writing" | "failed">("idle");
   useEffect(() => {
@@ -256,17 +255,6 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
               )}
               {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
             </button>
-            {!!hit.partners?.length && (
-              <button
-                type="button"
-                onClick={() => setPartnersOpen((v) => !v)}
-                aria-expanded={partnersOpen}
-                className="mt-1 flex cursor-pointer items-center gap-1 text-left text-[12.5px] leading-snug text-muted-foreground transition-colors duration-150 hover:text-foreground"
-              >
-                {hit.source === "PRIDE" ? "Gene" : "Protein"} data on the same tissue: {hit.partners.length}
-                <ChevronDown aria-hidden className={cn("size-3.5 transition-transform duration-200", partnersOpen && "rotate-180")} />
-              </button>
-            )}
           </div>
         </td>
         {counts && <CountCell value={facts?.case} tone="signal" href={`${page}#samples`} />}
@@ -339,20 +327,6 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     </span>
                   </span>
                 )}
-                </div>
-              </motion.div>
-            </td>
-          </tr>
-        )}
-      </AnimatePresence>
-      <AnimatePresence initial={false}>
-        {partnersOpen && (
-          <tr>
-            <td />
-            <td colSpan={counts ? 5 : 3} className="pr-2">
-              <motion.div {...unfold} className="overflow-hidden">
-                <div className="pb-4">
-                  <Partners hit={hit} />
                 </div>
               </motion.div>
             </td>

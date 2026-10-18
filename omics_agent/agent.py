@@ -538,45 +538,6 @@ def _grade(checks: dict) -> str:
     return "strong"
 
 
-GENERIC_TISSUE = {"tissue", "tissues", "cell", "cells", "line", "lines", "primary", "human", "mouse", "sample", "samples", "normal", "whole", "derived", "cultured"}
-
-
-def _tissue_words(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in GENERIC_TISSUE}
-
-
-def _species(organism: str) -> str:
-    return " ".join(organism.lower().split()[:2])
-
-
-def _partner(source: str, accession: str, title: str, url: str, organism: str, facts: dict) -> dict:
-    return {"accession": accession, "source": source, "title": title, "url": url, "organism": organism, "assay": " + ".join(facts.get("assays") or []), "tissue": facts["tissue"]}
-
-
-GENE_SOURCES = ["GEO", "ArrayExpress", "ExpressionAtlas", "CELLxGENE", "ENA"]
-
-
-def add_partners(search_plan: dict, hits: list[dict]) -> None:
-    """For each result with a known tissue, up to three datasets of the other molecular layer on the same topic, species
-    and tissue: PRIDE protein data (tissue from its trusted tags) for gene-expression results, and gene-expression data
-    (tissue named in its own title or summary) for PRIDE results."""
-    terms = search_plan["terms"] + search_plan.get("pride_keywords", [])
-    proteins = [d for d in index.load(index.keyword_search(terms, ["PRIDE"], search_plan["organism"], 200)) if d.facts and d.facts["tissue"]]
-    genes = index.load(index.keyword_search(terms, GENE_SOURCES, search_plan["organism"], 200)) if any(h["source"] == "PRIDE" for h in hits) else []
-    for hit in hits:
-        tissue = _tissue_words((hit.get("facts") or {}).get("tissue") or "")
-        if not tissue or (hit["source"] != "PRIDE" and hit["source"] not in GENE_SOURCES):
-            continue
-        if hit["source"] == "PRIDE":
-            matched = [(d, tissue & _tissue_words(d.text)) for d in genes]
-            shown = lambda d, w: ", ".join(dict.fromkeys(m.group() for word in sorted(w) if (m := re.search(word, d.text, re.I))))
-            others = [_partner(d.source, d.accession, d.title, d.url, d.organism, {"assays": [], "tissue": shown(d, w)}) for d, w in matched if w]
-        else:
-            others = [_partner(d.source, d.accession, d.title, d.url, d.organism, d.facts) for d in proteins if tissue & _tissue_words(d.facts["tissue"])]
-        species = _species(hit["organism"])
-        hit["partners"] = [o for o in others if o["accession"] != hit["accession"] and _species(o["organism"]) == species][:3]
-
-
 def paper_details(ids: list[str]) -> dict[str, dict]:
     """Title, journal, year and link for each `pmid:` or `doi:` ID that Europe PMC knows, from one query per 25 IDs."""
     ids = sorted(set(ids))
@@ -660,7 +621,6 @@ def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> 
     progress("facts", {"count": sum(1 for d in keep if d.facts)})
     hits = grade(search_plan, keep, verdicts)
     add_papers(hits)
-    add_partners(search_plan, hits)
     for h in hits:
         h["download_plan"] = download_plan(h["accession"], h["source"], h["url"])
     groups = bundles(hits)

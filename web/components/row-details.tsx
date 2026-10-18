@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { LINK } from "@/components/page-kit";
 import { firstTerm, quoteOnPage, slug, useMatches } from "@/components/matches";
-import { datasetPath, readyFiles, repositoryName, type Facts, type Hit, type ReadyFiles } from "@/lib/api";
+import { datasetPath, readyFiles, type Facts, type Hit, type ReadyFiles } from "@/lib/api";
 
 const METHOD_ORDER = ["acquisition", "labelling", "enrichment", "instrument_family", "search_engine", "fractionation"];
 
@@ -78,24 +78,6 @@ export function Ready({ accession }: { accession: string }) {
 }
 
 // Opened from its own toggle in the row header, which already names it, so the list needs no heading.
-export function Partners({ hit }: { hit: Hit }) {
-  if (!hit.partners?.length) return null;
-  return (
-    <ul className="grid gap-1 border-l-2 border-foreground pl-3 text-[13px]">
-      {hit.partners.map((p) => (
-        <li key={p.accession} className="flex min-w-0 items-baseline gap-2">
-          <Link href={datasetPath(p.accession)} className="shrink-0 font-mono text-[12px] font-medium underline decoration-rule underline-offset-4 hover:decoration-foreground">
-            {p.accession}
-          </Link>
-          <span className="min-w-0 truncate text-muted-foreground" title={p.title}>
-            {[repositoryName(p.source), p.assay, p.tissue].filter(Boolean).join(" · ")}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 // Each passed check and the quote lead to the words in the dataset's own text they stand on.
 export function Evidence({ hit, onOpen }: { hit: Hit; onOpen: () => void }) {
   const m = useMatches(hit.accession);

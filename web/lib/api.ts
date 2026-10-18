@@ -7,7 +7,6 @@ export type Facts = {
   libraries?: Record<string, Partial<Record<"case" | "control" | "mixed" | "other", number>>>;
   methods?: Record<string, { value: string; label: string; evidence: string; trusted: boolean }>;
 };
-export type Partner = { accession: string; source: string; title: string; url: string; organism: string; assay: string; tissue: string };
 export type ReadyFiles = { processed: { name: string; kind: string; bytes: number; url: string }[]; more: number; raw: { files: number; bytes: number } };
 export type Paper = { title: string; journal: string; year: string; url: string };
 export type Check = "yes" | "no" | "unclear" | "same" | "other" | "n/a";
@@ -15,7 +14,7 @@ export type Hit = {
   accession: string; source: string; modality: string; title: string; organism: string;
   samples: number | null; url: string; papers: string[]; facts: Facts | null; published: string | null;
   fit: "strong" | "partial"; checks: Record<"topic" | "patient_material" | "data_type" | "controls", Check>;
-  reason: string; evidence: string; paper: Paper | null; download_plan: string; partners?: Partner[];
+  reason: string; evidence: string; paper: Paper | null; download_plan: string;
 };
 export type AnswerItem = { accession: string; title: string; source: string; kind: "matched" | "cohort" | "ready"; fact: string; anchor: string };
 export type Result = { question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][]; answer?: AnswerItem[] };
