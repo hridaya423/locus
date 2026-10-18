@@ -222,6 +222,9 @@ export async function filePreview(accession: string, file: string, signal?: Abor
 export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; found_in: string; title?: string };
 
 // An identifier is one or two words with a digit (for "PMID: 123"); anything else is a question and never leaves the browser.
+// The tab's last search, kept so that back from a dataset page, and the list page, see the same results.
+export const LAST_SEARCH = "locus:last-search";
+
 // A watched search remembers the datasets it showed; a later run marks the ones locus has indexed since.
 const WATCHED = "locus:watched";
 export type Watch = { question: string; since: string; seen: string[] };

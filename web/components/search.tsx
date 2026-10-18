@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, watches, type Cited, type Plan, type Result, type Watch } from "@/lib/api";
+import { LAST_SEARCH, cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, watches, type Cited, type Plan, type Result, type Watch } from "@/lib/api";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
@@ -18,7 +18,7 @@ import { Reticle, Wordmark } from "@/components/logo";
 const SHOWN = { opacity: 1, scale: 1, filter: "blur(0px)" };
 const HIDDEN = { opacity: 0, scale: 0.9, filter: "blur(4px)" };
 const iconSwap = motionTier.micro;
-const LAST = "locus:last-search";
+const LAST = LAST_SEARCH;
 
 const STEPS = [
   { key: "plan", label: "Understanding the question" },

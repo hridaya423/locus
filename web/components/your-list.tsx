@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
-import { checkList, checkListAcross, datasetPath, foundAll, type ListAcross, type ListCheck } from "@/lib/api";
+import { LAST_SEARCH, checkList, checkListAcross, datasetPath, type ListAcross, type ListCheck, type Result } from "@/lib/api";
 
 const ROWS = 30;
 const HITS_SHOWN = 6;
@@ -14,7 +14,15 @@ const pText = (p: number) => (p < 0.001 ? p.toExponential(1) : p.toFixed(3));
 
 // The same overlap in every GEO dataset of the last search, the strongest first; datasets locus could not compare are listed after.
 function Across({ text }: { text: string }) {
-  const [found] = useState(foundAll);
+  // The last search of this tab, not every search ever run, so the datasets share one question.
+  const [found] = useState(() => {
+    try {
+      const last: Result = JSON.parse(sessionStorage.getItem(LAST_SEARCH) ?? "null");
+      return last ? { accessions: last.datasets.map((d) => d.accession), topic: last.plan.terms.join(", ") } : { accessions: [], topic: "" };
+    } catch {
+      return { accessions: [] as string[], topic: "" };
+    }
+  });
   const geo = [...new Set(found.accessions.filter((a) => /^GSE\d+$/.test(a)))].slice(0, 40);
   const [state, setState] = useState<{ busy?: boolean; data?: ListAcross; error?: boolean }>({});
   if (geo.length < 2) return null;
