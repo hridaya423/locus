@@ -54,6 +54,11 @@ export const MOMENTS = [
     ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 120000], ["pause", 800], ["eval", click("Check it in all")],
     ["wait", "/Your list in [0-9]+ datasets/.test(document.body.innerText)", 400000], ["eval", scrollText("Your list in")], ["pause", 2500]] },
   { slug: "metabolite-volcano", steps: [["go", "/d/ST003390"], ["wait", "/metabolites tested/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
+  { slug: "ms-start-with", steps: [["go", "/"], ["eval", fresh], ["go", "/"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "Phosphoproteomics of human liver cancer against normal liver tissue")], ["pause", 400], ["eval", submit("textarea")],
+    ["wait", "!!document.querySelector('#start-with')", 240000], ["pause", 800], ["eval", scrollTo("#start-with")], ["pause", 2500]] },
+  { slug: "nested-people", steps: [["go", "/d/GSE86618"], ["wait", "/samples come from 6 and 3 people/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
+  { slug: "provenance", steps: [["go", "/d/GSE132703"], ["wait", "/This page was read from/.test(document.body.innerText)", 120000],
+    ["eval", "(() => { const s = [...document.querySelectorAll('summary')].find((e) => /This page was read from/.test(e.textContent)); s.click(); s.scrollIntoView({ block: 'center', behavior: 'smooth' }); return true })()"], ["pause", 2500]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 
