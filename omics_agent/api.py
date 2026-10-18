@@ -85,7 +85,10 @@ def samplesheet(topic: str, accession: str = Path(pattern=r"^GSE\d+$")) -> Respo
 def sample_design(source: str, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
     """The factors that vary across a dataset's samples, their levels and counts, and what all samples share."""
     found = design.design(accession, source)
-    return found | {"comparison": volcano.groups(accession)["default"]} if found else {}
+    if not found:
+        return {}
+    comparison = volcano.groups(accession)["default"]
+    return found | {"comparison": comparison, "people": volcano.people(accession, comparison)}
 
 
 class SubsetIn(BaseModel):

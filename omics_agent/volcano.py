@@ -12,7 +12,7 @@ import httpx
 import numpy as np
 from scipy import stats
 
-from . import record, table
+from . import record, samples, table
 
 FULLTEXT = Path.home() / ".cache" / "omics-agent" / "fulltext"
 EUROPE_PMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
@@ -58,6 +58,23 @@ def groups(accession: str, present: set[str] | None = None) -> dict:
             default = {"factor": f["name"], "case": [max(cases, key=f["levels"].get)], "control": controls}
             break
     return {"factors": factors, "default": default}
+
+
+def people(accession: str, comparison: dict | None) -> dict | None:
+    """Distinct patients or donors in the sample table, in total and per compared group, when a column names them."""
+    rec = record.record(accession)
+    if not rec or not rec["samples"] or not rec["samples"]["rows"]:
+        return None
+    cols, rows = rec["samples"]["columns"], rec["samples"]["rows"]
+    i = next((n for n, c in enumerate(cols) if samples.DONOR.match(c.strip())), None)
+    named = [r for r in rows if i is not None and r[i]]
+    if i is None or not 2 <= len({r[i] for r in named}) < len(rows):
+        return None
+    out = {"field": cols[i], "total": len({r[i] for r in named}), "samples": len(rows)}
+    if comparison and comparison["factor"] in cols:
+        f = cols.index(comparison["factor"])
+        out |= {g: len({r[i] for r in named if r[f] in comparison[g]}) for g in ("case", "control")}
+    return out
 
 
 def compare(accession: str, factor: str | None = None, case: list[str] | None = None, control: list[str] | None = None,

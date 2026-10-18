@@ -153,6 +153,15 @@ export function DesignBars({ rec, selection }: { rec: DatasetRecord; selection: 
           {all ? "Fewer factors" : `All ${d.factors.length} factors`}
         </button>
       )}
+      {d.people && (
+        <p className="text-[13px]">
+          {d.people.samples.toLocaleString()} samples from <span className="font-medium">{d.people.total} people</span>
+          {d.comparison && d.people.case != null && (
+            <>: <span className="text-signal">{d.people.case} {d.comparison.case.join(", ")}</span>, <span className="text-control">{d.people.control} {d.comparison.control.join(", ")}</span></>
+          )}
+          <span className="text-muted-foreground"> · counted from the {d.people.field} column; samples from one person are not independent</span>
+        </p>
+      )}
       {d.crossed && <Crossed crossed={d.crossed} counts={result?.crossed} />}
       {shared.length > 0 && (
         <dl className="flex flex-wrap gap-x-5 gap-y-1 text-[13px]">

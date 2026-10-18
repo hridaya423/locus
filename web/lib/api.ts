@@ -69,6 +69,7 @@ export type Design = {
   factors: { name: string; column: string; levels: Record<string, number>; unstated?: number; aliases?: string[] }[];
   crossed?: { rows: string; columns: string; counts: [string, string, number][] };
   comparison?: { factor: string; case: string[]; control: string[] } | null;
+  people?: { field: string; total: number; samples: number; case?: number; control?: number } | null;
 };
 
 export async function design(accession: string, source: string): Promise<Design | null> {
