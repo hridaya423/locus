@@ -145,7 +145,7 @@ def _record(accession: str, source: str) -> dict | None:
     rows = [dict(zip(table["columns"], r)) for r in table["rows"]]
     rows = [{k: v for k, v in r.items() if k not in NOT_SAMPLE and k != "No. of Samples"}
             for r in rows for _ in range(int(r.get("No. of Samples") or 1))]
-    return from_rows(rows, f"{source} sample table")
+    return from_rows(rows, "Metabolomics Workbench sample factors" if source == "MetabolomicsWorkbench" else f"{source} sample table")
 
 
 def design(accession: str, source: str) -> dict | None:
@@ -153,7 +153,7 @@ def design(accession: str, source: str) -> dict | None:
         return _geo(accession)
     if source in ("PRIDE", "iProX", "jPOST", "PanoramaPublic") and accession.startswith("PXD"):
         return _pride(accession)
-    if source in ("ENA", "ArrayExpress"):
+    if source in ("ENA", "ArrayExpress", "MetabolomicsWorkbench"):
         return _record(accession, source)
     return None
 

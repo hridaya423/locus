@@ -413,7 +413,36 @@ def _stored(accession: str, row: dict) -> Record:
     return rec
 
 
-ADAPTERS = {"GEO": _geo, "PRIDE": _pride, "ENA": _ena, "ArrayExpress": _arrayexpress}
+WORKBENCH = "https://www.metabolomicsworkbench.org/rest/study"
+
+
+def _entries(text: str) -> list[dict]:
+    """A Metabolomics Workbench REST answer as a list: several results come keyed "1", "2", …; one comes bare."""
+    data = json.loads(text) if text.strip() else {}
+    return list(data.values()) if data and all(isinstance(v, dict) for v in data.values()) else [data] if data else []
+
+
+def _workbench(accession: str, row: dict) -> Record:
+    """What locus stored, plus each sample's factors and each analysis with its mwTab table (metabolite by sample)."""
+    rec = _stored(accession, row)
+    factors = _entries(_cached(f"{accession}.mw-factors.json", f"{WORKBENCH}/study_id/{accession}/factors"))
+    analyses = _entries(_cached(f"{accession}.mw-analysis.json", f"{WORKBENCH}/study_id/{accession}/analysis"))
+    pairs = [dict(p.partition(":")[::2] for p in f.get("factors", "").split(" | ") if ":" in p) for f in factors]
+    keys = list(dict.fromkeys(k.strip() for p in pairs for k in p))
+    if factors:
+        rec.samples = {"columns": ["Accession", "Title", "Sample source", *keys], "link": "",
+                       "rows": [[f.get("mb_sample_id", ""), f.get("local_sample_id", ""), f.get("sample_source", ""), *[p.get(k, "").strip() for k in keys]] for f, p in zip(factors, pairs)]}
+    for a in analyses:
+        described = "; ".join(f"{k.replace('_', ' ')}: {v}" for k, v in a.items() if v and k not in ("study_id", "analysis_id"))
+        rec.texts.append((f"Analysis {a['analysis_id']}", described))
+        rec.file(f"{a['analysis_id']}_mwtab.txt", f"{WORKBENCH}/analysis_id/{a['analysis_id']}/mwtab/txt", "Processed", None, True, "mwTab: metabolite by sample table")
+    rec.fact("Instrument", *[a.get("ms_instrument_name") or a.get("nmr_instrument_type") for a in analyses])
+    rec.fact("Chromatography", *[a.get("chromatography_type") for a in analyses])
+    rec.fact("Units", *[a.get("units") for a in analyses])
+    return rec
+
+
+ADAPTERS = {"GEO": _geo, "PRIDE": _pride, "ENA": _ena, "ArrayExpress": _arrayexpress, "MetabolomicsWorkbench": _workbench}
 
 
 def _paper_links(ids: list) -> list[dict]:

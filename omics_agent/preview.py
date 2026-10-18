@@ -174,7 +174,18 @@ def _table(text: str) -> tuple[list[str], list[list[str]], str, int]:
     return header, rows, DELIMITERS[d], comments
 
 
-def _mztab(lines: list[str]) -> tuple[list[str], list[list[str]], str]:
+def _mwtab(lines: list[str]) -> tuple[list[str], list[list[str]]]:
+    """The metabolite-by-sample block of a Metabolomics Workbench mwTab file: its 'Samples' row is the header."""
+    start = next((i for i, l in enumerate(lines) if re.match(r"(MS|NMR)_(METABOLITE|BINNED)_DATA_START", l)), None)
+    if start is None:
+        raise ValueError("The mwTab file has no metabolite data block in the bytes read.")
+    rows = []
+    for line in lines[start + 1:]:
+        if line.endswith("_DATA_END"):
+            break
+        rows.append(line.split("\t"))
+    header = ["Metabolite", *rows[0][1:]] if rows and rows[0][0] == "Samples" else []
+    return header, [r for r in rows[1:] if r[0] != "Factors"]
     for head, body in MZTAB:
         header = next((l.split("\t")[1:] for l in lines if l.startswith(head + "\t")), None)
         if header:
@@ -338,7 +349,10 @@ def preview(accession: str, file: str) -> dict:
         text, whole = _text(data, len(data) < READ or len(data) == size)
         read = len(data)
         lines = [l.rstrip("\r") for l in text.split("\n")]
-        if lines[0].startswith("MTD"):
+        if lines[0].startswith("#METABOLOMICS WORKBENCH"):
+            header, body = _mwtab(lines)
+            kind = "mwTab metabolite data"
+        elif lines[0].startswith("MTD"):
             header, body, kind = _mztab(lines)
         elif lines[0].startswith("!"):
             header, body, samples = _series_matrix(lines)
