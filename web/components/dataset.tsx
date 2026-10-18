@@ -143,7 +143,7 @@ function Body({ rec }: { rec: DatasetRecord }) {
         <About rec={rec} />
         <Samples rec={rec} designed={designed} selection={selection} />
         <QualitySection accession={rec.accession} />
-        {(rec.source === "GEO" || rec.source === "MetabolomicsWorkbench") && <FirstLookSection accession={rec.accession} />}
+        {["GEO", "MetabolomicsWorkbench", "MetaboLights"].includes(rec.source) && <FirstLookSection accession={rec.accession} />}
         <Files rec={rec} selection={selection} />
         {rec.sources && rec.sources.length > 0 && <ReadFrom sources={rec.sources} />}
       </div>

@@ -69,7 +69,8 @@ def compare(accession: str, factor: str | None = None, case: list[str] | None = 
             within: tuple[str, str] | None = None) -> dict:
     data = table.counts(accession)
     if not data:
-        return {"accession": accession, "available": False, "reason": "no gene by sample table: neither NCBI's counts nor the authors' files"}
+        reason = "no gene by sample table: neither NCBI's counts nor the authors' files" if accession.startswith("GSE") else "no metabolite by sample table whose columns are the samples"
+        return {"accession": accession, "available": False, "reason": reason}
     rec = record.record(accession)
     present = set(data["samples"])
     choice = groups(accession, present)

@@ -118,13 +118,13 @@ def quality(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$"))
     """Reads per sample from the run table with outliers flagged, and the authors' QC criteria quoted from their methods."""
     return qc.sample_qc(accession)
 @app.get("/table/{accession}")
-def processed_table(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$")) -> dict:
+def processed_table(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6}|MTBLS\d+)$")) -> dict:
     """Whether locus can hand over the finished counts table for a GEO series, its size and its source."""
     return table.summary(accession)
 
 
 @app.get("/table/{accession}/download")
-def processed_table_zip(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$")) -> Response:
+def processed_table_zip(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6}|MTBLS\d+)$")) -> Response:
     """counts, sample metadata, gene annotation and a manifest, as one zip."""
     if not table.summary(accession)["available"]:
         raise HTTPException(404, f"No processed table for {accession}.")
@@ -132,7 +132,7 @@ def processed_table_zip(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$")) ->
 
 
 @app.get("/first-look/{accession}")
-def first_look(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+def first_look(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6}|MTBLS\d+)$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
                control: Annotated[list[str] | None, Query()] = None, within_factor: str | None = None, within: str | None = None) -> dict:
     """Each gene's change between two sample groups and its significance, from the fetched counts; the method is in the result."""
     try:
@@ -142,7 +142,7 @@ def first_look(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$"), factor: str
 
 
 @app.get("/first-look/{accession}/paper")
-def first_look_paper(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+def first_look_paper(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6}|MTBLS\d+)$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
                      control: Annotated[list[str] | None, Query()] = None) -> dict:
     """The genes the dataset's paper names, and where each lands in the same comparison."""
     look = volcano.compare(accession, factor, case, control)
@@ -150,7 +150,7 @@ def first_look_paper(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$"), facto
 
 
 @app.get("/first-look/{accession}/pathways")
-def first_look_pathways(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6})$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
+def first_look_pathways(accession: str = Path(pattern=r"^(GSE\d+|ST\d{6}|MTBLS\d+)$"), factor: str | None = None, case: Annotated[list[str] | None, Query()] = None,
                         control: Annotated[list[str] | None, Query()] = None, within: Annotated[list[str] | None, Query()] = None) -> dict:
     """Reactome pathways over-represented among the top genes up and down in the same comparison, from Enrichr."""
     look = volcano.compare(accession, factor, case, control, tuple(within) if within and len(within) == 2 else None)

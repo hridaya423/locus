@@ -285,7 +285,7 @@ export function FirstLookSection({ accession }: { accession: string }) {
     return () => ctrl.abort();
   }, [accession, look]);
   const paths = answered?.look === look ? answered.data : null;
-  const unit = look?.feature ?? (accession.startsWith("ST") ? "metabolite" : "gene");
+  const unit = look?.feature ?? (/^(ST|MTBLS)/.test(accession) ? "metabolite" : "gene");
   const ringed = useMemo(() => new Set(ringOn && check?.available ? check.genes.map((g) => g.gene) : []), [check, ringOn]);
 
   if (!summary && !failed) return null;

@@ -169,12 +169,57 @@ def _workbench_matrix(accession: str) -> dict | None:
     }
 
 
+def _metabolights_matrix(accession: str) -> dict | None:
+    """A MetaboLights study's metabolites x samples table from the metabolite assignment file (MAF) that covers the most
+    samples of its sample sheet; metabolites are named by metabolite_identification, else database_identifier."""
+    rec = record.record(accession)
+    if not rec or not rec["samples"]:
+        return None
+    named = {r[0] for r in rec["samples"]["rows"]}
+    best = None
+    for f in [f for f in rec["files"] if f["name"].startswith("m_") and f["name"].endswith(".tsv")]:
+        path = WORKBENCH / accession / f["name"]
+        if not path.exists():
+            body = httpx.get(f["url"], timeout=120, follow_redirects=True).raise_for_status().content
+            if len(body) > MAX_BYTES:
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+        rows = list(csv.reader(io.StringIO(path.read_text(errors="replace")), delimiter="\t"))
+        if not rows:
+            continue
+        header = rows[0]
+        columns = [i for i, h in enumerate(header) if h in named]
+        if len(columns) >= 4 and (best is None or len(columns) > len(best[2])):
+            best = (f, header, columns, rows[1:], path)
+    if not best:
+        return None
+    f, header, columns, rows, path = best
+    label = lambda r: next((r[header.index(k)] for k in ("metabolite_identification", "database_identifier") if k in header and r[header.index(k)].strip()), "")
+    number = lambda v: float(v) if re.fullmatch(r"-?[\d.]+(?:[eE][-+]?\d+)?", v.strip()) else np.nan
+    body = [r for r in rows if len(r) == len(header) and label(r)]
+    matrix = np.array([[number(r[i]) for i in columns] for r in body]) if body else np.empty((0, len(columns)))
+    keep = np.isfinite(matrix).sum(axis=1) >= len(columns) / 2
+    if not keep.any():
+        return None
+    matrix, names = matrix[keep], [label(r) for r, k in zip(body, keep) if k]
+    return {
+        "accession": accession, "samples": [header[i] for i in columns], "gene_ids": names, "matrix": np.nan_to_num(matrix, nan=0.0),
+        "kind": "log scale" if np.nanmin(matrix) < 0 else "normalised, linear", "symbols": names, "genes": {}, "feature": "metabolite",
+        "organism": next((v[0] for lbl, v in rec["facts"] if lbl == "Organism"), "not stated"),
+        "source": {"url": f["url"], "file": f["name"], "build": "as the authors quantified it", "pipeline": "the authors' metabolite assignment file (MAF)",
+                   "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "bytes": path.stat().st_size, "genes_url": ""},
+    }
+
+
 @lru_cache(maxsize=8)
 def counts(accession: str) -> dict | None:
     """A genes x samples matrix with gene symbols and where it came from: NCBI's raw counts, else the authors' own table;
     for a Metabolomics Workbench study, metabolites x samples from its mwTab."""
     if re.fullmatch(r"ST\d{6}", accession):
         return _workbench_matrix(accession)
+    if re.fullmatch(r"MTBLS\d+", accession):
+        return _metabolights_matrix(accession)
     if not (found := available(accession)):
         return _authors_matrix(accession)
     path = _fetch(found["url"], DATA / found["file"])
@@ -229,8 +274,8 @@ def bundle(accession: str) -> bytes:
                                                 "counts": data["source"], "samples_from": rec["url"], "organism": data["organism"]}, indent=1))
         metabolites = data.get("feature") == "metabolite"
         z.writestr("README.txt", f"""{accession}: {data['kind']} from {data['source']['pipeline']}, {data['source']['build'] if metabolites else f"genome {data['source']['build']}"}.
-counts.tsv  {len(data['gene_ids'])} {'metabolites' if metabolites else 'genes'} x {len(data['samples'])} samples (columns are {'Metabolomics Workbench sample IDs' if metabolites else 'GEO sample accessions'})
-samples.tsv one row per sample, the characteristics from the {'Metabolomics Workbench sample factors' if metabolites else 'GEO record'}
+counts.tsv  {len(data['gene_ids'])} {'metabolites' if metabolites else 'genes'} x {len(data['samples'])} samples (columns are {'the repository sample names' if metabolites else 'GEO sample accessions'})
+samples.tsv one row per sample, the characteristics from the {'repository sample table' if metabolites else 'GEO record'}
 features.tsv {'the metabolite names as the authors wrote them' if metabolites else 'NCBI Gene symbol, description and type per gene_id'}
 
 Python: import pandas as pd; counts = pd.read_csv("counts.tsv", sep="\\t", index_col=0).drop(columns="symbol"); samples = pd.read_csv("samples.tsv", sep="\\t", index_col=0)
