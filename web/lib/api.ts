@@ -222,6 +222,25 @@ export async function filePreview(accession: string, file: string, signal?: Abor
 export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; found_in: string; title?: string };
 
 // An identifier is one or two words with a digit (for "PMID: 123"); anything else is a question and never leaves the browser.
+// A watched search remembers the datasets it showed; a later run marks the ones locus has indexed since.
+const WATCHED = "locus:watched";
+export type Watch = { question: string; since: string; seen: string[] };
+
+export function watches(): Watch[] {
+  try {
+    return JSON.parse(localStorage.getItem(WATCHED) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function setWatch(question: string, accessions: string[] | null): Watch | null {
+  const rest = watches().filter((w) => w.question !== question);
+  const watch = accessions ? { question, since: new Date().toISOString().slice(0, 10), seen: accessions } : null;
+  localStorage.setItem(WATCHED, JSON.stringify(watch ? [watch, ...rest] : rest));
+  return watch;
+}
+
 export const looksLikeIdentifier = (text: string) => text.length <= 200 && text.trim().split(/\s+/).length <= 2 && /\d/.test(text);
 
 // "Philippe 2020 PNAS LARP1": a capitalised surname, optionally "et al.", then a year.

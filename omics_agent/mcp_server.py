@@ -38,16 +38,20 @@ def _record(d: Dataset) -> dict:
 
 
 @mcp.tool(annotations=READ_ONLY)
-def search_datasets(question: str, limit_per_repository: int = 60) -> dict:
+def search_datasets(question: str, limit_per_repository: int = 60, seen: list[str] | None = None) -> dict:
     """Find public omics datasets for a research question in plain English, graded and checked. Takes about a minute.
 
     Searches GEO, ArrayExpress, ENA, PRIDE, MassIVE, MetaboLights, CELLxGENE and more. Returns the search plan and
     each relevant dataset with a grade (strong or partial), checks (same topic, patient material, requested data type,
     controls), case and control sample counts and libraries per assay read from the sample records where available,
     a reason, a verbatim quote from the dataset metadata, the linked paper, and a download plan. Also returns groups
-    of datasets from the same paper.
+    of datasets from the same paper. To watch a search, pass the accessions an earlier run returned as `seen`; `new`
+    then lists the datasets this run adds (locus's index grows with each harvest).
     """
-    return agent.run(question, limit_per_repository)
+    result = agent.run(question, limit_per_repository)
+    if seen is not None:
+        result["new"] = [d["accession"] for d in result["datasets"] if d["accession"] not in set(seen)]
+    return result
 
 
 @mcp.tool(annotations=READ_ONLY)

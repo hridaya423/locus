@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, type Cited, type Plan, type Result } from "@/lib/api";
+import { cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, watches, type Cited, type Plan, type Result, type Watch } from "@/lib/api";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
@@ -132,6 +132,9 @@ export function Search() {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [result, setResult] = useState<Result | null>(null);
   const [cited, setCited] = useState<{ question: string; paper: Cited } | null>(null);
+  const [watched, setWatched] = useState<Watch[]>([]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setWatched(watches()), []);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -294,6 +297,16 @@ export function Search() {
           Or paste a GSE, PXD, SRR, PMID or DOI to open its page, or{" "}
           <Link href="/list" className={MUTED_LINK}>check your own gene or protein list</Link>.
         </p>
+      )}
+      {idle && watched.length > 0 && (
+        <ul className="grid justify-items-center gap-1 text-[13px]">
+          {watched.slice(0, 3).map((w) => (
+            <li key={w.question}>
+              <span className="text-muted-foreground">Watching since {w.since}: </span>
+              <a href={`/?q=${encodeURIComponent(w.question)}`} className={LINK}>{w.question}</a>
+            </li>
+          ))}
+        </ul>
       )}
 
       {(voice.listening || voice.problem) && (

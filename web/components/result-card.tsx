@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, ChevronDown, X } from "lucide-react";
@@ -50,6 +50,9 @@ export const unfold = {
 
 // A no-break space before each dot keeps separators from starting a wrapped line.
 export const SEP = "\u00a0·  ";
+
+// Accessions a watched search had not shown before, with the date watching began.
+export const NewSince = createContext<{ since: string; fresh: Set<string> } | null>(null);
 
 export const ROW = "border-b border-rule transition-colors duration-150 last:border-b-0 hover:bg-card/60";
 
@@ -234,6 +237,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   }
   const reason = hit.fit === "partial" ? hit.reason : "";
   const warnings = Object.entries(WARNING).map(([k, text]) => text[hit.checks[k as keyof Hit["checks"]]]).filter(Boolean);
+  const watched = useContext(NewSince);
   const meta = [repositoryName(hit.source), hit.published?.slice(0, 4), assayOf(hit), materialOf(hit)].filter(Boolean).join(SEP);
   const toggle = () => setExpanded((v) => !v);
 
@@ -252,6 +256,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
             <button type="button" onClick={toggle} aria-expanded={expanded} aria-label={`Details of ${hit.accession}`} className="grid w-full min-w-0 cursor-pointer gap-1 text-left">
               <span className="flex min-w-0 flex-wrap items-baseline gap-x-2" title={meta}>
                 <span className="shrink-0 font-mono text-[12px] font-medium text-foreground/80">{shortAccession(hit)}</span>
+                {watched?.fresh.has(hit.accession) && <span className="label shrink-0 text-signal" title={`Not in this search when you started watching it on ${watched.since}`}>new</span>}
                 <span className="label line-clamp-2 min-w-0 basis-full text-muted-foreground sm:line-clamp-1 sm:basis-0 sm:grow">{meta}</span>
               </span>
               {!branch && hit.paper && (

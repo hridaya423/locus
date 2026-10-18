@@ -6,10 +6,10 @@ import { ArrowDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
 import { useRouter } from "next/navigation";
-import { datasetPath, genePath, repositoryName, type Hit, type Result } from "@/lib/api";
+import { datasetPath, genePath, repositoryName, setWatch, watches, type Hit, type Result, type Watch } from "@/lib/api";
 import { LINK as LINK_CLASS } from "@/components/page-kit";
 import { CompareDialog, Connector } from "@/components/compare";
-import { Checkbox, CountCell, DatasetRow, ROW, SEP, Stem, assayOf, materialOf, rememberScroll, unfold } from "@/components/result-card";
+import { Checkbox, CountCell, DatasetRow, NewSince, ROW, SEP, Stem, assayOf, materialOf, rememberScroll, unfold } from "@/components/result-card";
 import Link from "next/link";
 
 type SortKey = "control" | "case" | "samples" | "year";
@@ -230,6 +230,10 @@ export function Results({ result }: { result: Result }) {
   const [copied, setCopied] = useState(false);
   const [comparing, setComparing] = useState(false);
   const section = useRef<HTMLElement>(null);
+  const [toggled, setToggled] = useState(0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const watch = useMemo<Watch | null>(() => watches().find((w) => w.question === result.question) ?? null, [result.question, toggled]);
+  const fresh = useMemo(() => (watch ? { since: watch.since, fresh: new Set(result.datasets.map((d) => d.accession).filter((a) => !watch.seen.includes(a))) } : null), [watch, result]);
 
   const visible = result.datasets;
   const geo = result.datasets.filter((d) => d.source === "GEO" && d.fit === "strong").map((d) => d.accession);
@@ -259,6 +263,7 @@ export function Results({ result }: { result: Result }) {
   }
 
   return (
+    <NewSince.Provider value={fresh}>
     <motion.section ref={section} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={motionTier.entrance} className="relative grid grid-cols-1 gap-5 pb-16">
       <h2 className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
         {strongCount > 0 ? (
@@ -267,6 +272,11 @@ export function Results({ result }: { result: Result }) {
           <span className="text-sm font-medium">No dataset meets every requirement</span>
         )}
         {strongCount !== result.datasets.length && <Tally value={result.datasets.length} label="relevant" />}
+        <button type="button" onClick={() => { setWatch(result.question, watch ? null : result.datasets.map((d) => d.accession)); setToggled((n) => n + 1); }}
+          className="ml-auto text-[13px] font-normal text-muted-foreground underline decoration-rule underline-offset-4 transition-colors duration-150 hover:text-foreground hover:decoration-foreground"
+          title={watch ? "Stop watching this search" : "Later runs of this search mark the datasets locus adds after today"}>
+          {watch ? `Watching since ${watch.since}${fresh?.fresh.size ? ` · ${fresh.fresh.size} new` : ""}` : "Watch this search"}
+        </button>
       </h2>
 
       {!!result.answer?.length && <StartWith answer={result.answer} />}
@@ -333,5 +343,6 @@ export function Results({ result }: { result: Result }) {
         )}
       </AnimatePresence>
     </motion.section>
+    </NewSince.Provider>
   );
 }
