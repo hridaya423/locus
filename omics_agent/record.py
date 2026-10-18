@@ -5,6 +5,7 @@ Each adapter names every source field it reads and every field it leaves out on 
 record lands in `unmapped`, and the self-check fails on it, so a field the repository page shows is never silently lost.
 """
 
+import html
 import json
 import re
 import sqlite3
@@ -183,6 +184,24 @@ def _run_files(rec: Record, run: dict) -> None:
             return
 
 
+# Sample attributes that describe the submission or the location, not how samples differ.
+SAMPLE_NOISE = re.compile(r"^ENA-|_units$|^(?:latitude|longitude|elevation|geo_loc_name|collection_(?:timestamp|date|device|method)|tube_id|sampledescription|"
+                          r"physical_specimen\w*|irb_\w+|env_\w+|empo_\d|scientific_name|organism|host scientific name|host_taxid|host_common_name|dna_extracted|"
+                          r"description|title|alias|sample_name|anonymized_name|qiita_\w+|submitted_to_insdc)$", re.I)
+SAMPLE_BATCH, MAX_SAMPLES, SAMPLE_COLUMNS = 100, 1000, 12
+
+
+def _sample_attributes(accessions: list[str]) -> dict[str, dict[str, str]]:
+    """Each BioSample's attributes from ENA's sample XML, 100 samples a request."""
+    out: dict[str, dict[str, str]] = {}
+    for i in range(0, len(accessions), SAMPLE_BATCH):
+        chunk = accessions[i:i + SAMPLE_BATCH]
+        root = ET.fromstring(_cached(f"{chunk[0]}-{len(chunk)}.samples.xml", ENA_XML.format(",".join(chunk))))
+        for sample in root.findall("SAMPLE"):
+            out[sample.get("accession", "")] = {(a.findtext("TAG") or "").strip(): (a.findtext("VALUE") or "").strip() for a in sample.findall("SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE")}
+    return out
+
+
 def _ena_runs(rec: Record, project: str, files_only: bool = False) -> None:
     """Every run of a study with its read files and sizes."""
     runs = _runs(project)
@@ -201,6 +220,25 @@ def _ena_runs(rec: Record, project: str, files_only: bool = False) -> None:
     used = [(label, key) for label, key in columns if any(r.get(key) for r in runs)]
     rec.samples = {"columns": [label for label, _ in used], "rows": [[r.get(key, "") for _, key in used] for r in runs],
                    "link": "https://www.ebi.ac.uk/ena/browser/view/{}", "pages": True}
+    # The run table says nothing about how samples differ; the samples' own attributes do (PRJEB39707: days, sex, subject).
+    ids = list(dict.fromkeys(r["sample_accession"] for r in runs if r.get("sample_accession")))
+    if not ids or len(ids) > MAX_SAMPLES:
+        return
+    try:
+        attributes = _sample_attributes(ids)
+    except (httpx.HTTPError, ET.ParseError):
+        return
+    values: dict[str, set] = {}
+    for attrs in attributes.values():
+        for tag, value in attrs.items():
+            if not SAMPLE_NOISE.search(tag) and value.lower() not in ("not provided", "not collected", "missing", "not applicable", ""):
+                values.setdefault(tag, set()).add(value)
+    kept = [t for t, v in values.items() if 2 <= len(v) <= 50 or (samples.DONOR.match(t) and 2 <= len(v) < len(ids))][:SAMPLE_COLUMNS]
+    sample_column = rec.samples["columns"].index("Sample")
+    rec.samples["columns"] += kept
+    for row in rec.samples["rows"]:
+        attrs = attributes.get(row[sample_column], {})
+        row += [attrs.get(t, "") for t in kept]
 
 
 def _names(values: list) -> list[str]:
@@ -298,7 +336,8 @@ def _ena(accession: str, row: dict) -> Record:
     text = lambda path: " ".join((project.findtext(path) or "").split())
     rec = Record(accession, "ENA", row["url"], text("TITLE") or row["title"])
     rec.unmapped = sorted({child.tag for child in project} - ENA_SHOWN)
-    if description := (project.findtext("DESCRIPTION") or "").strip():
+    # ENA stores some descriptions with their entities escaped twice ("p &amp;lt; 0.015" arrives as "p &lt; 0.015").
+    if description := html.unescape((project.findtext("DESCRIPTION") or "").strip()):
         rec.texts.append(("Description", description))
     rec.fact("Study name", text("NAME"))
     rec.fact("Secondary accession", *[e.text for e in project.findall("IDENTIFIERS/SECONDARY_ID")])

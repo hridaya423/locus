@@ -185,7 +185,7 @@ def resolve_labels(labels: dict, fields: dict[str, Counter]) -> dict:
     }
 
 
-DONOR = re.compile(r"^(?:patient|donor|subject|individual|participant)[ _-]?(?:id|number|no|code)?$", re.I)
+DONOR = re.compile(r"^(?:host[ _])?(?:patient|donor|subject|individual|participant)[ _-]?(?:id|number|no|code)?$", re.I)
 
 
 def donors(fields: dict[str, Counter], labels: dict, records: list[dict[str, str]], total: int) -> dict | None:
