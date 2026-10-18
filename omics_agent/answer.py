@@ -68,7 +68,8 @@ def pick(plan: dict, hits: list[dict]) -> list[dict]:
     # People, not records: 540 single-cell records from 9 patients count as 9.
     size = lambda f: min(f["donors"]["case"], f["donors"]["control"]) if f.get("donors") else min(f["case"], f["control"])
     best = max((h for h in counted if h["accession"] not in taken), key=lambda h: size(h["facts"]), default=None)
-    if best:
+    # A question with no control group in it ("how isoforms differ") gets no largest-comparison pick.
+    if best and plan.get("wants_controls", True):
         f = best["facts"]
         d = f.get("donors")
         fact = (f"{d['case']} case and {d['control']} control people across {f['case'] + f['control']} sample records" if d
