@@ -202,18 +202,13 @@ Contract: `docs/plans/2026-10-17-overnight-bar.md`. Branch `overnight/2026-10-17
 - Assistant bar (00:05): Opus 5.5 + web search answered all 8 harness questions, $3.91 of the $5 cap (`scripts/assistant_bar.py`, answers in /tmp/locus-night/assistant/). Haiku spend: harness searches were cached; not metered separately.
 - `dataset.tsx` split into `page-kit.tsx`, `sample-table.tsx`, `files.tsx`, `aside.tsx` so parallel builders never share a file.
 
-### Pieces in flight (00:30)
-- A samples filter each other — t3/a92a90b9 ad8864d; critic A FIX → fixed; critic A2 running.
-- B file preview — t3/d788bbfb fe14605; critic B FIX → fixed; critic B2 running.
-- C paste anything + paper page + mic — t3/7a65981b 8c58bb3; critic C FIX → fixed; one more fix asked (read zip listings by Range, no whole-zip download).
-- D assays from the methods (lead) — feat/assay 51089a2; critics D FIX (36 RPF typed TIS), D2 FIX (10.1% libraries wrong: RNA words beat titles); round 3 title-first, self-check sweeps 3,226 cached titles; critic D3 running.
-- E table + first look + paper genes + gene everywhere (lead) — feat/gene-entry 5fddd5d; critic E FIX (page crash on unavailable default, nuisance defaults, paper direction noise); round 2 done; critic E2 running.
-- F quality (lead) — feat/qc 0bb6d34; critic F FIX (top-ups flagged as outliers, 62% of QC quotes not QC); round 2 done; critic F2 running.
-- G why it matched — t3/why-matched-highlights 2b71f7e; critic G running.
-- H the answer, "Start with" (lead) — feat/answer a05bd32; no critic yet.
-- Trial integration of A–G on integrate/trial: merges resolve (union for append-only files, by hand for dataset.tsx); all 14 self-checks pass; harness 36 pages, 0 problems, median 341 ms.
-- Incident 00:32: the disk filled (0 bytes free); every tool call failed for a few minutes. Cause: memory pressure → swap on the shared APFS container. 21 orphaned headless Chromes from critics' scripts held 17 GB, plus ~15 APIs warmed with the 2.5 GB embedding index. Fix: killed orphans (Chrome 17 GB → 0.5 GB); critic APIs restarted without warm-up (`python -c 'import os, uvicorn; from omics_agent.api import app; uvicorn.run(app, port=...)'`, index loads on first search); watchdog `/tmp/locus-night/watchdog.sh` kills orphan Chrome each minute and stops if free disk < 5 GB. Nothing in data/ or caches was deleted; only the lead-look .next cache, a half-copied node_modules, stale Chrome profiles and a mistakenly downloaded 135 MB GSE150910 kallisto file under ~/omics-data.
-- Rule learned: union-merging two appended functions can drop a shared closing tail; after any union merge run tsc and list every route and tool.
+### State at 02:50
+- Critics B2, D3, E2, F2, G stalled after the 00:32 disk incident (no activity after 00:52) and were cancelled at 02:35.
+- All pieces merged onto overnight/2026-10-17 (ee30038, af5929a): A filter (+fix rounds to c161ccf), B preview (fe14605), C paste/paper/mic (f215d9e, zip sizes by Range), G why-matched (2b71f7e), assays (51089a2) + matched libraries (6333471), quality (0bb6d34), table/first look/paper genes/gene everywhere (5fddd5d) + design check (edfe4a9) + your list (1b8b7ac), answer (a05bd32), browse (e0e8423). Partners deleted (af5929a).
+- Integrated build on 8010/3010: all 18 module self-checks pass; tsc and eslint clean; 22 API routes, 24 MCP tools; harness 36 pages, 0 problems, median 326 ms.
+- Door audit (seed 1): values that open nothing per page 20.03 → 14.24; outbound links per page 5.97 → 5.97 (remaining: repository-record receipts, file downloads, linked records).
+- Next: three critics on the integrated build (X1 samples/files/quality/design; X2 assays/pairs/why/paste-paper/doors; X3 table/first look/gene everywhere/answer/list) — briefs in /tmp/locus-night/group-brief.md; delegate_task returned parent_not_active from a notification-started turn.
+- Lesson: after a disk-full event, child agent sessions can hang without failing; check thread updatedAt, not only task status.
 
 ### Moments
 (one line each: source · page · dataset · moment)
