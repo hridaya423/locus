@@ -293,6 +293,24 @@ def _groups(headers: list[str], table: dict | None, samples: list[dict] | None =
     return summary | {"factor": design._clean(factor), "levels": counts}, groups
 
 
+INTENSITY = re.compile(r"^(?:LFQ intensity|Intensity) (?![LMH]$)(.+)$")
+CHANNEL = re.compile(r"^Reporter intensity (?:corrected )?(\d+)(?: (.+))?$")
+
+
+def experiments(header: list[str]) -> dict | None:
+    """The samples a MaxQuant table measured, from its column names ('Intensity XAD_1', 'Reporter intensity corrected 3
+    WT1'), grouped by name without the trailing number, and the isobaric channels per run when there are any."""
+    names = sorted(dict.fromkeys(m[1] for h in header if (m := INTENSITY.match(h))), key=lambda n: [int(p) if p.isdigit() else p for p in re.split(r"(\d+)", n)])
+    channels = len({m[1] for h in header if (m := CHANNEL.match(h))})
+    if len(names) < 2 and channels < 2:
+        return None
+    stems: dict[str, int] = {}
+    for n in names:
+        stem = re.sub(r"[_ .-]*\d+$", "", n) or n
+        stems[stem] = stems.get(stem, 0) + 1
+    return {"names": names, "groups": stems if 1 < len(stems) < len(names) else None, "channels": channels or None}
+
+
 @lru_cache(maxsize=64)
 def preview(accession: str, file: str) -> dict:
     """The columns, first rows and sample groups of one processed file of a dataset. LookupError when the dataset or
@@ -341,7 +359,7 @@ def preview(accession: str, file: str) -> dict:
     for c, g in zip(columns, groups or [None] * width):
         c["group"] = g
     return {
-        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "member": member, "skipped": skipped, "bytes_read": read, "size": size,
+        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "member": member, "experiments": experiments(header), "skipped": skipped, "bytes_read": read, "size": size,
         "complete": whole, "rows_read": len(body), "total_rows": len(body) if whole else None, "column_count": width,
         "columns": columns[:MAX_COLUMNS], "rows": [[v[:CELL] for v in r[:MAX_COLUMNS]] for r in body[:SHOWN]], "samples": summary,
     }

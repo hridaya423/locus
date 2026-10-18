@@ -16,7 +16,7 @@ import { QualitySection } from "@/components/qc";
 import { FirstLookSection } from "@/components/first-look";
 import { dataType } from "@/components/result-card";
 import { MarkedText, MarkedTitle, MatchedLine, goToMatch, hasMatch, useFound, useMatches, type Matches } from "@/components/matches";
-import { datasetRecord, repositoryName, type DatasetRecord, type Hit } from "@/lib/api";
+import { datasetRecord, filePreview, repositoryName, type DatasetRecord, type FilePreview, type Hit } from "@/lib/api";
 
 export function DatasetPage({ accession }: { accession: string }) {
   const router = useRouter();
@@ -206,8 +206,44 @@ function Samples({ rec, designed, selection }: { rec: DatasetRecord; designed: b
       {rec.samples ? (
         <SampleTable dataset={rec.accession} samples={rec.samples} selection={selection} />
       ) : (
-        <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} does not list individual samples{rec.files.some((f) => f.kind === "sample design") ? "; the sample design file is under Files" : ""}.</p>
+        <>
+          <p className="text-[13px] text-muted-foreground">{repositoryName(rec.source)} does not list individual samples{rec.files.some((f) => f.kind === "sample design") ? "; the sample design file is under Files" : ""}.</p>
+          <TableSamples rec={rec} />
+        </>
       )}
     </section>
+  );
+}
+
+const NAMES_SHOWN = 48;
+
+// Without a sample list, the authors' search-engine table still names what it measured: one column per sample or channel.
+function TableSamples({ rec }: { rec: DatasetRecord }) {
+  const zip = rec.files.find((f) => f.preview && /\.zip$/i.test(f.name));
+  const [found, setFound] = useState<FilePreview | null>(null);
+  useEffect(() => {
+    if (!zip) return;
+    const ctrl = new AbortController();
+    filePreview(rec.accession, zip.name, ctrl.signal).then(setFound, () => {});
+    return () => ctrl.abort();
+  }, [rec.accession, zip]);
+  const e = found?.experiments;
+  if (!found || !e) return null;
+  const runs = e.names.length;
+  return (
+    <div className="grid gap-2 text-[13px]">
+      <p>
+        {runs > 1 ? <>The authors&apos; protein table names <span className="font-medium">{runs} samples</span></> : <>The authors&apos; protein table holds one run</>}
+        {e.channels && <>, {runs > 1 ? "each" : ""} with <span className="font-medium">{e.channels} isobaric channels</span></>}
+        {e.groups && <>: {Object.entries(e.groups).map(([g, n], i) => <span key={g}>{i > 0 && ", "}<span className="font-mono text-[12.5px]">{g}</span> {n}</span>)}</>}.
+      </p>
+      {runs > 1 && (
+        <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[12px] text-muted-foreground">
+          {e.names.slice(0, NAMES_SHOWN).map((n) => <span key={n}>{n}</span>)}
+          {runs > NAMES_SHOWN && <span>+{runs - NAMES_SHOWN} more</span>}
+        </p>
+      )}
+      <p className="text-[12px] text-muted-foreground">Read from the column names of {found.member?.path ?? found.file} in {found.file}, not downloaded.</p>
+    </div>
   );
 }
