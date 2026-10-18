@@ -114,7 +114,7 @@ function PlanChips({ plan }: { plan: Plan }) {
       ))}
       {plan.method_notes.length > 0 && (
         <ul className="grid gap-1 border-l-2 border-foreground pl-3 text-sm text-muted-foreground">
-          {plan.method_notes.map((n) => <li key={n}>{n}</li>)}
+          {plan.method_notes.slice(0, 2).map((n) => <li key={n}>{n}</li>)}
         </ul>
       )}
     </div>
