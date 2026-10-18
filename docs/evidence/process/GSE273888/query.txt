@@ -1,0 +1,10 @@
+Query typed into locus (17 Oct 2026, local vLLM model qwen38-unc, 8 min 14 s):
+
+  bulk RNA-seq of human cells treated with an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle
+
+Plan terms: mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2, mTOR signaling; organism Homo sapiens; assays bulk RNA-seq.
+locus returned 34 strong GEO hits; GSE273888 (HeLa cells, 100 nM rapamycin vs no treatment, 3 + 3, paired-end) was chosen as the smallest two-condition study with FASTQs on ENA.
+
+Command:
+
+  uv run omics process GSE273888 --topic "mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2, mTOR signaling"

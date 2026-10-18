@@ -1,8 +1,12 @@
 import argparse
 import json
+import os
+import re
 import sys
 
 from dotenv import load_dotenv
+
+from . import process
 
 
 def describe(facts: dict) -> str:
@@ -11,19 +15,69 @@ def describe(facts: dict) -> str:
         parts.append(f"case {facts['case']} · control {facts['control']}")
         if facts.get("mixed"):
             parts.append(f"mixed pools {facts['mixed']}")
+    if facts.get("grain"):
+        individuals = "unknown" if facts["individuals"] is None else facts["individuals"]
+        parts.append(f"{individuals} individuals / {facts['source'].split()[0]} samples / {facts['runs']} runs" + (f" · {facts['excluded_pooled']} pooled left out" if facts["excluded_pooled"] else ""))
     elif facts["has_control"] is not None:
         parts.append("has controls" if facts["has_control"] else "no controls")
     return " · ".join(p for p in parts if p) + f"  (from {facts['source']})"
 
 
+def process_main(argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(prog="omics process", description="Run one GEO bulk RNA-seq series from subsampled ENA reads to DESeq2 results and plots.")
+    parser.add_argument("accession", help="a GEO series, such as GSE123456")
+    parser.add_argument("--topic", default="", help="the search question the labels answer; defaults to the study title")
+    parser.add_argument("--reads", type=int, default=process.READS, help="reads taken from the start of each FASTQ")
+    parser.add_argument("--threads", type=int, default=process.THREADS)
+    parser.add_argument("--json", action="store_true", help="print the result as JSON")
+    args = parser.parse_args(argv)
+    if not re.fullmatch(r"GSE\d+", args.accession):
+        parser.error("the accession must be a GEO series (GSE…)")
+
+    load_dotenv()
+    log = lambda msg: print(msg, file=sys.stderr, flush=True)
+    stages = {
+        "plan": "planning: sample records, labels and ENA runs",
+        "reference": "reference: GENCODE transcripts and salmon index",
+        "fetch": "fetching the first reads of each FASTQ from ENA",
+        "quantify": "quantifying with salmon",
+        "count": "counting: tximport, counts.tsv and .count files",
+        "test": "testing: DESeq2 with apeglm, PCA, volcano and MA plots",
+        "explain": "explaining: the model writes a paragraph from the numbers; code checks every number",
+    }
+
+    announced: set[str] = set()
+
+    def progress(stage: str, data: dict) -> None:
+        if stage == "log":
+            log(data)
+        elif stage in stages and stage not in announced:
+            announced.add(stage)
+            log(stages[stage] + (f" ({data['count']} samples)" if "count" in data else ""))
+
+    try:
+        result = process.run(args.accession, args.topic, args.reads, args.threads, progress=progress)
+    except (LookupError, ValueError) as error:
+        sys.exit(f"cannot process {args.accession}: {error}")
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        print("\n".join(process.summary_lines(result)))
+
+
 def main() -> None:
+    if sys.argv[1:2] == ["process"]:
+        process_main(sys.argv[2:])
+        return
     parser = argparse.ArgumentParser(prog="omics", description="Find public omics datasets with a plain-English question.")
-    parser.add_argument("question")
+    parser.add_argument("question", help="a question, or 'process' to run a GEO series (see 'omics process --help')")
     parser.add_argument("--json", action="store_true", help="print machine-readable results")
     parser.add_argument("--limit", type=int, default=agent.KEEP, help="how many triaged candidates to screen")
     args = parser.parse_args()
 
     load_dotenv()
+    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("LOCAL_LLM_URL")):
+        sys.exit("locus needs a model: set ANTHROPIC_API_KEY, or LOCAL_LLM_URL and LOCAL_LLM_MODEL for a local server, in .env (see .env.example).")
     from . import agent
 
     log = lambda msg: print(msg, file=sys.stderr)

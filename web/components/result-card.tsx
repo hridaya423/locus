@@ -9,6 +9,7 @@ import { EASE_OUT } from "@/lib/springs";
 import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type Facts, type Hit } from "@/lib/api";
 import { Evidence, Methods, Ready } from "@/components/row-details";
 import { MASS_SPEC, ProtocolLine } from "@/components/assay";
+import { ProcessPanel } from "@/components/process-panel";
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -126,6 +127,20 @@ function Libraries({ libraries, matched }: { libraries: NonNullable<Facts["libra
   );
 }
 
+// Proteomics counts from an SDRF table: individuals, samples and runs are different things, so each is named, and a
+// table without an individual column says "unknown" rather than passing the sample count off as patients.
+function Grains({ facts }: { facts: Facts }) {
+  const individuals = facts.individuals === null || facts.individuals === undefined ? "unknown" : facts.individuals;
+  const samples = facts.source.split(" ")[0];
+  const labels = Object.keys(facts.labels ?? {});
+  return (
+    <span className="label text-muted-foreground" title="Counted from the curated SDRF sample table (bigbio/sdrf-annotated-datasets)">
+      {individuals} individuals{SEP}{samples} samples{SEP}{facts.runs} runs{labels.length > 0 && `${SEP}${labels.join(", ")}`}
+      {!!facts.excluded_pooled && `${SEP}${facts.excluded_pooled} pooled left out`}
+    </span>
+  );
+}
+
 // A native checkbox, restyled: the box fills with ink and the tick draws itself in.
 export function Checkbox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string }) {
   return (
@@ -221,6 +236,9 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   const plan = hit.download_plan;
   const page = datasetPath(hit.accession);
   const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
+  // Bulk RNA-seq GEO series with counted case and control samples can run the laptop-tier pipeline.
+  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total)?rnaseq$/.test(norm(a))) && (facts?.case ?? 0) >= 2 && (facts?.control ?? 0) >= 2;
+  const [processing, setProcessing] = useState(false);
 
   async function exportSamplesheet() {
     setSheet("writing");
@@ -265,6 +283,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                 </span>
               )}
               {facts?.libraries && Object.keys(facts.libraries).length > 0 && <Libraries libraries={facts.libraries} matched={matched} />}
+              {facts?.grain && <Grains facts={facts} />}
             </button>
           </div>
         </td>
@@ -325,6 +344,15 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     </button>
                   </div>
                 </details>
+                {rnaseq && !processing && (
+                  <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <button type="button" onClick={() => setProcessing(true)} className={cn(ACTION, "w-fit")}>
+                      Process
+                    </button>
+                    <span className="text-xs text-muted-foreground">subsampled reads → salmon → counts → DESeq2, on this machine</span>
+                  </span>
+                )}
+                {processing && <ProcessPanel accession={hit.accession} topic={topic} />}
                 {riboseq && (
                   <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <button type="button" onClick={exportSamplesheet} disabled={sheet === "writing"} className={cn(ACTION, "w-fit disabled:cursor-wait disabled:no-underline")}>

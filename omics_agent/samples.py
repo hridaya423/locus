@@ -95,15 +95,31 @@ def geo_records(accession: str) -> list[dict]:
     return records
 
 
-def geo_files(accession: str) -> list[str]:
-    """Download links for the processed files a GEO series offers, at series or sample level; one cached series request."""
+def _series_text(accession: str) -> str:
+    """The series-level GEO record, cached."""
     path = CACHE / f"{accession}.series.txt"
     if not path.exists():
         response = ncbi_get(GEO_SAMPLES, {"acc": accession, "targ": "self", "form": "text", "view": "brief"})
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(response.text)
+    return path.read_text()
+
+
+def geo_series(accession: str) -> dict[str, str]:
+    """The series title, summary and overall design, from the GEO record; empty strings when absent."""
+    fields = {"!Series_title": "title", "!Series_summary": "summary", "!Series_overall_design": "design"}
+    out = dict.fromkeys(fields.values(), "")
+    for line in _series_text(accession).splitlines():
+        key, _, value = line.partition(" = ")
+        if key in fields:
+            out[fields[key]] = (out[fields[key]] + " " + value).strip()
+    return out
+
+
+def geo_files(accession: str) -> list[str]:
+    """Download links for the processed files a GEO series offers, at series or sample level; one cached series request."""
     samples = CACHE / f"{accession}.txt"
-    lines = path.read_text().splitlines() + (samples.read_text().splitlines() if samples.exists() else [])
+    lines = _series_text(accession).splitlines() + (samples.read_text().splitlines() if samples.exists() else [])
     files = (line.partition(" = ")[2] for line in lines if line.startswith(("!Series_supplementary_file", "!Sample_supplementary_file")))
     # Series-level files (often one bundle of every sample's file) come before per-sample files.
     return sorted({f.replace("ftp://", "https://", 1) for f in files if f and f != "NONE"}, key=lambda f: ("/geo/samples/" in f, f))

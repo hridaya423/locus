@@ -1,0 +1,1843 @@
+{
+  "question": "bulk RNA-seq of human cells treated with an mTOR inhibitor such as Torin1 or rapamycin compared with vehicle",
+  "plan": {
+    "terms": [
+      "mTOR inhibitor",
+      "Torin1",
+      "rapamycin",
+      "mTORC1",
+      "mTORC2",
+      "mTOR signaling"
+    ],
+    "organism": "Homo sapiens",
+    "assays": [
+      "bulk RNA-seq"
+    ],
+    "repositories": [
+      "GEO",
+      "ArrayExpress",
+      "ENA",
+      "ExpressionAtlas"
+    ],
+    "ideal_summary": "Bulk RNA-seq analysis of human cell lines or primary cells treated with the mTOR inhibitor Torin1 or rapamycin compared to vehicle control. The study measures global transcriptomic changes in response to mTOR pathway inhibition. Samples include untreated controls and inhibitor-treated groups to identify differentially expressed genes associated with mTOR signaling.",
+    "method_notes": [
+      "Bulk RNA-seq measures average gene expression across the cell population, masking cell-type-specific responses if the sample is heterogeneous.",
+      "Torin1 inhibits both mTORC1 and mTORC2, while rapamycin primarily inhibits mTORC1; datasets should specify the inhibitor used to interpret pathway-specific effects.",
+      "Time-course data is valuable as mTOR inhibition effects can be rapid (translation) or delayed (transcriptional), so single time-point data may miss dynamic changes."
+    ],
+    "matched_assays": [],
+    "wants_controls": true,
+    "needs_patient_samples": false,
+    "geo_query": "(\"mTOR inhibitor\"[Title] OR \"Torin1\"[Title] OR \"rapamycin\"[Title] OR \"mTORC1\"[Title] OR \"mTORC2\"[Title] OR \"mTOR signaling\"[Title] OR \"mTOR inhibitor\"[Description] OR \"Torin1\"[Description] OR \"rapamycin\"[Description] OR \"mTORC1\"[Description] OR \"mTORC2\"[Description] OR \"mTOR signaling\"[Description]) AND (\"vehicle\"[Description] OR \"control\"[Description] OR \"untreated\"[Description] OR \"DMSO\"[Description])",
+    "pride_keywords": [
+      "mTOR inhibitor",
+      "Torin1",
+      "rapamycin",
+      "mTORC1"
+    ],
+    "cellxgene_diseases": []
+  },
+  "candidates": 300,
+  "datasets": [
+    {
+      "accession": "GSE273388",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Effect of feeding on gene expression in HEK-293E cells either treated with Torin1 or not.",
+      "organism": "Homo sapiens",
+      "samples": 18,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE273388",
+      "papers": [
+        "pmid:39571580"
+      ],
+      "facts": {
+        "case": 9,
+        "control": 9,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "human embryonic kidney",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 18
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 9,
+            "control": 9
+          }
+        },
+        "source": "18 GEO sample records"
+      },
+      "published": "2024-11-20",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This experiment tests how a specific mTOR blocker called Torin1 affects human kidney cells, which fits the criteria for the study.",
+      "evidence": "human embryonic kidney (HEK) 293E cells",
+      "paper": {
+        "title": "Nutrient control of growth and metabolism through mTORC1 regulation of mRNA splicing",
+        "journal": "Mol Cell",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/39571580"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE273388 && cd ~/omics-data/GSE273388\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE273nnn/GSE273388/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE273388 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE99875",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "786-0 renal cell carcinoma cell line Everolimus treatment",
+      "organism": "Homo sapiens",
+      "samples": 11,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE99875",
+      "papers": [],
+      "facts": {
+        "case": 5,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "renal cell carcinoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 11
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 5,
+            "control": 6
+          }
+        },
+        "source": "11 GEO sample records"
+      },
+      "published": "2022-12-01",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset profiles human cancer cells treated with Everolimus, which is a type of mTOR inhibitor, making it relevant to the research question.",
+      "evidence": "786-0 renal cell carcinoma cell lines",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE99875 && cd ~/omics-data/GSE99875\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE99nnn/GSE99875/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE99875 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE187403",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Transcriptional effects of catalytic mTOR inhibiton among LPS-stimulated primary human monocytes",
+      "organism": "Homo sapiens",
+      "samples": 18,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE187403",
+      "papers": [
+        "pmid:36028574"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "primary_cells",
+        "tissue": "peripheral_blood",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 18
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 12,
+            "control": 6
+          }
+        },
+        "source": "18 GEO sample records"
+      },
+      "published": "2022-07-29",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at how an mTOR inhibitor affects human immune cells, providing the specific human cell type and treatment comparison needed for the research question.",
+      "evidence": "with and without pretreatment with a catalytic mTOR inhibitor",
+      "paper": {
+        "title": "mTOR regulation of metabolism limits LPS-induced monocyte inflammatory and procoagulant responses",
+        "journal": "Commun Biol",
+        "year": "2022",
+        "url": "https://europepmc.org/article/MED/36028574"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE187403 && cd ~/omics-data/GSE187403\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE187nnn/GSE187403/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE187403 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE273387",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Effect of the reduced mTORC1 activity on gene expression in LAM cells",
+      "organism": "Homo sapiens",
+      "samples": 21,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE273387",
+      "papers": [
+        "pmid:39571580"
+      ],
+      "facts": {
+        "case": 15,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "lymph node",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 21
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 15,
+            "control": 6
+          }
+        },
+        "source": "21 GEO sample records"
+      },
+      "published": "2024-11-20",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research looks at how mTOR inhibitors like rapamycin and Torin1 change gene activity in human cells derived from a specific disease.",
+      "evidence": "mTORC1 is inhibited by rapamycin or Torin1",
+      "paper": {
+        "title": "Nutrient control of growth and metabolism through mTORC1 regulation of mRNA splicing",
+        "journal": "Mol Cell",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/39571580"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE273387 && cd ~/omics-data/GSE273387\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE273nnn/GSE273387/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE273387 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE137807",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTOR- and LARP1-dependent regulation of TOP mRNA poly(A) tail and ribosome loading [LARP1 KD, Torin1]",
+      "organism": "Homo sapiens",
+      "samples": 4,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137807",
+      "papers": [
+        "pmid:36288708"
+      ],
+      "facts": {
+        "case": 2,
+        "control": 2,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "HEK293T",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 4
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 2,
+            "control": 2
+          }
+        },
+        "source": "4 GEO sample records"
+      },
+      "published": "2022-09-19",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset specifically measures gene expression in human cells treated with Torin1, an mTOR inhibitor, which directly matches the research question's criteria.",
+      "evidence": "LARP1 KD, Torin1",
+      "paper": {
+        "title": "mTOR- and LARP1-dependent regulation of TOP mRNA poly(A) tail and ribosome loading",
+        "journal": "Cell Rep",
+        "year": "2022",
+        "url": "https://europepmc.org/article/MED/36288708"
+      },
+      "download_plan": "mkdir -p ~/omics-data/GSE137807 && cd ~/omics-data/GSE137807\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE137nnn/GSE137807/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE137807 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE286174",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "A systems approach reveals SMARCD3 regulon drives alternate growth signaling and vulnerability to MEK inhibitors in everolimus resistant breast cancer cells",
+      "organism": "Homo sapiens",
+      "samples": 36,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE286174",
+      "papers": [
+        "pmid:41260207"
+      ],
+      "facts": {
+        "case": 18,
+        "control": 18,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "breast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 36
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 18,
+            "control": 18
+          }
+        },
+        "source": "36 GEO sample records"
+      },
+      "published": "2025-12-11",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at how breast cancer cells stop responding to an mTOR drug called everolimus by analyzing their gene activity.",
+      "evidence": "We analyzed transcriptomic profiles from multiple pairs of everolimus resistant or sensitive ER+BC cell lines",
+      "paper": {
+        "title": "System analysis links SMARCD3 regulons to growth signaling and MEK inhibitor response in everolimus-resistant ER+ breast cancer cells",
+        "journal": "Cell Rep Med",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/41260207"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE286174 && cd ~/omics-data/GSE286174\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE286nnn/GSE286174/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE286174 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE292426",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Macropinocytosis and vascularization detrmine response to mTOR inhibitors in lung squamous cell carcinomas",
+      "organism": "Homo sapiens",
+      "samples": 25,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE292426",
+      "papers": [
+        "pmid:41364715"
+      ],
+      "facts": {
+        "case": 14,
+        "control": 11,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "patient_tissue",
+        "tissue": "lung",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 25
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 14,
+            "control": 11
+          }
+        },
+        "source": "25 GEO sample records"
+      },
+      "published": "2025-12-02",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research examines how lung cancer cells adapt to survive an mTOR inhibitor called TAK228 by changing how they take in nutrients.",
+      "evidence": "patient-derived xenografts (PDXs)",
+      "paper": {
+        "title": "Macropinocytosis and Vascularization Determine Response to mTOR Inhibitors in Lung Squamous Cell Carcinoma",
+        "journal": "Cancer Res",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41364715"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE292426 && cd ~/omics-data/GSE292426\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE292nnn/GSE292426/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE292426 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE279596",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Everolimus and sunitinib induce infantile hemangiomas cell apoptosis through P53 activation",
+      "organism": "Homo sapiens",
+      "samples": 9,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE279596",
+      "papers": [],
+      "facts": {
+        "case": 6,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "skin",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 9
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 6,
+            "control": 3
+          }
+        },
+        "source": "9 GEO sample records"
+      },
+      "published": "2025-10-16",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study tests how an mTOR inhibitor called everolimus affects the growth of cells derived from infantile hemangiomas.",
+      "evidence": "We further performed transcriptome profiling in iHemEC upon Everolimus and Sunitinib intervention",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE279596 && cd ~/omics-data/GSE279596\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE279nnn/GSE279596/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE279596 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE307286",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Combining brigatinib with mTOR inhibition to effectively treat NF2-SWN-associated and sporadic NF2-deficient meningiomas",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE307286",
+      "papers": [
+        "pmid:41417846"
+      ],
+      "facts": {
+        "case": 9,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "meningioma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 9,
+            "control": 3
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2025-09-05",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This paper investigates how combining an mTOR inhibitor with another drug stops the growth of meningioma brain tumors.",
+      "evidence": "AG-NF2-Men cell line from a grade-1 meningioma of an NF2-related schwannomatosis (NF2-SWN) patient",
+      "paper": {
+        "title": "Combining Brigatinib with mTOR Inhibition to Effectively Treat NF2-SWN-Associated and Sporadic NF2-Deficient Meningiomas",
+        "journal": "Cancer Res Commun",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41417846"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE307286 && cd ~/omics-data/GSE307286\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE307nnn/GSE307286/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE307286 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE290879",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing; Genome binding/occupancy profiling by high throughput sequencing; Other",
+      "title": "Biphasic control of the B cell transcriptome by mTORC1 and GSK3",
+      "organism": "Homo sapiens",
+      "samples": 84,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE290879",
+      "papers": [
+        "pmid:41026602"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 59,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "blood",
+        "assays": [
+          "RNA-seq",
+          "ChIP-seq",
+          "CRISPR screen"
+        ],
+        "library": {
+          "OTHER": 52,
+          "ChIP-Seq": 4,
+          "RNA-Seq": 28
+        },
+        "libraries": {
+          "CRISPR screen": {
+            "control": 49,
+            "case": 3
+          },
+          "ChIP-seq": {
+            "control": 3,
+            "other": 1
+          },
+          "RNA-seq": {
+            "control": 7,
+            "case": 9,
+            "other": 12
+          }
+        },
+        "source": "84 GEO sample records"
+      },
+      "published": "2025-08-19",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at how blocking a specific protein pathway in human B-cells changes their gene activity over time.",
+      "evidence": "we evaluated impact of rapamycin, a potent mTOR inhibitor",
+      "paper": {
+        "title": "Biphasic control of the B cell transcriptome by mTORC1 and GSK3",
+        "journal": "Cell Rep",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/41026602"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE290879 && cd ~/omics-data/GSE290879\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE290nnn/GSE290879/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE290879 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE242829",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Glioma-associated microglia and macrophages as a potential target for mTOR inhibition in glioblastoma",
+      "organism": "Homo sapiens",
+      "samples": 36,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE242829",
+      "papers": [
+        "pmid:41070610"
+      ],
+      "facts": {
+        "case": 24,
+        "control": 12,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "microglia",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 36
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 24,
+            "control": 12
+          }
+        },
+        "source": "36 GEO sample records"
+      },
+      "published": "2025-07-28",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research tests how blocking the mTOR pathway affects immune cells found in brain tumors using human cell models.",
+      "evidence": "Effects were investigated in a tumor cell/GAM co-culture model under mTORi with rapamycin or torin2",
+      "paper": {
+        "title": "Glioma\u2011associated microglia and macrophages as a potential target for mTOR inhibition in glioblastoma",
+        "journal": "Mol Med Rep",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/41070610"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE242829 && cd ~/omics-data/GSE242829\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE242nnn/GSE242829/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE242829 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE146579",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Genome wide expression analysis of high passage growth arrested BJ fibroblasts maintained or withdrawn from rapamycin maintenance, in the presence or absence of various SMAD2/3 regulating molecules",
+      "organism": "Homo sapiens",
+      "samples": 24,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE146579",
+      "papers": [
+        "pmid:40493192"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 12,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Foreskin dermal fibroblast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 24
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 12,
+            "control": 12
+          }
+        },
+        "source": "24 GEO sample records"
+      },
+      "published": "2025-05-30",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at how removing a drug called rapamycin affects the gene activity of skin cells that have stopped growing, which directly matches the search for the effects of an mTOR inhibitor.",
+      "evidence": "maintained or withdrawn from rapamycin maintenance",
+      "paper": {
+        "title": "Ligand-specific regulation of a binary enhancer code dictating cellular senescence",
+        "journal": "Proc Natl Acad Sci U S A",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40493192"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE146579 && cd ~/omics-data/GSE146579\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE146nnn/GSE146579/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE146579 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE146577",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Genome wide expression analysis of high passage growth arrested BJ fibroblasts maintained or withdrawn from rapamycin maintenance, upon control or transcription factor knockdown",
+      "organism": "Homo sapiens",
+      "samples": 10,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE146577",
+      "papers": [
+        "pmid:40493192"
+      ],
+      "facts": {
+        "case": 6,
+        "control": 4,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Foreskin dermal fibroblast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 10
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 6,
+            "control": 4
+          }
+        },
+        "source": "10 GEO sample records"
+      },
+      "published": "2025-05-30",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This experiment tests how removing rapamycin changes gene activity in skin cells that have been kept on the drug, providing a direct comparison of treated versus untreated states.",
+      "evidence": "maintained or withdrawn from rapamycin",
+      "paper": {
+        "title": "Ligand-specific regulation of a binary enhancer code dictating cellular senescence",
+        "journal": "Proc Natl Acad Sci U S A",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40493192"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE146577 && cd ~/omics-data/GSE146577\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE146nnn/GSE146577/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE146577 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE146575",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Genome wide expression analysis of the impact of rapamycin and DOT1L inhibitor treatment upon the progression of replicative senescence",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE146575",
+      "papers": [
+        "pmid:40493192"
+      ],
+      "facts": {
+        "case": 9,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Foreskin dermal fibroblast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 9,
+            "control": 3
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2025-05-30",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study compares cells treated with rapamycin against cells treated with a standard control substance to see how the drug affects aging processes in skin cells.",
+      "evidence": "rapamycin, the DOT1L inhibitor EPZ-5676, rapamycin + EPZ-5676, or control treatment",
+      "paper": {
+        "title": "Ligand-specific regulation of a binary enhancer code dictating cellular senescence",
+        "journal": "Proc Natl Acad Sci U S A",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40493192"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE146575 && cd ~/omics-data/GSE146575\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE146nnn/GSE146575/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE146575 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE270973",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTOR Signaling Regulates Multiple Metabolic Pathways in Human Lung Fibroblasts After TGF-\u03b2 and in Pulmonary Fibrosis",
+      "organism": "Homo sapiens",
+      "samples": 28,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE270973",
+      "papers": [
+        "pmid:39745695"
+      ],
+      "facts": {
+        "case": 22,
+        "control": 10,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Lung",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {},
+        "libraries": {
+          "RNA-seq": {
+            "case": 22,
+            "control": 10
+          }
+        },
+        "source": "32 samples, groups curated by Gemma"
+      },
+      "published": "2024-12-12",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study looks at how blocking the mTOR protein changes gene activity in human lung cells, which fits the general topic but does not specify if a standard drug like Torin1 or rapamycin was used.",
+      "evidence": "We investigated the effects of mTOR and ATF4 on gene expression in human lung fibroblasts using RNA-sequencing.",
+      "paper": {
+        "title": "mTOR signaling regulates multiple metabolic pathways in human lung fibroblasts after TGF-\u03b2 and in pulmonary fibrosis",
+        "journal": "Am J Physiol Lung Cell Mol Physiol",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/39745695"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE270973 && cd ~/omics-data/GSE270973\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE270nnn/GSE270973/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE270973 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE271325",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Transcriptomic analysis of the effects of mTOR inhibitor everolimus, CDK8/19 inhibitor SNX631 and their combination in MDA-MB-468 xenografts",
+      "organism": "Homo sapiens",
+      "samples": 50,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE271325",
+      "papers": [
+        "pmid:39541354"
+      ],
+      "facts": {
+        "case": 35,
+        "control": 15,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "xenograft",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 50
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 35,
+            "control": 15
+          }
+        },
+        "source": "50 GEO sample records"
+      },
+      "published": "2024-10-31",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study uses a different mTOR drug called everolimus on mouse tumors rather than the specific drugs Torin1 or rapamycin on human cells mentioned in the question.",
+      "evidence": "tumor samples were collected after 30-40 days of treatment with vehicle or everolimus",
+      "paper": {
+        "title": "Mediator kinase inhibitors suppress triple-negative breast cancer growth and extend tumor suppression by mTOR and AKT inhibitors",
+        "journal": "Proc Natl Acad Sci U S A",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/39541354"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE271325 && cd ~/omics-data/GSE271325\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE271nnn/GSE271325/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE271325 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE269711",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Transcriptome changes associated with targeting mTORC2 in lung squamous cell carcinoma",
+      "organism": "Homo sapiens",
+      "samples": 6,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE269711",
+      "papers": [
+        "pmid:40640525"
+      ],
+      "facts": {
+        "case": 3,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "lung squamous cell carcinoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 6
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 3,
+            "control": 3
+          }
+        },
+        "source": "6 GEO sample records"
+      },
+      "published": "2024-10-31",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study focuses on a specific genetic change in mTORC2 within lung cancer cells rather than testing the direct effect of adding an mTOR inhibitor drug to cells.",
+      "evidence": "Loss of function of mTORC2 in LUSC cells inhibits glycolysis and lactate secretion in cultured cells",
+      "paper": {
+        "title": "Targeting mTORC2 in lung squamous cell carcinoma improves anti-tumor immunity through the PSGL-1-VISTA axis",
+        "journal": "Cancer Gene Ther",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40640525"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE269711 && cd ~/omics-data/GSE269711\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE269nnn/GSE269711/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE269711 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE246152",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "GDF-15 is a biomarker of aggressiveness and is down-regulated by the mTOR inhibitor sirolimus through ATF4 and ATF5 suppression in epithelioid hemangioendothelioma.",
+      "organism": "Homo sapiens",
+      "samples": 8,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE246152",
+      "papers": [],
+      "facts": {
+        "case": 4,
+        "control": 4,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "EHE",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 8
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 4,
+            "control": 4
+          }
+        },
+        "source": "8 GEO sample records"
+      },
+      "published": "2024-04-24",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study uses sirolimus, which is a different type of mTOR inhibitor than the Torin1 or rapamycin specified in your research question.",
+      "evidence": "the mTOR inhibitor sirolimus was observed to inhibit GDF-15 expression",
+      "paper": null,
+      "download_plan": "mkdir -p ~/omics-data/GSE246152 && cd ~/omics-data/GSE246152\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE246nnn/GSE246152/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE246152 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE255002",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Drug-regulated CD33-targeted CAR T cells control AML using clinically optimized rapamycin dosing",
+      "organism": "Homo sapiens",
+      "samples": 70,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE255002",
+      "papers": [
+        "pmid:38502193"
+      ],
+      "facts": {
+        "case": 38,
+        "control": 32,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "primary_cells",
+        "tissue": "blood",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 70
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 38,
+            "control": 32
+          }
+        },
+        "source": "70 GEO sample records"
+      },
+      "published": "2024-04-18",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study uses rapamycin to control the activity of engineered immune cells, which matches the drug specified in your research question.",
+      "evidence": "Rapamycin withdrawal paused DARIC33-stimulated T cell effector functions",
+      "paper": {
+        "title": "Drug-regulated CD33-targeted CAR T cells control AML using clinically optimized rapamycin dosing",
+        "journal": "J Clin Invest",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38502193"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE255002 && cd ~/omics-data/GSE255002\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE255nnn/GSE255002/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE255002 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE245454",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Dual targeting of the androgen receptor and PI3K/AKT/mTOR pathways in prostate cancer elicits improved anti-tumor efficacy and apoptosis",
+      "organism": "Homo sapiens",
+      "samples": 30,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE245454",
+      "papers": [
+        "pmid:38225213"
+      ],
+      "facts": {
+        "case": 24,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "prostate",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 30
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 24,
+            "control": 6
+          }
+        },
+        "source": "30 GEO sample records"
+      },
+      "published": "2024-01-22",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study tests a combination of drugs targeting multiple pathways rather than isolating the effect of a single mTOR inhibitor like Torin1 or rapamycin.",
+      "evidence": "Transcriptomic analysis performed in the androgen-sensitive VCaP cell line revealed that gene expression was more affected by the co-treatment with darolutamide and copanlisib, compared to single agents.",
+      "paper": {
+        "title": "Dual targeting of the androgen receptor and PI3K/AKT/mTOR pathways in prostate cancer models improves antitumor efficacy and promotes cell apoptosis",
+        "journal": "Mol Oncol",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38225213"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE245454 && cd ~/omics-data/GSE245454\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE245nnn/GSE245454/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE245454 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE228824",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "CAR gene delivery by T-cell targeted lentiviral vectors is enhanced by rapamycin induced reduction of antiviral mechanisms",
+      "organism": "Homo sapiens",
+      "samples": 13,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE228824",
+      "papers": [
+        "pmid:37904721"
+      ],
+      "facts": {
+        "case": 10,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "blood",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 13
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 10,
+            "control": 3
+          }
+        },
+        "source": "13 GEO sample records"
+      },
+      "published": "2023-12-20",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study explicitly uses rapamycin, a specific mTOR inhibitor, to treat human T cells and analyzes the resulting changes in gene expression.",
+      "evidence": "Down-modulation of various antiviral restriction factors including the interferon-induced transmembrane proteins (IFITMs) was achieved with rapamycin as verified by mass spectrometry (LC-MS).",
+      "paper": {
+        "title": "CAR Gene Delivery by T-cell Targeted Lentiviral Vectors is Enhanced by Rapamycin Induced Reduction of Antiviral Mechanisms",
+        "journal": "Adv Sci (Weinh)",
+        "year": "2023",
+        "url": "https://europepmc.org/article/MED/37904721"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE228824 && cd ~/omics-data/GSE228824\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE228nnn/GSE228824/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE228824 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE304701",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Changes in RNA levels following inhibition of mechanistic target of rapamycin",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE304701",
+      "papers": [],
+      "facts": {
+        "case": 9,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Melanoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 9,
+            "control": 3
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2025-09-20",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study directly measures how blocking the mTOR protein changes the genetic instructions in human cells, which matches the research question perfectly.",
+      "evidence": "inhibiting the mechanistic target of rapamycin using RNA sequencing",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE304701 && cd ~/omics-data/GSE304701\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE304nnn/GSE304701/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE304701 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE212746",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTOR inhibition amplifies the anti-lymphoma effect of PI3K\u03b2/\u03b4 blockage in diffuse large B-cell lymphoma",
+      "organism": "Homo sapiens",
+      "samples": 30,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE212746",
+      "papers": [
+        "pmid:36352190"
+      ],
+      "facts": {
+        "case": 15,
+        "control": 15,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "diffuse large B-cell lymphoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 30
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 15,
+            "control": 15
+          }
+        },
+        "source": "30 GEO sample records"
+      },
+      "published": "2022-11-07",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study tests a specific mTOR inhibitor in cancer cells, but it is used in combination with another drug rather than compared directly against a simple control group as the primary focus.",
+      "evidence": "combined treatment with AZD8186 and the mTOR inhibitor AZD2014",
+      "paper": {
+        "title": "mTOR inhibition amplifies the anti-lymphoma effect of PI3K\u03b2/\u03b4 blockage in diffuse large B-cell lymphoma",
+        "journal": "Leukemia",
+        "year": "2023",
+        "url": "https://europepmc.org/article/MED/36352190"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE212746 && cd ~/omics-data/GSE212746\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE212nnn/GSE212746/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE212746 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE320374",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Targeting MET and mTOR Synergistically Overcomes Adaptive Resistance in Glioblastoma",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE320374",
+      "papers": [],
+      "facts": {
+        "case": 6,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "brain",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 6,
+            "control": 6
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2026-08-24",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research focuses on a combination therapy for brain cancer where the mTOR inhibitor is used alongside another drug, making it less direct than a simple inhibitor-versus-control comparison.",
+      "evidence": "Targeting mTOR with everolimus in combination with crizotinib",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE320374 && cd ~/omics-data/GSE320374\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE320nnn/GSE320374/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE320374 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE330631",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTORC1 inhibition upregulates CD20 and enhances anti-CD20 antibody efficacy in B-ALL",
+      "organism": "Homo sapiens",
+      "samples": 4,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE330631",
+      "papers": [],
+      "facts": {
+        "case": 2,
+        "control": 2,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "B-cell precursor acute lymphoblastic leukemia (BCP-ALL)",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 4
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 2,
+            "control": 2
+          }
+        },
+        "source": "4 GEO sample records"
+      },
+      "published": "2026-08-14",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study tests how blocking a specific growth signal (mTORC1) changes the surface markers on leukemia cells to make them easier for antibodies to target.",
+      "evidence": "mTORC1 inhibition upregulates CD20",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE330631 && cd ~/omics-data/GSE330631\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE330nnn/GSE330631/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE330631 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE301844",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTOR inhibition enhances the antitumor efficacy of RAF dimer-MEK blockade by inhibiting the ATF4-MTHFD2 pathway",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE301844",
+      "papers": [
+        "pmid:42091854"
+      ],
+      "facts": {
+        "case": 9,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "melanoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 9,
+            "control": 3
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2026-05-04",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This research examines how adding an mTOR inhibitor to other cancer drugs helps treat melanoma by blocking a specific survival pathway.",
+      "evidence": "mTOR inhibitor sapanisertib",
+      "paper": {
+        "title": "mTOR inhibition enhances the antitumor efficacy of pan-RAF-MEK blockade by inhibiting the ATF4-MTHFD2 pathway",
+        "journal": "Cell Death Dis",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/42091854"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE301844 && cd ~/omics-data/GSE301844\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE301nnn/GSE301844/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE301844 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE320384",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Effect of RM-006 treatment on gene expression in LN229 cells",
+      "organism": "Homo sapiens",
+      "samples": 8,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE320384",
+      "papers": [
+        "pmid:41997112"
+      ],
+      "facts": {
+        "case": 6,
+        "control": 2,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "glioblastoma",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 8
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 6,
+            "control": 2
+          }
+        },
+        "source": "8 GEO sample records"
+      },
+      "published": "2026-04-16",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study uses gene sequencing to understand how a new mTOR inhibitor affects cell death mechanisms in brain cancer cells.",
+      "evidence": "bi-steric mTORC1 inhibitors",
+      "paper": {
+        "title": "mTORC1 activity suppresses ferroptosis through a SCARB1-dependent HDL-tocopherol uptake pathway",
+        "journal": "Mol Cell",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41997112"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE320384 && cd ~/omics-data/GSE320384\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE320nnn/GSE320384/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE320384 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE309057",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "PMEPA1 mediates resistance to mTOR inhibitors in triple-negative breast cancer via dual modulation of TGF-\u03b2 signaling and PI3K/AKT activation",
+      "organism": "Homo sapiens",
+      "samples": 6,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE309057",
+      "papers": [
+        "pmid:41819443"
+      ],
+      "facts": {
+        "case": 4,
+        "control": 2,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Breast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 6
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 4,
+            "control": 2
+          }
+        },
+        "source": "6 GEO sample records"
+      },
+      "published": "2026-03-06",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This work analyzes gene changes in breast cancer cells that have become resistant to mTOR inhibitors to identify why the drugs stop working.",
+      "evidence": "mTORi-resistant TNBC cell lines",
+      "paper": {
+        "title": "PMEPA1 promotes mTOR inhibitor resistance in triple-negative breast cancer: Targeting the TGF-\u03b2/PMEPA1 axis as a therapeutic strategy to overcome resistance",
+        "journal": "Biochem Pharmacol",
+        "year": "2026",
+        "url": "https://europepmc.org/article/MED/41819443"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE309057 && cd ~/omics-data/GSE309057\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE309nnn/GSE309057/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE309057 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE273650",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "mTORC1 inhibition activates the integrated stress response (ISR) in  TALL-1 cell line",
+      "organism": "Homo sapiens",
+      "samples": 24,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE273650",
+      "papers": [
+        "pmid:40754585"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 12,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "Blood",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 24
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 12,
+            "control": 12
+          }
+        },
+        "source": "24 GEO sample records"
+      },
+      "published": "2025-07-09",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study examines how inhibiting mTOR affects a specific type of human leukemia cell line.",
+      "evidence": "mTORC1 inhibition activates the integrated stress response (ISR) in  TALL-1 cell line",
+      "paper": {
+        "title": "mTOR inhibition sensitizes T-ALL cells to Venetoclax through engagement of the integrated stress response",
+        "journal": "Signal Transduct Target Ther",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40754585"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE273650 && cd ~/omics-data/GSE273650\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE273nnn/GSE273650/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE273650 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE252590",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Generation of mature epicardium derived from human-induced pluripotent stem cells via inhibition of mTOR signaling",
+      "organism": "Homo sapiens; Mus musculus",
+      "samples": 23,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE252590",
+      "papers": [
+        "pmid:40593704"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 9,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "epicardium",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 23
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 12,
+            "control": 9
+          }
+        },
+        "source": "23 GEO sample records"
+      },
+      "published": "2025-06-30",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This work uses mTOR inhibition to help stem cells develop into mature heart tissue cells in a lab setting.",
+      "evidence": "employs mammalian target of rapamycin (mTOR) signaling inhibition in embryonic epicardium",
+      "paper": {
+        "title": "Generation of mature epicardium derived from human-induced pluripotent stem cells via inhibition of mTOR signaling",
+        "journal": "Nat Commun",
+        "year": "2025",
+        "url": "https://europepmc.org/article/MED/40593704"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE252590 && cd ~/omics-data/GSE252590\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE252nnn/GSE252590/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE252590 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE273888",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Raw sequence reads of the transcriptomics for rapamycin-treated HeLa cells",
+      "organism": "Homo sapiens",
+      "samples": 6,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE273888",
+      "papers": [],
+      "facts": {
+        "case": 3,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "cervix",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 6
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 3,
+            "control": 3
+          }
+        },
+        "source": "6 GEO sample records"
+      },
+      "published": "2025-05-01",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset provides gene activity data from cancer cells that were treated with rapamycin, a drug that blocks the mTOR pathway, allowing for a comparison with untreated cells.",
+      "evidence": "transcriptomic profiling of HeLa cells treated with rapamycin",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE273888 && cd ~/omics-data/GSE273888\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE273nnn/GSE273888/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE273888 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE230627",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "A bi-steric mTORC1-selective inhibitor overcomes drug resistance in breast cancer",
+      "organism": "Homo sapiens",
+      "samples": 20,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE230627",
+      "papers": [],
+      "facts": {
+        "case": 16,
+        "control": 4,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "breast",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 20
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 16,
+            "control": 4
+          }
+        },
+        "source": "20 GEO sample records"
+      },
+      "published": "2024-06-01",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study tests a new drug that blocks a specific part of the mTOR pathway in breast cancer cells, but it does not use the standard inhibitors Torin1 or rapamycin mentioned in your question.",
+      "evidence": "we used RMC-6272, a bi-steric molecule with a rapamycin-like moiety",
+      "paper": null,
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE230627 && cd ~/omics-data/GSE230627\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE230nnn/GSE230627/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE230627 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE184247",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing; Other",
+      "title": "eIF4A1 enhances LARP1-mediated translational repression during mTORC1 inhibition",
+      "organism": "Homo sapiens",
+      "samples": 31,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE184247",
+      "papers": [
+        "pmid:38773334"
+      ],
+      "facts": {
+        "case": 6,
+        "control": 6,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "HEK293 T-REx",
+        "assays": [
+          "Ribo-seq",
+          "RIP-seq",
+          "RNA-seq"
+        ],
+        "library": {
+          "OTHER": 12,
+          "RIP-Seq": 15,
+          "RNA-Seq": 4
+        },
+        "libraries": {
+          "Ribo-seq": {
+            "control": 6,
+            "case": 6
+          },
+          "RIP-seq": {
+            "other": 15
+          },
+          "RNA-seq": {
+            "other": 4
+          }
+        },
+        "source": "31 GEO sample records"
+      },
+      "published": "2024-02-13",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This study investigates how cells react when the mTORC1 pathway is blocked, which is the biological process affected by the inhibitors in your question, though the specific drug name is not listed in the text.",
+      "evidence": "upon mTORC1 inhibition",
+      "paper": {
+        "title": "eIF4A1 enhances LARP1-mediated translational repression during mTORC1 inhibition",
+        "journal": "Nat Struct Mol Biol",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38773334"
+      },
+      "download_plan": "mkdir -p ~/omics-data/GSE184247 && cd ~/omics-data/GSE184247\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE184nnn/GSE184247/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE184247 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE212388",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Gene expression profile at single cell level of primary human aortic endothelial cells (HAECs) under stimulation of pathophysiologic flows and antiproliferative therapies (rapamycin, paclitaxel)",
+      "organism": "Homo sapiens",
+      "samples": 8,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE212388",
+      "papers": [
+        "pmid:37732484"
+      ],
+      "facts": {
+        "case": 4,
+        "control": 4,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "primary_cells",
+        "tissue": "Human aorta",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 8
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 4,
+            "control": 4
+          }
+        },
+        "source": "8 GEO sample records"
+      },
+      "published": "2023-11-29",
+      "fit": "strong",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "yes"
+      },
+      "reason": "This dataset examines the effects of rapamycin on human aortic endothelial cells, directly matching the requirement for bulk RNA-seq of human cells treated with an mTOR inhibitor.",
+      "evidence": "Gene expression profile at single cell level of primary human aortic endothelial cells (HAECs) under stimulation of pathophysiologic flows and antiproliferative therapies (rapamycin, paclitaxel)",
+      "paper": {
+        "title": "Single-Cell RNA Sequencing Reveals That Adaptation of Human Aortic Endothelial Cells to Antiproliferative Therapies Is Modulated by Flow-Induced Shear Stress",
+        "journal": "Arterioscler Thromb Vasc Biol",
+        "year": "2023",
+        "url": "https://europepmc.org/article/MED/37732484"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE212388 && cd ~/omics-data/GSE212388\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE212nnn/GSE212388/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE212388 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE226653",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "Retinoic acid enhances HIV-1 reverse transcription and transcription in macrophages via mTOR-modulated mechanisms",
+      "organism": "Homo sapiens",
+      "samples": 12,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE226653",
+      "papers": [
+        "pmid:38943643",
+        "pmid:42281995",
+        "pmid:42146495"
+      ],
+      "facts": {
+        "case": 12,
+        "control": 0,
+        "mixed": 0,
+        "has_control": false,
+        "sample_type": "cell_line",
+        "tissue": "blood",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 12
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 12
+          }
+        },
+        "source": "12 GEO sample records"
+      },
+      "published": "2023-12-31",
+      "fit": "partial",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "yes",
+        "controls": "no"
+      },
+      "reason": "This research focuses on how retinoic acid affects HIV replication in macrophages, using mTOR as a mechanism rather than testing an mTOR inhibitor as the primary treatment.",
+      "evidence": "Functional validations uncover post-entry mechanisms of RA action including SAMHD1-modulated reverse transcription and CDK9/RNA polymerase II (RNAPII)-dependent transcription under the control of mammalian target of rapamycin (mTOR).",
+      "paper": {
+        "title": "Retinoic acid enhances HIV-1 reverse transcription and transcription in macrophages via mTOR-modulated mechanisms",
+        "journal": "Cell Rep",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38943643"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE226653 && cd ~/omics-data/GSE226653\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE226nnn/GSE226653/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE226653 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    },
+    {
+      "accession": "GSE250539",
+      "source": "GEO",
+      "modality": "Expression profiling by high throughput sequencing",
+      "title": "TORSEL, a 4EBP1-based mTORC1 live-cell sensor, reveals nutrient-sensing targeting by histone deacetylase inhibitor",
+      "organism": "Homo sapiens",
+      "samples": 6,
+      "url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE250539",
+      "papers": [
+        "pmid:38824577"
+      ],
+      "facts": {
+        "case": 3,
+        "control": 3,
+        "mixed": 0,
+        "has_control": true,
+        "sample_type": "cell_line",
+        "tissue": "kidney; Embryo",
+        "assays": [
+          "RNA-seq"
+        ],
+        "library": {
+          "RNA-Seq": 6
+        },
+        "libraries": {
+          "RNA-seq": {
+            "case": 3,
+            "control": 3
+          }
+        },
+        "source": "6 GEO sample records"
+      },
+      "published": "2024-06-26",
+      "fit": "partial",
+      "checks": {
+        "topic": "same",
+        "patient_material": "n/a",
+        "data_type": "no",
+        "controls": "yes"
+      },
+      "reason": "This study develops a new tool to watch mTOR activity in real-time and tests a different type of drug (histone deacetylase inhibitors) rather than comparing Torin1 or rapamycin to a control.",
+      "evidence": "We developed a genetically encoded mTORC1 sensor called TORSEL.",
+      "paper": {
+        "title": "TORSEL, a 4EBP1-based mTORC1 live-cell sensor, reveals nutrient-sensing targeting by histone deacetylase inhibitors",
+        "journal": "Cell Biosci",
+        "year": "2024",
+        "url": "https://europepmc.org/article/MED/38824577"
+      },
+      "partners": [],
+      "download_plan": "mkdir -p ~/omics-data/GSE250539 && cd ~/omics-data/GSE250539\n# processed files from GEO\nwget -r -np -nH --cut-dirs=3 -R \"index.html*\" https://ftp.ncbi.nlm.nih.gov/geo/series/GSE250nnn/GSE250539/suppl/\n# raw reads from SRA (needs NCBI EDirect and sra-tools)\nesearch -db sra -query GSE250539 | efetch -format runinfo | cut -d, -f1 | grep -E '^[SED]RR' | xargs -n1 prefetch\nls */*.sra | xargs -n1 fasterq-dump --split-files"
+    }
+  ],
+  "same_paper": []
+}

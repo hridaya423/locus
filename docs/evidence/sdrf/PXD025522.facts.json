@@ -1,0 +1,28 @@
+{
+  "accession": "PXD025522",
+  "topic": "hepatocellular carcinoma, cirrhosis",
+  "sdrf_rows": 8,
+  "facts": {
+    "case": 4,
+    "control": 4,
+    "mixed": 0,
+    "has_control": true,
+    "sample_type": "patient_tissue",
+    "tissue": "Liver",
+    "assays": [],
+    "library": {},
+    "libraries": {},
+    "grain": "samples",
+    "individuals": null,
+    "individuals_by_group": {},
+    "runs": 8,
+    "excluded_pooled": 0,
+    "labels": {
+      "label free sample": {
+        "case": 4,
+        "control": 4
+      }
+    },
+    "source": "8 SDRF samples (bigbio/sdrf-annotated-datasets)"
+  }
+}

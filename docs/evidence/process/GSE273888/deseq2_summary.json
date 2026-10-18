@@ -1,0 +1,28 @@
+{
+  "genes": 62646,
+  "genes_tested": 15469,
+  "genes_with_padj": 6471,
+  "significant": 84,
+  "up": 44,
+  "down": 40,
+  "pca": {
+    "variance": [25, 20.3],
+    "means": {
+      "no_treatment": {
+        "PC1": -2.85,
+        "PC2": -0.46
+      },
+      "100_nm_rapamycin": {
+        "PC1": 2.85,
+        "PC2": 0.46
+      }
+    }
+  },
+  "versions": {
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "tximport": "1.38.2",
+    "apeglm": "1.32.0",
+    "ggplot2": "4.0.3"
+  }
+}

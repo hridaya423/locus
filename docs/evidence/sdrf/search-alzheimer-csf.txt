@@ -1,0 +1,148 @@
+
+[strong] PXD064699  PRIDE  Proteomics: Data-dependent acquisition, Bottom-up proteomics  
+  Down Syndrome and Alzheimer Disease CSF Proteome
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes the protein makeup of spinal fluid from people with Down syndrome and Alzheimer's to see how the disease progresses differently in these groups compared to healthy individuals.
+  https://www.ebi.ac.uk/pride/archive/projects/PXD064699
+
+[strong] PXD057614  PRIDE  Proteomics: Data-independent acquisition  
+  Human Cerebrospinal Fluid HDL-like proteome from Alzheimer Disease patients
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This research looks at specific cholesterol-carrying particles in the spinal fluid of Alzheimer's patients to understand how they differ from those in healthy people.
+  source says: "analysis of the HDL-like proteome in AD patients and controls"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD057614
+
+[strong] PXD014557  PRIDE  Proteomics: Shotgun proteomics  
+  Microdissected brain tissue Alzheimer's
+  facts: Brain | Hippocampus · patient tissue · 40 individuals / 40 samples / 400 runs  (from 40 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study focuses on a specific part of the brain tissue rather than spinal fluid, making it unsuitable for a study specifically about cerebrospinal fluid proteomics.
+  source says: "microdissected from five subjects with Alzheimer disease and five non-demented controls"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD014557
+
+[strong] PXD012059  PRIDE  Proteomics: Shotgun proteomics  
+  Ventriculomics analyses of autopsy AD tissue
+  facts: Brain · patient tissue · unknown individuals / 6 samples / 6 runs  (from 6 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes proteins from the tissue lining the brain's fluid-filled spaces (ventricles) rather than the cerebrospinal fluid itself.
+  source says: "protein expression levels from isolated tissue from the walls of the ventricles"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD012059
+
+[strong] PXD075438  PRIDE  Proteomics: Bottom-up proteomics  
+  Glycoproteomics of Human and Mouse Brains in Alzheimer’s Disease
+  facts: Brain · patient tissue · case 2 · control 2 · unknown individuals / 4 samples / 4 runs  (from 4 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This research focuses on brain tissue samples from the frontal cortex, not the fluid surrounding the brain.
+  source says: "human frontal cortex"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD075438
+
+[strong] PXD072063  PRIDE  Proteomics: Data-dependent acquisition, Bottom-up proteomics  
+  Association of tear fluid glutathione synthetase and glutathione levels with amyloid positivity
+  facts: Cerebellum · patient tissue · unknown individuals / 60 samples / 60 runs  (from 60 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes proteins found in tears, which is a different body fluid than cerebrospinal fluid.
+  source says: "Tear fluid is a promising source of biomarkers"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD072063
+
+[strong] PXD073336  PRIDE  Proteomics: Bottom-up proteomics  
+  Retinal proteome changes mirror brain pathology and reveal synaptic and cytoskeletal dysfunction in Alzheimer’s disease
+  facts: Retina, Hippocampus · patient tissue · case 32 · control 30 · 16 individuals / 62 samples / 62 runs  (from 62 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes proteins from the eyes and brain tissue, not the fluid surrounding the brain and spinal cord.
+  source says: "paired retinal and hippocampal tissue"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD073336
+
+[strong] PXD063590  PRIDE  Proteomics: Bottom-up proteomics  
+  Single cell proteomic analysis of human prefrontal cortex in Alzheimer's Disease
+  facts: dorsolateral prefrontal cortex · patient tissue · case 2000 · control 750 · 3 individuals / 2928 samples / 2928 runs · 178 pooled left out  (from 2928 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study measures proteins inside individual brain cells, rather than in the fluid surrounding them.
+  source says: "isolated single cells"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD063590
+
+[strong] PXD042026  PRIDE  Proteomics: Shotgun proteomics  
+  Targeting the Post-Synaptic Proteome in Alzheimer Disease with Psychosis
+  facts: Brain · patient tissue · unknown individuals / 8 samples / 8 runs  (from 8 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzed proteins from brain tissue samples rather than cerebrospinal fluid, focusing specifically on the post-synaptic regions of the prefrontal cortex.
+  source says: "PSDs from dorsolateral prefrontal cortex"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD042026
+
+[strong] PXD028282  PRIDE  Proteomics: Shotgun proteomics  
+  Microdissected pyramidal cell proteomics of Alzheimer brain reveals alterations in Creatine Kinase B, 14-3-3-g and Heat Shock Cognate 71
+  facts: Pyramidal neuron · patient tissue · unknown individuals / 10 samples / 10 runs  (from 10 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes proteins from brain cells rather than the fluid surrounding the brain, so it does not match the specific sample type requested.
+  source says: "isolated pyramidal cells from the CA1 region of the hippocampus"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD028282
+
+[strong] PXD023340  PRIDE  Proteomics: Top-down proteomics  
+  APOE-Dependent Molecular Abnormalities in the Cerebrovasculature of Autopsied Alzheimer Disease Brain Tissue
+  facts: Brain · patient tissue · unknown individuals / 9 samples / 9 runs  (from 9 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study looks at proteins in the blood vessels of the brain, not in the cerebrospinal fluid itself.
+  source says: "proteomic changes in cerebrovessels from AD and healthy control brains"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD023340
+
+[strong] PXD021718  PRIDE  Proteomics: Gel-based experiment  
+  Proteome of systemic extracellular vesicles from sporadic and familiar Alzheimer’s disease
+  facts: Extracellular vesicle · patient tissue · unknown individuals / 15 samples / 15 runs  (from 15 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This dataset examines proteins in blood plasma vesicles, not the cerebrospinal fluid found in the brain and spinal cord.
+  source says: "protein profile of systemic EVs from postmortem SAD and FAD patients"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD021718
+
+[strong] PXD020717  PRIDE  Proteomics: Shotgun proteomics  
+  Quantitative PTM Maps of Human Pathologic Tau Identify Patient Heterogeneity and Define Critical Steps in Alzheimer’s Disease Progression - frontal gyrus (sarkosyl soluble)
+  facts: Brain · patient tissue · case 10 · control 8 · unknown individuals / 18 samples / 18 runs  (from 18 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This research focuses on brain tissue samples rather than the fluid surrounding the brain and spinal cord.
+  source says: "isolated from the post-mortem human tissue"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD020717
+
+[strong] PXD020482  PRIDE  Proteomics: SRM/MRM, Shotgun proteomics  
+  Quantitative PTM Maps of Human Pathologic Tau Identify Patient Heterogeneity and Define Critical Steps in Alzheimer’s Disease Progression - MC1-isolated Tau
+  facts: Brain · patient tissue · unknown individuals / 13 samples / 13 runs  (from 13 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study analyzes Tau protein extracted from brain tissue, not from cerebrospinal fluid.
+  source says: "isolated from the post-mortem human tissue"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD020482
+
+[strong] PXD072965  PRIDE  Proteomics: SRM/MRM  
+  Post-translational regulation of human D-3-phosphoglycerate dehydrogenase in Alzheimer’s disease
+  facts: Brain · patient tissue · unknown individuals / 8 samples / 8 runs  (from 8 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls yes
+  why: This study looks at specific chemical changes on a single protein in brain tissue, not the full list of proteins in cerebrospinal fluid.
+  source says: "PHGDH was immunoprecipitated from hippocampal tissue of healthy and AD-affected males and females"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD072965
+
+[strong] PXD061828  PRIDE  Proteomics: Bottom-up proteomics  
+  Familial Alzheimer disease mutation in SORL1 impairs release of neurotrophic extracellular vesicles by microglia
+  facts: Cell culture · patient tissue · unknown individuals / 7 samples / 7 runs  (from 7 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls unclear
+  why: This study analyzes proteins in lab-grown cells rather than the fluid from the human brain, so it does not match the specific sample type requested.
+  source says: "expression of SORLAN1358S in iPSC-derived human microglia"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD061828
+
+[strong] PXD050457  PRIDE  Proteomics:   
+  Probing protein structural changes in Alzheimer's disease via quantitative crosslinking mass spectrometry
+  checks: topic same  patient material unclear  data type yes  controls unclear
+  why: The text does not specify which body part or fluid was analyzed, making it impossible to confirm if it used cerebrospinal fluid.
+  source says: "investigate the changes in protein-protein interactions during the AD progression"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD050457
+
+[strong] PXD032192  PRIDE  Proteomics: SRM/MRM, Shotgun proteomics  
+  Proteopathic tau seeds contain key similarities to mature paired helical filaments in Alzheimer disease
+  facts: Brain · patient tissue · unknown individuals / 2 samples / 2 runs  (from 2 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls unclear
+  why: This dataset describes the characterization of soluble tau species from human Alzheimer's brain, not from cerebrospinal fluid samples.
+  source says: "derived from human Alzheimer brain"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD032192
+
+[strong] PXD079144  PRIDE  Proteomics: Data-dependent acquisition  
+  Serine-65 phosphorylated ubiquitin associates with soluble Tau and seeding activity in Alzheimer’s disease
+  facts: frontal cortex · patient tissue · 5 individuals / 5 samples / 10 runs  (from 5 SDRF samples (bigbio/sdrf-annotated-datasets))
+  checks: topic same  patient material yes  data type yes  controls unclear
+  why: This study focuses on protein modifications in brain tissue lysates to understand tau seeding, not on the proteome of cerebrospinal fluid.
+  source says: "pS65-Ub modified tau is elevated in AD frontal cortex"
+  https://www.ebi.ac.uk/pride/archive/projects/PXD079144

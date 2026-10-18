@@ -1,0 +1,28 @@
+{
+  "accession": "PXD028392",
+  "topic": "Alzheimer's disease",
+  "sdrf_rows": 6,
+  "facts": {
+    "case": 3,
+    "control": 3,
+    "mixed": 0,
+    "has_control": true,
+    "sample_type": "patient_tissue",
+    "tissue": "Brain",
+    "assays": [],
+    "library": {},
+    "libraries": {},
+    "grain": "samples",
+    "individuals": null,
+    "individuals_by_group": {},
+    "runs": 6,
+    "excluded_pooled": 0,
+    "labels": {
+      "label free sample": {
+        "control": 3,
+        "case": 3
+      }
+    },
+    "source": "6 SDRF samples (bigbio/sdrf-annotated-datasets)"
+  }
+}
