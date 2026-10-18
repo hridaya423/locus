@@ -22,7 +22,7 @@ const SORT_VALUE: Record<SortKey, (h: Hit) => number | null> = {
 };
 
 // The resolved paper is canonical: GEO links papers by PubMed ID, PRIDE and CELLxGENE by DOI.
-const studyOf = (h: Hit) => h.paper?.url ?? h.papers[0] ?? h.accession;
+const studyOf = (h: Hit) => h.study ?? h.paper?.url ?? h.papers[0] ?? h.accession;
 const counted = (h: Hit) => h.facts?.case != null;
 
 function sortHits(hits: Hit[], key: SortKey) {
@@ -60,7 +60,9 @@ function StudyRow({ hits, counts, matched, topic, selected, toggle, select }: Gr
   const repositories = [...new Set(hits.map((h) => repositoryName(h.source)))];
   const assays = [...new Set(hits.map(assayOf).filter(Boolean))];
   const best = hits.filter(counted).sort((a, b) => b.facts!.case! + (b.facts!.control ?? 0) - a.facts!.case! - (a.facts!.control ?? 0))[0];
-  const samples = hits.reduce((n, h) => n + (h.samples ?? 0), 0);
+  // One submission listed in two repositories (ArrayExpress and ENA) has its samples once, not twice.
+  const mirrored = new Set(hits.map((h) => h.title)).size === 1;
+  const samples = mirrored ? Math.max(...hits.map((h) => h.samples ?? 0)) : hits.reduce((n, h) => n + (h.samples ?? 0), 0);
   const picked = hits.filter((h) => selected.has(h.accession)).length;
   const href = `${datasetPath((best ?? hits[0]).accession)}#samples`;
   return (
@@ -80,7 +82,7 @@ function StudyRow({ hits, counts, matched, topic, selected, toggle, select }: Gr
             <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="grid w-full min-w-0 cursor-pointer gap-1 text-left">
               <span className="text-sm leading-snug text-foreground">{paper?.title ?? hits[0].title}</span>
               <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="shrink-0 rounded-[3px] bg-foreground px-1.5 py-px font-mono text-[11px] font-medium text-background tabular">{hits.length} datasets</span>
+                <span className="shrink-0 rounded-[3px] bg-foreground px-1.5 py-px font-mono text-[11px] font-medium text-background tabular">{mirrored ? `${hits.length} records of one study` : `${hits.length} datasets`}</span>
                 <span className="label line-clamp-2 min-w-0 basis-full text-muted-foreground sm:line-clamp-1 sm:basis-0 sm:grow">{repositories.join(" + ")}{SEP}{assays.join(" + ")}</span>
               </span>
               {paper && (
@@ -235,7 +237,11 @@ export function Results({ result }: { result: Result }) {
   const watch = useMemo<Watch | null>(() => watches().find((w) => w.question === result.question) ?? null, [result.question, toggled]);
   const fresh = useMemo(() => (watch ? { since: watch.since, fresh: new Set(result.datasets.map((d) => d.accession).filter((a) => !watch.seen.includes(a))) } : null), [watch, result]);
 
-  const visible = result.datasets;
+  // The backend's same-study groups (one paper, or one title across repositories) collapse into one row.
+  const visible = useMemo(() => {
+    const study = new Map(result.same_paper.flatMap((g) => g.map((a) => [a, g.join("+")] as const)));
+    return result.datasets.map((d) => (study.has(d.accession) ? { ...d, study: study.get(d.accession) } : d));
+  }, [result]);
   const geo = result.datasets.filter((d) => d.source === "GEO" && d.fit === "strong").map((d) => d.accession);
   const strong = visible.filter((d) => d.fit === "strong");
   const partial = visible.filter((d) => d.fit === "partial");

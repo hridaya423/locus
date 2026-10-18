@@ -12,6 +12,7 @@ export type ReadyFiles = { processed: { name: string; kind: string; bytes: numbe
 export type Paper = { title: string; journal: string; year: string; url: string };
 export type Check = "yes" | "no" | "unclear" | "same" | "other" | "n/a";
 export type Hit = {
+  study?: string;
   accession: string; source: string; modality: string; title: string; organism: string;
   samples: number | null; url: string; papers: string[]; facts: Facts | null; published: string | null;
   fit: "strong" | "partial"; checks: Record<"topic" | "patient_material" | "data_type" | "controls", Check>;
