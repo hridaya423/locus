@@ -419,7 +419,12 @@ export async function geneAcross(gene: string, accessions: string[], hint: strin
 export const genePath = (gene: string, accessions: string[], hint: string) =>
   `/g/${encodeURIComponent(gene)}?${new URLSearchParams([...accessions.map((a) => ["in", a]), ["hint", hint]])}`;
 
+// The datasets of this tab's last search, so a gene or list is compared within one question; else every dataset found.
 export function foundAll(): { accessions: string[]; topic: string } {
+  try {
+    const last: Result | null = JSON.parse(sessionStorage.getItem(LAST_SEARCH) ?? "null");
+    if (last) return { accessions: last.datasets.map((d) => d.accession), topic: last.plan.terms.join(", ") };
+  } catch {}
   try {
     const all: Record<string, Found> = JSON.parse(localStorage.getItem(FOUND) ?? "{}");
     const list = Object.values(all);
