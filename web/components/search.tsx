@@ -139,18 +139,19 @@ export function Search() {
   // A search is kept for the tab's session, so coming back from a dataset page lands on the same results and row.
   useLayoutEffect(() => {
     const asked = new URLSearchParams(location.search).get("q")?.trim();
-    if (asked) {
+    const saved = sessionStorage.getItem(LAST);
+    const last: Result | null = saved ? JSON.parse(saved) : null;
+    if (asked && asked !== last?.question) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setQ(asked);
-      if (looksLikeIdentifier(asked)) open(asked, true);
+      open(asked, true);
       return;
     }
-    const saved = sessionStorage.getItem(LAST);
-    if (!saved) return;
-    const last: Result = JSON.parse(saved);
+    if (!last) return;
     setQ(last.question);
     setPlan(last.plan);
     setResult(last);
+    if (!asked) history.replaceState(null, "", `/?q=${encodeURIComponent(last.question)}`);
     const y = Number(sessionStorage.getItem(SCROLL));
     sessionStorage.removeItem(SCROLL);
     if (y) requestAnimationFrame(() => window.scrollTo(0, y));
@@ -179,7 +180,7 @@ export function Search() {
   async function open(text: string, fromUrl = false) {
     setMiss(null);
     voice.stop();
-    if (!looksLikeIdentifier(text)) return run(text);
+    if (!looksLikeIdentifier(text)) return run(text, !fromUrl);
     current.current?.abort();
     setLooking(true);
     try {
@@ -194,9 +195,10 @@ export function Search() {
     }
   }
 
-  async function run(question: string) {
+  async function run(question: string, animate = true) {
     if (!question.trim()) return;
     setMiss(null);
+    history.replaceState(null, "", `/?q=${encodeURIComponent(question.trim())}`);
     // A new search replaces the one in flight, so a stalled stream can never lock the page.
     current.current?.abort();
     const controller = new AbortController();
@@ -208,7 +210,7 @@ export function Search() {
     };
     // The bar glides from the centre to the top instead of jumping.
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (document.startViewTransition && !still) document.startViewTransition(() => flushSync(reset));
+    if (document.startViewTransition && animate && !still) document.startViewTransition(() => flushSync(reset));
     else reset();
     try {
       await search(question, (s) => {
