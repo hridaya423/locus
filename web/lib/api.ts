@@ -261,3 +261,17 @@ export async function assays(accession: string, signal?: AbortSignal): Promise<A
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json();
 }
+
+export type DepthRow = { sample: string; title: string; runs: string[]; reads: number; bases: number; library: string; paired: boolean; read_length: number | null; outlier: string | null; top_up_of: string | null };
+export type Quality = {
+  accession: string;
+  depth: { available: boolean; reason?: string; sequencing?: boolean; project?: string; rows: DepthRow[]; outliers: number; top_ups: number; rule: string; source: string;
+    groups: Record<string, { samples: number; median_reads: number; min_reads: number; max_reads: number; flagged: boolean }> };
+  criteria: { quotes: { text: string; field: string }[]; read: string[] };
+};
+
+export async function quality(accession: string, signal?: AbortSignal): Promise<Quality> {
+  const res = await fetch(`${API}/qc/${encodeURIComponent(accession)}`, { signal });
+  if (!res.ok) throw new Error(`${res.status}`);
+  return res.json();
+}

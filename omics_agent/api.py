@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, assay, design, paper, preview, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, design, paper, preview, qc, record, resolve, sources, subset, why  # noqa: E402  (needs the API key loaded first)
 
 app = FastAPI(title="omics-agent")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["*"], allow_headers=["*"])
@@ -107,6 +107,12 @@ def assays(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) 
     if not (found := assay.classify(accession)):
         raise HTTPException(404, f"{accession} is not in the index.")
     return found
+
+
+@app.get("/qc/{accession}")
+def quality(accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,39}$")) -> dict:
+    """Reads per sample from the run table with outliers flagged, and the authors' QC criteria quoted from their methods."""
+    return qc.sample_qc(accession)
 
 
 @app.get("/record/{accession}")
