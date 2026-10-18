@@ -19,7 +19,8 @@ function source(p: FilePreview): string {
   const covered = p.rows_read > p.rows.length ? `; types and ranges cover the ${p.rows_read.toLocaleString()} rows read` : "";
   const above = p.skipped ? `; ${p.skipped.toLocaleString()} ${p.format === "xlsx" ? "rows" : "comment lines"} above the header skipped` : "";
   const where = p.format === "xlsx" ? "Downloaded the whole file" : p.complete ? "Read the whole file" : `Read the first ${size(p.bytes_read)}`;
-  return where + covered + above;
+  const inside = p.member ? `${p.member.path} inside the zip (one of ${p.member.files} files), not downloaded. ` : "";
+  return inside + where + covered + above;
 }
 
 function runs(columns: PreviewColumn[]): { group: string; count: number }[] {

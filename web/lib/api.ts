@@ -206,7 +206,7 @@ export async function subset(accession: string, filters: Filters, text: string, 
 
 export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
 export type FilePreview = {
-  file: string; url: string; format: string; sheet: string | null; skipped: number; bytes_read: number; size: number | null; complete: boolean;
+  file: string; url: string; format: string; sheet: string | null; member?: { path: string; files: number } | null; skipped: number; bytes_read: number; size: number | null; complete: boolean;
   rows_read: number; total_rows: number | null; column_count: number; columns: PreviewColumn[]; rows: string[][];
   samples: { by: string | null; matched: number; of: number; factor: string | null; levels: Record<string, number>; keys?: string[]; looks_like?: string | null } | null;
 };

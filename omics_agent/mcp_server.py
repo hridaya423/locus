@@ -263,7 +263,8 @@ def list_files(accession: str) -> dict:
 def preview_file(accession: str, file_name: str) -> dict:
     """Look inside one processed file of a dataset without downloading it: the columns with their inferred types and
     numeric ranges, the first 20 rows, and the column count. Works for delimited tables (tab, comma, semicolon or space separated, gzipped or not),
-    GEO series matrices, mzTab, and small xlsx files. Reads only the first 256 KB of the file; `bytes_read`, `size` and
+    GEO series matrices, mzTab, small xlsx files, and the main table inside a search-engine zip (MaxQuant's
+    proteinGroups.txt in a PRIDE txt.zip; `member` names it), read by two Range requests. Reads only the first 256 KB; `bytes_read`, `size` and
     `url` say what was read, and `total_rows` is null unless the whole file was read. When the columns are samples, each
     column carries its group (for example diagnosis: IPF or Control) from the dataset's sample table. `file_name` is a
     name from list_files, for example "GSE86618_34816genes-540cells-tpm.txt.gz". `samples` says whether the columns

@@ -21,5 +21,6 @@ Raw material for the demo video. Each moment is one thing a researcher would ret
 | "The PRIDE record never says mito-IP; locus found it in the paper's methods and said so." | Assays are read from the paper when the record leaves them out, and labelled as such. | PXD058312 | `mito-ip-paper.png`, `mito-ip-paper.mp4` |
 | "Before I trusted the volcano, it warned that diagnosis partly goes with batch and institution, and that a 1.13× change is detectable." | The design is checked before the numbers are read. | GSE150910 | `design-check.png`, `design-check.mp4` |
 | "I pasted my gene list: 3 of 11 are MitoCarta proteins, and 6 are among the significant IPF genes, against 0.6 by chance." | Bring your own list: MitoCarta recovery and its rank in a dataset. | /list against GSE124685 | `your-list.png`, `your-list.mp4` |
+| "The protein table was inside a 1.6 GB txt.zip; locus showed proteinGroups.txt, 365 columns, in under a second without downloading it." | Preview reaches inside archives: two Range reads, the zip's directory and the table's first bytes. | PXD047213 | `zip-preview.png`, `zip-preview.mp4` |
 
 Not captured: dictation (needs real speech; the headless browser has no microphone).

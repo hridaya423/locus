@@ -9,6 +9,7 @@ import csv
 import io
 import math
 import re
+import struct
 import zlib
 from functools import lru_cache
 from itertools import islice
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import httpx
 
-from . import design, record, samples as geo_samples
+from . import design, paper, record, samples as geo_samples
 
 CACHE = Path.home() / "omics-data" / "previews"
 READ = 256 * 1024
@@ -27,6 +28,10 @@ MAX_COLUMNS = 1000
 SHOWN = 20
 CELL = 120
 TABLE = re.compile(r"\.(tsv|csv|txt|mztab)(\.gz)?$", re.I)
+ZIP = re.compile(r"\.zip$", re.I)
+# Inside a search-engine zip, the table a reader wants first: MaxQuant's protein groups, DIA-NN's protein matrix, then any table.
+MEMBERS = [re.compile(p, re.I) for p in (r"(^|/)proteinGroups\.txt$", r"pg_matrix\.tsv$", r"(^|/)peptides\.txt$", r"(^|/)report\.tsv$")]
+NOT_MEMBER = re.compile(r"summary|parameters|readme|log|msmsScans|msScans|allPeptides|\.mzid|\.xml", re.I)
 XLSX = re.compile(r"\.xlsx$", re.I)
 MISSING = {"", "na", "nan", "n/a", "null", "none", "-"}
 INTEGER = re.compile(r"^[+-]?\d+$")
@@ -57,6 +62,8 @@ def _data_rows(accession: str) -> dict[str, int] | None:
 def previewable(f: dict, accession: str = "") -> bool:
     """A processed table, or an xlsx up to 20 MB; not a series matrix whose samples GEO says have no data rows."""
     name = f["name"]
+    if ZIP.search(name) and (f["processed"] or f.get("group") in ("Search", "Result")):
+        return True
     if not f["processed"] or NOT_A_TABLE.search(name):
         return False
     if XLSX.search(name):
@@ -80,6 +87,41 @@ def _head(url: str) -> tuple[bytes, int | None]:
             if len(data) >= READ:
                 break
     return data[:READ], int(total) if total.isdigit() else None
+
+
+def _ranged(url: str, header: str) -> tuple[bytes, int] | None:
+    with httpx.stream("GET", url, headers={"Range": header, "Accept-Encoding": "identity"}, timeout=60, follow_redirects=True) as r:
+        if r.status_code != 206 or "/" not in r.headers.get("content-range", ""):
+            return None
+        data = b""
+        for chunk in r.iter_raw():
+            data += chunk
+            if len(data) >= 4 * READ:
+                break
+        return data, int(r.headers["content-range"].rpartition("/")[2])
+
+
+def _zip_member(url: str) -> tuple[bytes, bool, str, int]:
+    """The first bytes of the most useful table inside a zip, inflated, without downloading the zip: two Range reads, one
+    for the central directory and one for the start of the member. Returns the bytes, whether they are the whole member,
+    its path and how many files the zip holds."""
+    files = paper.directory(lambda header: _ranged(url, header))
+    if not files:
+        raise ValueError("locus could not read this zip's list of files (the server ignores Range, or it is a zip64 archive).")
+    tables = [f for f in files if TABLE.search(f["path"]) and not NOT_MEMBER.search(f["path"])]
+    pick = next((f for rx in MEMBERS for f in tables if rx.search(f["path"])), max(tables, key=lambda f: f["size"], default=None))
+    if not pick or pick["method"] not in (0, 8):
+        raise ValueError(f"The zip holds {len(files)} files and no table locus can read.")
+    head = _ranged(url, f"bytes={pick['offset']}-{pick['offset'] + 30 + 1024 + READ}")
+    if not head or head[0][:4] != b"PK\x03\x04":
+        raise ValueError("locus could not read the start of the table inside the zip.")
+    name, extra = struct.unpack_from("<HH", head[0], 26)
+    raw = head[0][30 + name + extra:][:min(pick["compressed"], 4 * READ)]
+    if pick["method"] == 0:
+        return raw, len(raw) >= pick["size"], pick["path"], len(files)
+    inflater = zlib.decompressobj(-15)
+    data = inflater.decompress(raw, MAX_INFLATED)
+    return data, inflater.eof, pick["path"], len(files)
 
 
 def _text(data: bytes, whole: bool) -> tuple[str, bool]:
@@ -261,8 +303,15 @@ def preview(accession: str, file: str) -> dict:
     f = next((f for f in rec.files if f["name"] == file and previewable(f, accession)), None)
     if not f:
         raise LookupError(f"{accession} lists no processed table named {file}.")
-    sheet, samples, skipped = None, None, 0
-    if XLSX.search(file):
+    sheet, samples, skipped, member = None, None, 0, None
+    if ZIP.search(file):
+        data, whole, path, count = _zip_member(f["url"])
+        member = {"path": path, "files": count}
+        text = data.decode("utf-8", errors="replace")
+        text = text if whole else text.rpartition("\n")[0]
+        header, body, kind, skipped = _table(text)
+        read, size = len(data), f["bytes"]
+    elif XLSX.search(file):
         header, body, whole, read, sheet, skipped = _xlsx(accession, f)
         kind, size = "xlsx", read
     else:
@@ -292,7 +341,7 @@ def preview(accession: str, file: str) -> dict:
     for c, g in zip(columns, groups or [None] * width):
         c["group"] = g
     return {
-        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "skipped": skipped, "bytes_read": read, "size": size,
+        "accession": accession, "file": file, "url": f["url"], "format": kind, "sheet": sheet, "member": member, "skipped": skipped, "bytes_read": read, "size": size,
         "complete": whole, "rows_read": len(body), "total_rows": len(body) if whole else None, "column_count": width,
         "columns": columns[:MAX_COLUMNS], "rows": [[v[:CELL] for v in r[:MAX_COLUMNS]] for r in body[:SHOWN]], "samples": summary,
     }

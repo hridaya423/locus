@@ -96,33 +96,42 @@ def _range(url: str, header: str) -> tuple[bytes, int] | None:
         return response.read(), int(response.headers["content-range"].rpartition("/")[2])
 
 
-def directory_sizes(read, tail: int = ZIP_TAIL) -> dict[str, int]:
-    """File names and sizes from a zip's central directory, read through `read(header)` Range requests: the last `tail` bytes,
-    then the directory itself when it starts before them. Empty for a zip64 archive or a server without Range."""
+def directory(read, tail: int = ZIP_TAIL) -> list[dict]:
+    """The files of a zip from its central directory, read through `read(header)` Range requests: the last `tail` bytes,
+    then the directory itself when it starts before them. Each has its path, compression method, compressed and
+    uncompressed size and the offset of its local header. Empty for a zip64 archive or a server without Range."""
     if not (end := read(f"bytes=-{tail}")):
-        return {}
+        return []
     data, total = end
     if (found := data.rfind(b"PK\x05\x06")) < 0:
-        return {}
+        return []
     entries, size, offset = struct.unpack_from("<HII", data, found + 10)
     if 0xFFFFFFFF in (size, offset):
-        return {}
+        return []
     first = total - len(data)
     if offset >= first:
-        directory = data[offset - first:]
+        listing = data[offset - first:]
     elif more := read(f"bytes={offset}-{first - 1}"):
-        directory = more[0] + data
+        listing = more[0] + data
     else:
-        return {}
-    sizes, at = {}, 0
+        return []
+    files, at = [], 0
     for _ in range(entries):
-        if directory[at:at + 4] != b"PK\x01\x02":
-            return {}
-        uncompressed, name, extra, comment = struct.unpack_from("<I3H", directory, at + 24)
-        if uncompressed != 0xFFFFFFFF and not (key := directory[at + 46:at + 46 + name].decode()).endswith("/"):
-            sizes[key.rsplit("/", 1)[-1]] = uncompressed
+        if listing[at:at + 4] != b"PK\x01\x02":
+            return []
+        method, = struct.unpack_from("<H", listing, at + 10)
+        compressed, uncompressed, name, extra, comment = struct.unpack_from("<II3H", listing, at + 20)
+        local, = struct.unpack_from("<I", listing, at + 42)
+        path = listing[at + 46:at + 46 + name].decode(errors="replace")
+        if not path.endswith("/") and 0xFFFFFFFF not in (compressed, uncompressed, local):
+            files.append({"path": path, "method": method, "compressed": compressed, "size": uncompressed, "offset": local})
         at += 46 + name + extra + comment
-    return sizes
+    return files
+
+
+def directory_sizes(read, tail: int = ZIP_TAIL) -> dict[str, int]:
+    """File names and uncompressed sizes from a zip's central directory."""
+    return {f["path"].rsplit("/", 1)[-1]: f["size"] for f in directory(read, tail)}
 
 
 @lru_cache(maxsize=32)

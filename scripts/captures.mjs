@@ -45,6 +45,7 @@ export const MOMENTS = [
   { slug: "design-check", steps: [["go", "/d/GSE150910"], ["wait", "/detectable/.test(document.body.innerText)", 240000], ["eval", scrollTo("#first-look")], ["pause", 3000]] },
   { slug: "your-list", steps: [["go", "/list?in=GSE124685"], ["wait", "!!document.querySelector('textarea')"], ["eval", typeInto("textarea", "COL1A1 COL3A1 MMP7 SPP1 CTHRC1 POSTN SDHB TOMM20 CYC1 P08574 ACTB GAPDH")], ["pause", 600], ["eval", submit("textarea")],
     ["wait", "/MitoCarta 3.0 mitochondrial proteins/.test(document.body.innerText)", 240000], ["pause", 2500]] },
+  { slug: "zip-preview", steps: [["go", "/d/PXD047213"], ["wait", "!!document.querySelector('#files') && !/Reading /.test(document.body.innerText)", 120000], ["eval", scrollTo("#files")], ["pause", 1200], ["eval", click("Preview")], ["wait", "/inside the zip/.test(document.body.innerText)", 60000], ["pause", 2500]] },
   { slug: "doors-browse", steps: [["go", "/d/PXD010450"], ["wait", "!!document.querySelector('#about')", 120000], ["pause", 800], ["eval", click("Immunopeptidome", "aside a")], ["wait", "/datasets in locus/.test(document.body.innerText)", 60000], ["pause", 2500]] },
 ];
 
