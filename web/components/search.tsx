@@ -272,9 +272,9 @@ export function Search() {
           }}
           aria-label="Describe your research"
           placeholder="Lung fibrosis in humans, single-cell and proteomics, patients and controls"
-          className={cn("block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground", voice.supported ? "pr-24" : "pr-16")}
+          className={cn("block min-h-14 w-full resize-none overflow-hidden rounded-lg border border-rule bg-card py-[15px] pl-5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground outline-none transition-colors duration-150 focus:border-foreground", "pr-24")}
         />
-        {voice.supported && <MicButton listening={voice.listening} onClick={voice.toggle} />}
+        <MicButton listening={voice.listening} blocked={voice.blocked} onClick={voice.toggle} />
         <button
           type="submit"
           disabled={!q.trim()}
