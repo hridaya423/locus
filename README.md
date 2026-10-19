@@ -250,6 +250,13 @@ uv run python -m omics_agent.samples
 uv run python -m omics_agent.samplesheet
 ```
 
+## Contributors
+
+| Name | GitHub | Role |
+|------|--------|------|
+| Mani Sarkar | [@neomatrix369](https://github.com/neomatrix369) | Developing upstream at https://github.com/FlynnLachendro/pridemap/ and contributing downstream via team members |
+
+
 ## Licence
 
 Apache 2.0 (see [`LICENSE`](LICENSE)). The web interface is built on [PRIDE Map](https://github.com/FlynnLachendro/pridemap) by Flynn Lachendro, under the MIT licence ([`web/LICENSE.pridemap`](web/LICENSE.pridemap)).
