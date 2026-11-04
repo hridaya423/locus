@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, StringConstraints
 load_dotenv()
 
 from . import samples, store  # noqa: E402
-from . import agent, assay, browse, design, design_check, everywhere, follows, kits, lists, options, pace, paper, person, preview, process, qc, record, resolve, saved, settings, sources, subset, table, users, volcano, watches, why  # noqa: E402  (needs the API key loaded first)
+from . import agent, assay, browse, design, design_check, everywhere, follows, kits, lists, maxquant, options, pace, paper, person, preview, process, qc, record, resolve, saved, settings, sources, subset, table, users, volcano, watches, why  # noqa: E402  (needs the API key loaded first)
 
 HEARTBEAT = 10
 
@@ -470,6 +470,20 @@ def _kind_of(accession: str, topic: str) -> str:
 def files(accession: str = Path(pattern=r"^PXD\d{6}$")) -> dict:
     """The author-processed files of a PRIDE project and a summary of its raw files."""
     return sources.pride_files(accession)
+
+
+@app.get("/maxquant-kit/{accession}")
+def maxquant_kit(accession: str = Path(pattern=r"^PXD\d{6}$")) -> Response:
+    """A MaxQuant search kit for one PRIDE project (mqpar.xml from its SDRF, download and run scripts, a Slurm script and a
+    README), as a zip. Generated and validated here; the search runs on an x86-64 workstation or cluster, not on this
+    machine. 404 when the project has no SDRF, 422 when the SDRF states a design the kit cannot map."""
+    try:
+        data = maxquant.export_kit(accession)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except ValueError as error:
+        raise HTTPException(422, str(error))
+    return Response(data, media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{accession}-maxquant.zip"'})
 
 
 @app.get("/preview/{accession}")

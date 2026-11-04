@@ -73,6 +73,20 @@ export async function samplesheet(accession: string, topic: string): Promise<Blo
   return res.blob();
 }
 
+// The kit is generated and validated by the API; the search itself runs on a workstation or cluster, never here. A 404
+// carries the reason (no SDRF for the project) in `detail`, which the page shows instead of a generic failure.
+export async function maxquantKit(accession: string): Promise<Blob> {
+  const res = await fetch(`${API}/maxquant-kit/${accession}`);
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try {
+      detail = (await res.json()).detail ?? detail;
+    } catch {}
+    throw new Error(detail);
+  }
+  return res.blob();
+}
+
 export type Design = {
   source: string; samples: number; shared: Record<string, string>;
   factors: { name: string; column: string; levels: Record<string, number>; unstated?: number; aliases?: string[] }[];
