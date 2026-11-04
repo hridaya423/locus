@@ -1,0 +1,1844 @@
+[
+ {
+  "n": 1,
+  "question": "Matched RNA-seq and Ribo-seq before and after mTOR inhibition",
+  "wall_seconds": 213.4,
+  "timings": {
+   "plan": 0.0,
+   "gather": 6.5,
+   "triage": 92.5,
+   "prefetch": 0.0,
+   "screen": 93.2,
+   "facts": 19.8,
+   "grade": 0.6
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 26474,
+    "tokens_out": 6648,
+    "seconds_sum": 1107.0,
+    "seconds_max": 92.51
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 13681,
+    "tokens_out": 6959,
+    "seconds_sum": 1238.1,
+    "seconds_max": 93.18
+   },
+   "facts": {
+    "calls": 1,
+    "tokens_in": 879,
+    "tokens_out": 140,
+    "seconds_sum": 19.7,
+    "seconds_max": 19.71
+   }
+  },
+  "candidates": 300,
+  "rows": [
+   [
+    "PRJNA1196484",
+    "strong"
+   ],
+   [
+    "PRJEB61759",
+    "strong"
+   ],
+   [
+    "GSE241588",
+    "strong"
+   ],
+   [
+    "GSE132703",
+    "strong"
+   ],
+   [
+    "GSE118422",
+    "strong"
+   ],
+   [
+    "E-MTAB-10689",
+    "strong"
+   ],
+   [
+    "GSE178634",
+    "strong"
+   ],
+   [
+    "GSE263767",
+    "strong"
+   ],
+   [
+    "GSE35469",
+    "strong"
+   ],
+   [
+    "PRJNA1337462",
+    "strong"
+   ],
+   [
+    "GSE96643",
+    "strong"
+   ],
+   [
+    "GSE134517",
+    "strong"
+   ],
+   [
+    "GSE225683",
+    "strong"
+   ],
+   [
+    "GSE239412",
+    "partial"
+   ],
+   [
+    "GSE59816",
+    "partial"
+   ],
+   [
+    "GSE77033",
+    "partial"
+   ],
+   [
+    "GSE186779",
+    "partial"
+   ],
+   [
+    "GSE230627",
+    "partial"
+   ],
+   [
+    "GSE102674",
+    "partial"
+   ],
+   [
+    "GSE271325",
+    "partial"
+   ],
+   [
+    "GSE236742",
+    "partial"
+   ],
+   [
+    "PRJNA491910",
+    "partial"
+   ],
+   [
+    "GSE66927",
+    "partial"
+   ],
+   [
+    "GSE116387",
+    "partial"
+   ],
+   [
+    "E-TABM-205",
+    "partial"
+   ],
+   [
+    "GSE66789",
+    "partial"
+   ],
+   [
+    "GSE190260",
+    "partial"
+   ],
+   [
+    "GSE199522",
+    "partial"
+   ],
+   [
+    "PRJNA1307048",
+    "partial"
+   ],
+   [
+    "GSE214652",
+    "partial"
+   ],
+   [
+    "GSE273388",
+    "partial"
+   ],
+   [
+    "GSE102246",
+    "partial"
+   ],
+   [
+    "E-MTAB-16150",
+    "partial"
+   ],
+   [
+    "E-MTAB-8726",
+    "partial"
+   ],
+   [
+    "PRJNA721096",
+    "partial"
+   ],
+   [
+    "GSE92598",
+    "partial"
+   ],
+   [
+    "E-MTAB-5490",
+    "partial"
+   ],
+   [
+    "GSE121391",
+    "partial"
+   ],
+   [
+    "GSE138417",
+    "partial"
+   ],
+   [
+    "GSE59599",
+    "partial"
+   ],
+   [
+    "GSE320418",
+    "partial"
+   ],
+   [
+    "GSE304701",
+    "partial"
+   ],
+   [
+    "GSE152633",
+    "partial"
+   ],
+   [
+    "GSE104587",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "GSE36892": null,
+    "GSE35469": 9
+   },
+   "probable": {}
+  },
+  "strong": {
+   "sure": [
+    "GSE35469"
+   ],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 91.92,
+    "tokens_in": 2155,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.08,
+    "tokens_in": 2207,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.08,
+    "tokens_in": 2191,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.08,
+    "tokens_in": 2135,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.23,
+    "tokens_in": 2292,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.23,
+    "tokens_in": 2232,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.23,
+    "tokens_in": 2203,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.37,
+    "tokens_in": 2325,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.37,
+    "tokens_in": 2233,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.37,
+    "tokens_in": 2135,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.51,
+    "tokens_in": 2142,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 92.51,
+    "tokens_in": 2224,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 74.09,
+    "tokens_in": 723,
+    "tokens_out": 410,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.43,
+    "tokens_in": 877,
+    "tokens_out": 430,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.05,
+    "tokens_in": 730,
+    "tokens_out": 429,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.33,
+    "tokens_in": 1200,
+    "tokens_out": 439,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.91,
+    "tokens_in": 878,
+    "tokens_out": 444,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 80.06,
+    "tokens_in": 897,
+    "tokens_out": 443,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 80.37,
+    "tokens_in": 1298,
+    "tokens_out": 452,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 80.36,
+    "tokens_in": 505,
+    "tokens_out": 445,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 80.95,
+    "tokens_in": 1237,
+    "tokens_out": 448,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.96,
+    "tokens_in": 453,
+    "tokens_out": 477,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.24,
+    "tokens_in": 515,
+    "tokens_out": 474,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 87.94,
+    "tokens_in": 1380,
+    "tokens_out": 501,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 88.93,
+    "tokens_in": 1178,
+    "tokens_out": 511,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 89.17,
+    "tokens_in": 1073,
+    "tokens_out": 512,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 93.18,
+    "tokens_in": 737,
+    "tokens_out": 544,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 19.71,
+    "tokens_in": 879,
+    "tokens_out": 140,
+    "max_tokens": 16000
+   }
+  ]
+ },
+ {
+  "n": 2,
+  "question": "How isoforms of one gene differ in how efficiently they are translated",
+  "wall_seconds": 217.4,
+  "timings": {
+   "done": 0.0,
+   "plan": 0.0,
+   "gather": 1.3,
+   "triage": 90.6,
+   "prefetch": 0.0,
+   "screen": 88.4,
+   "facts": 35.7,
+   "grade": 0.5
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 24531,
+    "tokens_out": 6444,
+    "seconds_sum": 1053.6,
+    "seconds_max": 90.58
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 13267,
+    "tokens_out": 6922,
+    "seconds_sum": 1224.1,
+    "seconds_max": 88.35
+   },
+   "facts": {
+    "calls": 10,
+    "tokens_in": 8434,
+    "tokens_out": 1571,
+    "seconds_sum": 284.2,
+    "seconds_max": 35.6
+   }
+  },
+  "candidates": 300,
+  "rows": [
+   [
+    "GSE46613",
+    "strong"
+   ],
+   [
+    "E-MTAB-10452",
+    "strong"
+   ],
+   [
+    "PRJEB44747",
+    "strong"
+   ],
+   [
+    "GSE134517",
+    "strong"
+   ],
+   [
+    "PRJNA299254",
+    "strong"
+   ],
+   [
+    "GSE167223",
+    "strong"
+   ],
+   [
+    "PRJNA906650",
+    "strong"
+   ],
+   [
+    "GSE180930",
+    "strong"
+   ],
+   [
+    "GSE112295",
+    "strong"
+   ],
+   [
+    "GSE140084",
+    "strong"
+   ],
+   [
+    "GSE226437",
+    "strong"
+   ],
+   [
+    "GSE31539",
+    "strong"
+   ],
+   [
+    "E-MTAB-2278",
+    "strong"
+   ],
+   [
+    "GSE69352",
+    "partial"
+   ],
+   [
+    "GSE244655",
+    "partial"
+   ],
+   [
+    "GSE230441",
+    "partial"
+   ],
+   [
+    "GSE263893",
+    "partial"
+   ],
+   [
+    "GSE273359",
+    "partial"
+   ],
+   [
+    "GSE165609",
+    "partial"
+   ],
+   [
+    "GSE183016",
+    "partial"
+   ],
+   [
+    "PRJNA352714",
+    "partial"
+   ],
+   [
+    "GSE180854",
+    "partial"
+   ],
+   [
+    "GSE74279",
+    "partial"
+   ],
+   [
+    "GSE45237",
+    "partial"
+   ],
+   [
+    "GSE66135",
+    "partial"
+   ],
+   [
+    "GSE234223",
+    "partial"
+   ],
+   [
+    "GSE203496",
+    "partial"
+   ],
+   [
+    "GSE198624",
+    "partial"
+   ],
+   [
+    "GSE193966",
+    "partial"
+   ],
+   [
+    "GSE239734",
+    "partial"
+   ],
+   [
+    "GSE180465",
+    "partial"
+   ],
+   [
+    "GSE104587",
+    "partial"
+   ],
+   [
+    "PRJNA952530",
+    "partial"
+   ],
+   [
+    "GSE215770",
+    "partial"
+   ],
+   [
+    "GSE46195",
+    "partial"
+   ],
+   [
+    "GSE180918",
+    "partial"
+   ],
+   [
+    "GSE312581",
+    "partial"
+   ],
+   [
+    "GSE246818",
+    "partial"
+   ],
+   [
+    "GSE226132",
+    "partial"
+   ],
+   [
+    "GSE33716",
+    "partial"
+   ],
+   [
+    "GSE207146",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "GSE69352": 14,
+    "GSE100007": null
+   },
+   "probable": {}
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 74.85,
+    "tokens_in": 2048,
+    "tokens_out": 452,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 75.01,
+    "tokens_in": 2046,
+    "tokens_out": 452,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.14,
+    "tokens_in": 2010,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.3,
+    "tokens_in": 2102,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.3,
+    "tokens_in": 2060,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.3,
+    "tokens_in": 2008,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.3,
+    "tokens_in": 1993,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.44,
+    "tokens_in": 2121,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.44,
+    "tokens_in": 2030,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.45,
+    "tokens_in": 2062,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.58,
+    "tokens_in": 2008,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 90.58,
+    "tokens_in": 2043,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 75.14,
+    "tokens_in": 456,
+    "tokens_out": 419,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.67,
+    "tokens_in": 676,
+    "tokens_out": 433,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.3,
+    "tokens_in": 745,
+    "tokens_out": 437,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.92,
+    "tokens_in": 763,
+    "tokens_out": 439,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.43,
+    "tokens_in": 1003,
+    "tokens_out": 451,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.56,
+    "tokens_in": 758,
+    "tokens_out": 448,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 81.23,
+    "tokens_in": 1165,
+    "tokens_out": 462,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 81.31,
+    "tokens_in": 745,
+    "tokens_out": 456,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.77,
+    "tokens_in": 1017,
+    "tokens_out": 466,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.81,
+    "tokens_in": 1054,
+    "tokens_out": 477,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.92,
+    "tokens_in": 974,
+    "tokens_out": 476,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.35,
+    "tokens_in": 1020,
+    "tokens_out": 479,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.52,
+    "tokens_in": 1013,
+    "tokens_out": 484,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.89,
+    "tokens_in": 573,
+    "tokens_out": 484,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 88.35,
+    "tokens_in": 1305,
+    "tokens_out": 511,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 16.88,
+    "tokens_in": 890,
+    "tokens_out": 78,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 17.03,
+    "tokens_in": 980,
+    "tokens_out": 78,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 22.22,
+    "tokens_in": 726,
+    "tokens_out": 116,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 29.6,
+    "tokens_in": 619,
+    "tokens_out": 166,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 30.98,
+    "tokens_in": 845,
+    "tokens_out": 173,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 31.97,
+    "tokens_in": 842,
+    "tokens_out": 180,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 32.12,
+    "tokens_in": 789,
+    "tokens_out": 182,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 33.09,
+    "tokens_in": 868,
+    "tokens_out": 190,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 34.74,
+    "tokens_in": 1002,
+    "tokens_out": 199,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 35.6,
+    "tokens_in": 873,
+    "tokens_out": 209,
+    "max_tokens": 16000
+   }
+  ]
+ },
+ {
+  "n": 7,
+  "question": "Mitochondrial proteomics from organelle immunoprecipitation",
+  "wall_seconds": 217.5,
+  "timings": {
+   "done": 0.0,
+   "plan": 0.0,
+   "gather": 1.4,
+   "triage": 97.6,
+   "prefetch": 0.0,
+   "screen": 95.5,
+   "facts": 18.4,
+   "grade": 4.2
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 32625,
+    "tokens_out": 6648,
+    "seconds_sum": 1161.3,
+    "seconds_max": 97.55
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 21617,
+    "tokens_out": 7015,
+    "seconds_sum": 1281.2,
+    "seconds_max": 95.45
+   },
+   "facts": {
+    "calls": 6,
+    "tokens_in": 5690,
+    "tokens_out": 507,
+    "seconds_sum": 94.0,
+    "seconds_max": 18.25
+   }
+  },
+  "candidates": 300,
+  "rows": [
+   [
+    "PXD047774",
+    "strong"
+   ],
+   [
+    "PXD033413",
+    "strong"
+   ],
+   [
+    "PXD018182",
+    "strong"
+   ],
+   [
+    "PXD040098",
+    "strong"
+   ],
+   [
+    "PXD034231",
+    "strong"
+   ],
+   [
+    "PXD019339",
+    "strong"
+   ],
+   [
+    "PXD070247",
+    "strong"
+   ],
+   [
+    "PXD031282",
+    "strong"
+   ],
+   [
+    "PXD062418",
+    "strong"
+   ],
+   [
+    "PXD039492",
+    "strong"
+   ],
+   [
+    "PXD015789",
+    "strong"
+   ],
+   [
+    "PXD073831",
+    "strong"
+   ],
+   [
+    "PXD018122",
+    "strong"
+   ],
+   [
+    "PXD009054",
+    "strong"
+   ],
+   [
+    "PXD061134",
+    "strong"
+   ],
+   [
+    "PXD069883",
+    "strong"
+   ],
+   [
+    "PXD055473",
+    "strong"
+   ],
+   [
+    "PXD061137",
+    "strong"
+   ],
+   [
+    "PXD016400",
+    "strong"
+   ],
+   [
+    "PXD009834",
+    "strong"
+   ],
+   [
+    "PXD022961",
+    "strong"
+   ],
+   [
+    "PXD020009",
+    "strong"
+   ],
+   [
+    "PXD057148",
+    "strong"
+   ],
+   [
+    "PXD006690",
+    "strong"
+   ],
+   [
+    "PXD044812",
+    "strong"
+   ],
+   [
+    "PXD014201",
+    "strong"
+   ],
+   [
+    "PXD014200",
+    "strong"
+   ],
+   [
+    "MSV000079369",
+    "strong"
+   ],
+   [
+    "MSV000093335",
+    "strong"
+   ],
+   [
+    "PXD014957",
+    "strong"
+   ],
+   [
+    "PXD032011",
+    "strong"
+   ],
+   [
+    "PXD031948",
+    "strong"
+   ],
+   [
+    "PXD061165",
+    "strong"
+   ],
+   [
+    "PXD065823",
+    "strong"
+   ],
+   [
+    "PXD029667",
+    "strong"
+   ],
+   [
+    "PXD052817",
+    "strong"
+   ],
+   [
+    "PXD038821",
+    "strong"
+   ],
+   [
+    "PXD065392",
+    "strong"
+   ],
+   [
+    "PXD023474",
+    "strong"
+   ],
+   [
+    "PXD058529",
+    "strong"
+   ],
+   [
+    "MSV000084748",
+    "strong"
+   ],
+   [
+    "PXD030898",
+    "strong"
+   ],
+   [
+    "PXD029646",
+    "strong"
+   ],
+   [
+    "PXD041990",
+    "strong"
+   ],
+   [
+    "PXD036780",
+    "strong"
+   ],
+   [
+    "PXD062112",
+    "strong"
+   ],
+   [
+    "PXD038391",
+    "strong"
+   ],
+   [
+    "PXD019322",
+    "partial"
+   ],
+   [
+    "PXD061877",
+    "partial"
+   ],
+   [
+    "PXD009826",
+    "partial"
+   ],
+   [
+    "PXD062420",
+    "partial"
+   ],
+   [
+    "PXD019417",
+    "partial"
+   ],
+   [
+    "PXD013706",
+    "partial"
+   ],
+   [
+    "PXD061846",
+    "partial"
+   ],
+   [
+    "PXD023025",
+    "partial"
+   ],
+   [
+    "PXD044968",
+    "partial"
+   ],
+   [
+    "PXD016924",
+    "partial"
+   ],
+   [
+    "PXD047327",
+    "partial"
+   ],
+   [
+    "PXD062440",
+    "partial"
+   ],
+   [
+    "PXD006024",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "PXD058312": null
+   },
+   "probable": {
+    "PXD017210": null
+   }
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 95.96,
+    "tokens_in": 2606,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.11,
+    "tokens_in": 2698,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.27,
+    "tokens_in": 2670,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.42,
+    "tokens_in": 2860,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.57,
+    "tokens_in": 2716,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.71,
+    "tokens_in": 2644,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 96.86,
+    "tokens_in": 2736,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 97.0,
+    "tokens_in": 2765,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 97.15,
+    "tokens_in": 2701,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 97.28,
+    "tokens_in": 2719,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 97.42,
+    "tokens_in": 2634,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 97.55,
+    "tokens_in": 2876,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 74.85,
+    "tokens_in": 1415,
+    "tokens_out": 403,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.72,
+    "tokens_in": 1549,
+    "tokens_out": 416,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.29,
+    "tokens_in": 1394,
+    "tokens_out": 420,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 81.62,
+    "tokens_in": 1372,
+    "tokens_out": 444,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.7,
+    "tokens_in": 1130,
+    "tokens_out": 444,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.46,
+    "tokens_in": 1651,
+    "tokens_out": 453,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.89,
+    "tokens_in": 1810,
+    "tokens_out": 452,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.5,
+    "tokens_in": 1611,
+    "tokens_out": 464,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 85.81,
+    "tokens_in": 1556,
+    "tokens_out": 467,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 86.1,
+    "tokens_in": 1350,
+    "tokens_out": 473,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 86.67,
+    "tokens_in": 1189,
+    "tokens_out": 470,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 92.45,
+    "tokens_in": 1610,
+    "tokens_out": 522,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 92.86,
+    "tokens_in": 1443,
+    "tokens_out": 518,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 93.82,
+    "tokens_in": 1368,
+    "tokens_out": 527,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 95.45,
+    "tokens_in": 1169,
+    "tokens_out": 542,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 14.97,
+    "tokens_in": 1006,
+    "tokens_out": 80,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 14.97,
+    "tokens_in": 1084,
+    "tokens_out": 78,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 15.11,
+    "tokens_in": 638,
+    "tokens_out": 81,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 15.24,
+    "tokens_in": 794,
+    "tokens_out": 81,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 15.38,
+    "tokens_in": 810,
+    "tokens_out": 82,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 18.25,
+    "tokens_in": 1358,
+    "tokens_out": 105,
+    "max_tokens": 16000
+   }
+  ]
+ },
+ {
+  "n": 0,
+  "question": "Bulk RNA-seq of tumour-adjacent normal lung tissue in early-stage lung adenocarcinoma, patients who relapsed against patients who did not",
+  "wall_seconds": 181.0,
+  "timings": {
+   "done": 0.0,
+   "plan": 0.0,
+   "gather": 1.3,
+   "triage": 91.7,
+   "prefetch": 0.1,
+   "screen": 86.6,
+   "facts": 0.4,
+   "grade": 0.6
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 25779,
+    "tokens_out": 6648,
+    "seconds_sum": 1096.8,
+    "seconds_max": 91.66
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 12736,
+    "tokens_out": 6841,
+    "seconds_sum": 1199.8,
+    "seconds_max": 86.49
+   }
+  },
+  "candidates": 300,
+  "rows": [
+   [
+    "GSE229705",
+    "strong"
+   ],
+   [
+    "PRJNA608819",
+    "strong"
+   ],
+   [
+    "E-MTAB-6957",
+    "strong"
+   ],
+   [
+    "PRJNA987649",
+    "strong"
+   ],
+   [
+    "GSE229706",
+    "strong"
+   ],
+   [
+    "GSE133206",
+    "strong"
+   ],
+   [
+    "GSE273377",
+    "strong"
+   ],
+   [
+    "PRJNA1205811",
+    "strong"
+   ],
+   [
+    "PRJNA1538652",
+    "strong"
+   ],
+   [
+    "GSE229253",
+    "partial"
+   ],
+   [
+    "GSE19188",
+    "partial"
+   ],
+   [
+    "E-TABM-15",
+    "partial"
+   ],
+   [
+    "GSE123352",
+    "partial"
+   ],
+   [
+    "E-MEXP-2644",
+    "partial"
+   ],
+   [
+    "GSE121841",
+    "partial"
+   ],
+   [
+    "E-MTAB-5231",
+    "partial"
+   ],
+   [
+    "GSE116959",
+    "partial"
+   ],
+   [
+    "GSE99254",
+    "partial"
+   ],
+   [
+    "PRJNA935489",
+    "partial"
+   ],
+   [
+    "GSE166720",
+    "partial"
+   ],
+   [
+    "E-TABM-727",
+    "partial"
+   ],
+   [
+    "GSE118370",
+    "partial"
+   ],
+   [
+    "E-MTAB-1132",
+    "partial"
+   ],
+   [
+    "GSE298714",
+    "partial"
+   ],
+   [
+    "GSE31267",
+    "partial"
+   ],
+   [
+    "E-MTAB-13526",
+    "partial"
+   ],
+   [
+    "PRJNA773987",
+    "partial"
+   ],
+   [
+    "GSE132690",
+    "partial"
+   ],
+   [
+    "GSE138682",
+    "partial"
+   ],
+   [
+    "GSE5123",
+    "partial"
+   ],
+   [
+    "PRJNA901260",
+    "partial"
+   ],
+   [
+    "GSE90623",
+    "partial"
+   ],
+   [
+    "PRJNA1139087",
+    "partial"
+   ],
+   [
+    "GSE10445",
+    "partial"
+   ],
+   [
+    "GSE43458",
+    "partial"
+   ],
+   [
+    "GSE14814",
+    "partial"
+   ],
+   [
+    "GSE33532",
+    "partial"
+   ],
+   [
+    "GSE3593",
+    "partial"
+   ],
+   [
+    "GSE50081",
+    "partial"
+   ],
+   [
+    "GSE5843",
+    "partial"
+   ],
+   [
+    "GSE29135",
+    "partial"
+   ],
+   [
+    "GSE330633",
+    "partial"
+   ],
+   [
+    "GSE148466",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {},
+   "probable": {}
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": {
+   "GSE229705": 1,
+   "GSE229253": 10
+  },
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 91.08,
+    "tokens_in": 2145,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.23,
+    "tokens_in": 2115,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.23,
+    "tokens_in": 2197,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.23,
+    "tokens_in": 2180,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.38,
+    "tokens_in": 2131,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.39,
+    "tokens_in": 2150,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.38,
+    "tokens_in": 2162,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.53,
+    "tokens_in": 2130,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.52,
+    "tokens_in": 2178,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.53,
+    "tokens_in": 2098,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.66,
+    "tokens_in": 2079,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 91.66,
+    "tokens_in": 2214,
+    "tokens_out": 554,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 71.9,
+    "tokens_in": 892,
+    "tokens_out": 402,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 73.64,
+    "tokens_in": 1184,
+    "tokens_out": 410,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 73.8,
+    "tokens_in": 549,
+    "tokens_out": 417,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.41,
+    "tokens_in": 747,
+    "tokens_out": 441,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.8,
+    "tokens_in": 708,
+    "tokens_out": 441,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.12,
+    "tokens_in": 1057,
+    "tokens_out": 438,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.26,
+    "tokens_in": 1040,
+    "tokens_out": 445,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.55,
+    "tokens_in": 1096,
+    "tokens_out": 443,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.17,
+    "tokens_in": 613,
+    "tokens_out": 471,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.89,
+    "tokens_in": 1062,
+    "tokens_out": 474,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.65,
+    "tokens_in": 421,
+    "tokens_out": 483,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.03,
+    "tokens_in": 820,
+    "tokens_out": 482,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 85.36,
+    "tokens_in": 678,
+    "tokens_out": 495,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 85.81,
+    "tokens_in": 1026,
+    "tokens_out": 496,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 86.49,
+    "tokens_in": 843,
+    "tokens_out": 503,
+    "max_tokens": 16000
+   }
+  ]
+ }
+]

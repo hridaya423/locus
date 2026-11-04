@@ -241,6 +241,48 @@ export async function startProcess(accession: string, topic: string): Promise<{ 
   return res.json();
 }
 
+// The three rows (here, now / on your laptop / on a cluster) for one GEO series, and the runs and kits behind them.
+export type ProcessRowId = "here" | "laptop" | "cluster";
+export type ProcessRow = {
+  id: ProcessRowId; label: string; available: boolean; reason: string; what?: string;
+  action?: "run" | "cached" | "link" | "kit" | "command"; requirements?: { time: string; memory: string; disk: string };
+  detail?: string; command?: string; kit?: string; href?: string; why_not_laptop?: string; fidelity?: string; state?: string | null;
+};
+export type ProcessOptions = {
+  accession: string; topic: string; data_type: "bulk_rnaseq" | "scrnaseq" | "riboseq" | null; data_type_label: string;
+  organism: string; samples: number; live: boolean; rows: ProcessRow[]; reason?: string;
+};
+export type RowFigure = { file: string; title: string; caption: string };
+export type RowResult = {
+  accession: string; data_type: string; tier: string; title: string; summary: string[]; figures: RowFigure[];
+  tables?: { file: string; title: string }[]; warnings?: string[]; contrast?: { field: string; reference: string; target: string };
+  samples?: { gsm: string; title: string; condition?: string }[]; skipped?: { gsm: string; title: string; reason: string }[];
+  files: { name: string; bytes: number }[]; seconds: number; tools?: Record<string, string>;
+};
+export type RowStatus = {
+  accession: string; row: ProcessRowId; data_type: string; stage: string | null; log: string[];
+  stages: Record<string, { count?: number; done?: number }>; result: ProcessResult | RowResult | null; error: string | null;
+};
+const withTopic = (topic: string) => `?topic=${encodeURIComponent(topic)}`;
+
+export async function processOptions(accession: string, topic: string, signal?: AbortSignal): Promise<ProcessOptions> {
+  const res = await fetch(`${API}/process/${accession}/options${withTopic(topic)}`, { signal, cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export async function startRow(accession: string, row: ProcessRowId, topic: string): Promise<{ stage: string; started: boolean }> {
+  const res = await fetch(`${API}/process/${accession}/run/${row}${withTopic(topic)}`, { method: "POST" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export async function rowStatus(accession: string, row: ProcessRowId, topic: string, signal?: AbortSignal): Promise<RowStatus> {
+  const res = await fetch(`${API}/process/${accession}/run/${row}${withTopic(topic)}`, { signal, cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export const rowFile = (accession: string, row: ProcessRowId, name: string, topic: string) => `${API}/process/${accession}/run/${row}/files/${name}${withTopic(topic)}`;
+export const kitUrl = (accession: string, row: ProcessRowId, topic: string) => `${API}/process/${accession}/kit/${row}${withTopic(topic)}`;
+
 export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
 export type FilePreview = {
   file: string; url: string; format: string; sheet: string | null; member?: { path: string; files: number } | null; skipped: number;

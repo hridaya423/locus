@@ -1,0 +1,292 @@
+{
+  "accession": "GSE132703",
+  "tier": "here",
+  "pipeline": "locus riboseq",
+  "topic": "mTOR inhibition, Torin1 versus DMSO",
+  "tools": {
+    "locus riboseq": "here",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "ggplot2": "4.0.3"
+  },
+  "note": "The counts are the authors' own quantification as deposited in GEO, not locus's; locus only joined and tested them.",
+  "design": "DESeq2 ~ condition + assay + condition:assay (\u0394TE), ~ condition on RNA-seq (\u0394RNA) and on Ribo-seq (\u0394Ribo); deltaTE, Chothani et al. 2019",
+  "contrast": {
+    "field": "treatment",
+    "reference": "dmso",
+    "target": "torin_1",
+    "levels": {
+      "control": "DMSO",
+      "case": "Torin 1"
+    }
+  },
+  "files": [
+    {
+      "gsm": "GSM3889077",
+      "name": "GSM3889077_35YW_d1_RPF.htseqcounts.txt.gz",
+      "bytes": 79794,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889077/suppl/GSM3889077_35YW_d1_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889081",
+      "name": "GSM3889081_35YW_d1_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 78121,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889081/suppl/GSM3889081_35YW_d1_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889078",
+      "name": "GSM3889078_35YW_d2_RPF.htseqcounts.txt.gz",
+      "bytes": 79488,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889078/suppl/GSM3889078_35YW_d2_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889082",
+      "name": "GSM3889082_35YW_d2_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 78227,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889082/suppl/GSM3889082_35YW_d2_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889085",
+      "name": "GSM3889085_93C_ACGACT_D1_RPF.htseqcounts.txt.gz",
+      "bytes": 79369,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889085/suppl/GSM3889085_93C_ACGACT_D1_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889089",
+      "name": "GSM3889089_93C_GCAGCT_D1_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 76839,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889089/suppl/GSM3889089_93C_GCAGCT_D1_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889086",
+      "name": "GSM3889086_93C_ATCAGT_D2_RPF.htseqcounts.txt.gz",
+      "bytes": 81453,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889086/suppl/GSM3889086_93C_ATCAGT_D2_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889090",
+      "name": "GSM3889090_93C_TACGAT_D2_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 76701,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889090/suppl/GSM3889090_93C_TACGAT_D2_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889079",
+      "name": "GSM3889079_35YW_t1_RPF.htseqcounts.txt.gz",
+      "bytes": 76324,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889079/suppl/GSM3889079_35YW_t1_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889083",
+      "name": "GSM3889083_35YW_t1_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 77532,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889083/suppl/GSM3889083_35YW_t1_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889080",
+      "name": "GSM3889080_35YW_t2_RPF.htseqcounts.txt.gz",
+      "bytes": 74334,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889080/suppl/GSM3889080_35YW_t2_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889084",
+      "name": "GSM3889084_35YW_t2_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 78063,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889084/suppl/GSM3889084_35YW_t2_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889087",
+      "name": "GSM3889087_93C_CAGCAT_T1_RPF.htseqcounts.txt.gz",
+      "bytes": 79681,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889087/suppl/GSM3889087_93C_CAGCAT_T1_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889091",
+      "name": "GSM3889091_93C_CTGACG_T1_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 77173,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889091/suppl/GSM3889091_93C_CTGACG_T1_RNA.htseqcounts_cds.txt.gz"
+    },
+    {
+      "gsm": "GSM3889088",
+      "name": "GSM3889088_93C_CGACGT_T2_RPF.htseqcounts.txt.gz",
+      "bytes": 79212,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889088/suppl/GSM3889088_93C_CGACGT_T2_RPF.htseqcounts.txt.gz"
+    },
+    {
+      "gsm": "GSM3889092",
+      "name": "GSM3889092_93C_GCTACG_T2_RNA.htseqcounts_cds.txt.gz",
+      "bytes": 76032,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3889nnn/GSM3889092/suppl/GSM3889092_93C_GCTACG_T2_RNA.htseqcounts_cds.txt.gz"
+    }
+  ],
+  "pairs": [
+    {
+      "pair": 1,
+      "gsm": "GSM3889077",
+      "assay": "riboseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 1,
+      "gsm": "GSM3889081",
+      "assay": "rnaseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 2,
+      "gsm": "GSM3889078",
+      "assay": "riboseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 2,
+      "gsm": "GSM3889082",
+      "assay": "rnaseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 3,
+      "gsm": "GSM3889085",
+      "assay": "riboseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 3,
+      "gsm": "GSM3889089",
+      "assay": "rnaseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 4,
+      "gsm": "GSM3889086",
+      "assay": "riboseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 4,
+      "gsm": "GSM3889090",
+      "assay": "rnaseq",
+      "condition": "dmso"
+    },
+    {
+      "pair": 5,
+      "gsm": "GSM3889079",
+      "assay": "riboseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 5,
+      "gsm": "GSM3889083",
+      "assay": "rnaseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 6,
+      "gsm": "GSM3889080",
+      "assay": "riboseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 6,
+      "gsm": "GSM3889084",
+      "assay": "rnaseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 7,
+      "gsm": "GSM3889087",
+      "assay": "riboseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 7,
+      "gsm": "GSM3889091",
+      "assay": "rnaseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 8,
+      "gsm": "GSM3889088",
+      "assay": "riboseq",
+      "condition": "torin_1"
+    },
+    {
+      "pair": 8,
+      "gsm": "GSM3889092",
+      "assay": "rnaseq",
+      "condition": "torin_1"
+    }
+  ],
+  "skipped": [
+    {
+      "gsm": "GSM3889093",
+      "title": "LP: larp1dko_dmso_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889094",
+      "title": "LP: larp1dko_dmso_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889095",
+      "title": "LP: larp1dko_torin_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889096",
+      "title": "LP: larp1dko_torin_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889097",
+      "title": "LP: larp1dko_dmso_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889098",
+      "title": "LP: larp1dko_dmso_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889099",
+      "title": "LP: larp1dko_torin_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889100",
+      "title": "LP: larp1dko_torin_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM4146393",
+      "title": "larp1dko_dmso_RPF_rep1_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146394",
+      "title": "larp1dko_dmso_RPF_rep2_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146395",
+      "title": "larp1dko_torin_RPF_rep1_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146396",
+      "title": "larp1dko_torin_RPF_rep2_reseq",
+      "reason": "no count table or reads for this library"
+    }
+  ],
+  "warnings": [
+    "'genotype/variation' takes 2 values among the chosen libraries (sgLARP1, wild-type); the contrast pools them."
+  ],
+  "stage_seconds": {
+    "plan": 0.7,
+    "fetch": 7.4,
+    "deltate": 14.8
+  },
+  "started": "2026-10-18T21:10:18+00:00",
+  "finished": "2026-10-18T21:10:41+00:00",
+  "seconds": 23
+}

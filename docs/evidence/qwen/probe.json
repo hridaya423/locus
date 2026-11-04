@@ -1,0 +1,87 @@
+{
+ "single": [
+  {
+   "label": "triage numbered x25",
+   "seconds": 63.6,
+   "tokens_in": 2163,
+   "tokens_out": 452,
+   "error": ""
+  },
+  {
+   "label": "triage compact x25",
+   "seconds": 11.8,
+   "tokens_in": 2184,
+   "tokens_out": 83,
+   "error": ""
+  },
+  {
+   "label": "screen x4",
+   "seconds": 62.2,
+   "tokens_in": 1404,
+   "tokens_out": 447,
+   "error": ""
+  },
+  {
+   "label": "screen short x4",
+   "seconds": 48.5,
+   "tokens_in": 1422,
+   "tokens_out": 346,
+   "error": ""
+  },
+  {
+   "label": "screen short x2",
+   "seconds": 24.9,
+   "tokens_in": 681,
+   "tokens_out": 179,
+   "error": ""
+  },
+  {
+   "label": "label GSE325566",
+   "seconds": 26.6,
+   "tokens_in": 892,
+   "tokens_out": 190,
+   "error": ""
+  },
+  {
+   "label": "label GSE325566 again",
+   "seconds": 27.3,
+   "tokens_in": 892,
+   "tokens_out": 190,
+   "error": ""
+  }
+ ],
+ "concurrency": [
+  {
+   "n": 1,
+   "wall": 13.2,
+   "call_s_min": 13.22,
+   "call_s_max": 13.22,
+   "tokens_out_mean": 86.0,
+   "tok_per_s_per_stream": 6.51
+  },
+  {
+   "n": 8,
+   "wall": 23.0,
+   "call_s_min": 21.2,
+   "call_s_max": 23.02,
+   "tokens_out_mean": 84.5,
+   "tok_per_s_per_stream": 3.67
+  },
+  {
+   "n": 16,
+   "wall": 35.5,
+   "call_s_min": 25.79,
+   "call_s_max": 35.47,
+   "tokens_out_mean": 96.7,
+   "tok_per_s_per_stream": 2.73
+  },
+  {
+   "n": 32,
+   "wall": 53.7,
+   "call_s_min": 41.47,
+   "call_s_max": 53.64,
+   "tokens_out_mean": 94.8,
+   "tok_per_s_per_stream": 1.77
+  }
+ ]
+}

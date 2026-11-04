@@ -5,11 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+// CHROME_FLAGS adds launch flags, for example --no-sandbox on a Linux box where user namespaces are restricted.
+const FLAGS = (process.env.CHROME_FLAGS ?? "").split(" ").filter(Boolean);
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export async function browser() {
   const port = 9400 + Math.floor(Math.random() * 500);
-  const proc = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "locus-chrome-"))}`, "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
+  const proc = spawn(CHROME, [...FLAGS, "--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "locus-chrome-"))}`, "--hide-scrollbars", "about:blank"], { stdio: "ignore" });
   process.on("exit", () => proc.kill());
   let targets;
   for (let i = 0; i < 100 && !targets; i++) {

@@ -1,0 +1,20 @@
+Ribo-seq, Homo sapiens, 28 samples · where it can run, and what it costs for this dataset
+HERE, NOW
+ΔTE from the authors' CDS counts: DESeq2 with an interaction term, classes and a Δ RNA vs Δ Ribo scatter
+GEO holds the authors' count tables for 4 + 4 Ribo-seq/RNA-seq pairs
+under a minute · memory about 1 GB · disk under 50 MB
+Show the results
+ON YOUR LAPTOP
+Subsampled reads → rRNA removal → transcriptome alignment → P-sites, metagene, footprint lengths, CDS counts → ΔTE
+8 libraries (this machine runs it)
+about 5 min · memory about 1.5 GB · disk 2 GB
+a lower-fidelity approximation of the cluster pipeline: transcriptome alignment, subsampled reads
+Show the results
+uv run omics process GSE132703 --topic 'mTOR inhibition, mTORC1, rapamycin, everolimus, translation efficiency, ribosome profiling' --tier riboseq-laptop
+copy
+ON A CLUSTER
+nf-core/riboseq on the full reads, as a Slurm kit
+8 libraries
+about 8 h · memory 64 GB per job (STAR index 32 GB) · disk 63 GB
+not a laptop job: STAR against the human genome needs about 32 GB of memory
+Download the kit (zip)

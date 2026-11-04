@@ -30,6 +30,8 @@ def process_main(argv: list[str]) -> None:
     parser.add_argument("--reads", type=int, default=process.READS, help="reads taken from the start of each FASTQ")
     parser.add_argument("--threads", type=int, default=process.THREADS)
     parser.add_argument("--json", action="store_true", help="print the result as JSON")
+    parser.add_argument("--tier", default="laptop", choices=["laptop", "riboseq-here", "riboseq-laptop", "scrnaseq-here"],
+                        help="which run: the bulk RNA-seq laptop pipeline (default), or a single-cell / Ribo-seq row of the Process panel")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"GSE\d+", args.accession):
         parser.error("the accession must be a GEO series (GSE…)")
@@ -48,21 +50,47 @@ def process_main(argv: list[str]) -> None:
 
     announced: set[str] = set()
 
-    def progress(stage: str, data: dict) -> None:
+    def progress(stage: str, data) -> None:
         if stage == "log":
             log(data)
-        elif stage in stages and stage not in announced:
+        elif stage not in announced and stage != "done":
             announced.add(stage)
-            log(stages[stage] + (f" ({data['count']} samples)" if "count" in data else ""))
+            log(stages.get(stage, f"{stage}…") + (f" ({data['count']} samples)" if isinstance(data, dict) and "count" in data else ""))
 
     try:
-        result = process.run(args.accession, args.topic, args.reads, args.threads, progress=progress)
+        if args.tier == "laptop":
+            result = process.run(args.accession, args.topic, args.reads, args.threads, progress=progress)
+        else:
+            result = _row_run(args, progress)
     except (LookupError, ValueError) as error:
         sys.exit(f"cannot process {args.accession}: {error}")
     if args.json:
         print(json.dumps(result, indent=2))
-    else:
+    elif args.tier == "laptop":
         print("\n".join(process.summary_lines(result)))
+    else:
+        print("\n".join(row_summary_lines(result)))
+
+
+def _row_run(args, progress) -> dict:
+    """A single-cell or Ribo-seq row from the Process panel, written under data/process/<GSE>/<tier>/."""
+    out = process.out_dir(args.accession) / args.tier
+    if args.tier == "scrnaseq-here":
+        from . import singlecell
+        return singlecell.run_here(args.accession, args.topic, out, progress=progress, threads=min(args.threads, 6))
+    from . import riboseq
+    if args.tier == "riboseq-here":
+        return riboseq.run_here(args.accession, args.topic, out, progress=progress)
+    return riboseq.run_laptop(args.accession, args.topic, out, reads=args.reads, threads=min(args.threads, 6), progress=progress)
+
+
+def row_summary_lines(result: dict) -> list[str]:
+    lines = [result["title"], *result.get("summary", []), *(f"warning: {w}" for w in result.get("warnings", [])),
+             "figures:", *(f"  {f['file']}: {f['caption']}" for f in result.get("figures", [])), "files:",
+             *(f"  {f['bytes']:>12,}  {f['name']}" for f in result.get("files", []))]
+    if result.get("skipped"):
+        lines += ["left out:", *(f"  {s['gsm']}: {s['reason']}" for s in result["skipped"])]
+    return lines
 
 
 def main() -> None:

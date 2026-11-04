@@ -239,8 +239,9 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   const plan = hit.download_plan;
   const page = datasetPath(hit.accession);
   const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
-  // Bulk RNA-seq GEO series with counted case and control samples can run the laptop-tier pipeline.
-  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total)?rnaseq$/.test(norm(a))) && (facts?.case ?? 0) >= 2 && (facts?.control ?? 0) >= 2;
+  // GEO series of the data types locus processes (bulk and single-cell RNA-seq, Ribo-seq) get the three-row Process panel,
+  // which says for each row whether it can run on this dataset and why not.
+  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total|sc|sn|singlecell|singlenucle(us|i))?rnaseq$|^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
   const [processing, setProcessing] = useState(false);
 
   async function exportSamplesheet() {
@@ -355,7 +356,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     <button type="button" onClick={() => setProcessing(true)} className={cn(ACTION, "w-fit")}>
                       Process
                     </button>
-                    <span className="text-xs text-muted-foreground">subsampled reads → salmon → counts → DESeq2, on this machine</span>
+                    <span className="text-xs text-muted-foreground">here, now · on your laptop · on a cluster, with what each costs for this dataset</span>
                   </span>
                 )}
                 {processing && <ProcessPanel accession={hit.accession} topic={topic} />}

@@ -162,6 +162,32 @@ The contrast is one two-level comparison: the most frequent control value of the
 
 The same run is available as a background job from the API (`POST /process/{accession}?topic=…`, then `GET /process/{accession}` until `stage` is `done`, and `GET /process/{accession}/files/{name}` for each output) and from the **Process** button on a GEO RNA-seq row in the web app, which shows the stages and then the plots, the top genes and the downloads. The worked example is in [`docs/evidence/process/GSE273888/`](docs/evidence/process/GSE273888/).
 
+### Where it can run: three rows for every data type
+
+The **Process** button on a GEO row (bulk RNA-seq, single-cell RNA-seq or Ribo-seq) opens three rows, each with what it
+costs *for this dataset* (time, memory, disk, estimated from ENA's read counts and file sizes and calibrated on measured
+runs) and an honest label. A row that cannot work for the dataset is shown greyed with its reason, never hidden.
+
+| Row | Meaning |
+|---|---|
+| **Here, now** | Small analyses of files that are already processed: the authors' tables or matrices, or a run computed earlier. Safe on the public server. |
+| **On your laptop** | What a 16 GB laptop can run: the subsampled-reads pipeline (run here when locus runs live; otherwise the one command, and a zip of the samples it uses). |
+| **On a cluster** | A Slurm / nf-core kit (samplesheet, `run.sbatch`, `nextflow.config`, README with the GENCODE release), with the one-line reason a laptop cannot do it, for example "a human STAR index needs about 32 GB of memory". Written from the records; not run on a cluster. |
+
+| Data type | Here, now | On your laptop | On a cluster |
+|---|---|---|---|
+| Bulk RNA-seq | the First look from the authors' table, or an earlier run | salmon → DESeq2 on 2,000,000 reads per FASTQ (above) | nf-core/rnaseq 3.27.0 kit (STAR + salmon) |
+| Single-cell / single-nucleus RNA-seq | QC, Leiden clusters, UMAP, marker dot plot and pseudobulk DESeq2 per cluster from the authors' per-sample matrices in GEO (scanpy; `--tier scrnaseq-here`) | kb-python kit on subsampled reads, then the same scanpy script | nf-core/scrnaseq kit (STARsolo) |
+| Ribo-seq (with matched RNA-seq) | ΔTE from the authors' CDS count tables: DESeq2 with an interaction term (the deltaTE approach), gene classes and a Δ RNA vs Δ Ribo scatter (`--tier riboseq-here`) | fastp → bowtie2 against rRNA, then one GENCODE transcript per gene → P-site offsets, metagene with 3-nt periodicity, footprint lengths, CDS counts → ΔTE (`--tier riboseq-laptop`; a lower-fidelity approximation of the cluster pipeline, and it says so) | nf-core/riboseq kit, with the samplesheet and contrasts above |
+
+API: `GET /process/{GSE}/options?topic=…` (the rows), `POST` then `GET /process/{GSE}/run/{here|laptop}?topic=…`
+(a run and its status; `…/files/{name}` for outputs), `GET /process/{GSE}/kit/{laptop|cluster}?topic=…` (a zip).
+Single-cell needs the `omics-sc` micromamba environment (scanpy, leidenalg, python-igraph, kb-python) and Ribo-seq the
+`omics-ribo` one (bowtie2, samtools, fastp, pysam, seqkit, matplotlib); both exist for linux-aarch64. Worked examples:
+[`docs/evidence/process/GSE229253/`](docs/evidence/process/GSE229253/) (single-nucleus) and
+[`docs/evidence/process/GSE132703/`](docs/evidence/process/GSE132703/) (Ribo-seq); the panel itself in
+[`docs/evidence/process/panel/`](docs/evidence/process/panel/).
+
 ## How it works
 
 1. **Plan.** Claude Sonnet 5.5 turns the question into search terms with synonyms, an organism, the repositories, the assays wanted, the assays that must be matched, and notes on what each method can measure. The plan is cached per question, so the same question always runs the same search.
@@ -225,8 +251,8 @@ What a judge or a reviewer should know before trusting a result. None of these i
 
 **Not built**
 
-- Ribo-seq processing and translational efficiency (ΔTE) are designed in `docs/data-processing-contract.md`, not built; the samplesheet export only writes the inputs for nf-core/riboseq.
-- No single-cell, proteomics or metabolomics processing; the pipeline is bulk RNA-seq only.
+- The laptop Ribo-seq path aligns to one transcript per gene with bowtie2, on subsampled reads; it is a preview, not nf-core/riboseq. Single-cell "here, now" uses the authors' matrices and runs no batch integration, so clusters can follow donors (the result says when they do). Cluster kits were written from the records and not run on a cluster.
+- No proteomics or metabolomics processing (the MaxQuant kit lives on the `maxquant-kit` branch).
 - Voice input uses the browser's own speech recognition, which browsers allow only on `localhost` or over HTTPS; over plain HTTP to another machine the button is disabled and says why.
 
 ## Layout
@@ -237,6 +263,9 @@ What a judge or a reviewer should know before trusting a result. None of these i
 | `omics_agent/samples.py` | GEO sample records, labels and counts |
 | `omics_agent/samplesheet.py` | The nf-core/riboseq export |
 | `omics_agent/process.py`, `deseq2.R` | The laptop-tier RNA-seq pipeline: ENA reads → salmon → counts → DESeq2 → plots |
+| `omics_agent/options.py`, `kits.py` | The three rows per data type with their requirements, and the laptop and cluster kits |
+| `omics_agent/singlecell.py`, `singlecell_analyse.py`, `pseudobulk_deseq2.R` | Single-cell: scanpy QC, clusters, UMAP, markers, pseudobulk DESeq2; kb-python and nf-core/scrnaseq kits |
+| `omics_agent/riboseq.py`, `riboseq_psite.py`, `deltate_deseq2.R` | Ribo-seq: ΔTE from counts or from subsampled reads (rRNA removal, transcriptome alignment, P-sites, metagene); nf-core/riboseq kit |
 | `omics_agent/index.py`, `store.py` | The local index and hybrid search |
 | `omics_agent/harvest*.py`, `embed.py` | Index builders |
 | `omics_agent/api.py`, `cli.py`, `mcp_server.py` | The three interfaces |
