@@ -106,6 +106,8 @@ function useRow(accession: string, row: ProcessRowId | null, topic: string, star
     if (!row) return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
+    // A new dataset, row or topic starts from a blank status, so the last row's stages never show under the new one.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStatus(null);
     setFailed(null);
     const poll = async () => {
@@ -357,7 +359,7 @@ export function ProcessPanel({ accession, topic }: { accession: string; topic: s
     return () => controller.abort();
   }, [accession, topic]);
   if (failed) return <span className="flex items-start gap-1 text-[13px] text-warn"><X aria-hidden className="mt-0.5 size-3.5 shrink-0" strokeWidth={2.5} />{failed}</span>;
-  if (!opts) return <span className="flex items-center gap-2 text-[13px] text-muted-foreground"><LoaderCircle aria-hidden className="size-3.5 animate-spin" />Reading the sample records and ENA's run table…</span>;
+  if (!opts) return <span className="flex items-center gap-2 text-[13px] text-muted-foreground"><LoaderCircle aria-hidden className="size-3.5 animate-spin" />Reading the sample records and ENA&rsquo;s run table…</span>;
   if (!opts.data_type) return <span className="text-[13px] text-muted-foreground">Not processed here: {opts.reason}</span>;
   return (
     <div className="grid gap-2 border-l-2 border-foreground pl-3" data-options={accession}>
