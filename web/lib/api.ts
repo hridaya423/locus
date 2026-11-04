@@ -22,7 +22,11 @@ export type Hit = {
   reason: string; evidence: string; paper: Paper | null; download_plan: string;
 };
 export type AnswerItem = { accession: string; title: string; source: string; kind: "matched" | "cohort" | "ready"; fact: string; anchor: string };
-export type Result = { question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][]; answer?: AnswerItem[] };
+export type Result = {
+  question: string; plan: Plan; candidates: number; datasets: Hit[]; same_paper: string[][]; answer?: AnswerItem[];
+  // Set by the browser, not the API: for a watched search, the results this run showed for the first time.
+  new_since?: { since: string; fresh: string[] };
+};
 export type Stage =
   | { stage: "plan"; data: Plan }
   | { stage: "candidates"; data: { count: number } }
@@ -66,6 +70,20 @@ export async function readyFiles(accession: string, signal?: AbortSignal): Promi
 export async function samplesheet(accession: string, topic: string): Promise<Blob> {
   const res = await fetch(`${API}/samplesheet/${accession}?topic=${encodeURIComponent(topic)}`);
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.blob();
+}
+
+// The kit is generated and validated by the API; the search itself runs on a workstation or cluster, never here. A 404
+// carries the reason (no SDRF for the project) in `detail`, which the page shows instead of a generic failure.
+export async function maxquantKit(accession: string): Promise<Blob> {
+  const res = await fetch(`${API}/maxquant-kit/${accession}`);
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try {
+      detail = (await res.json()).detail ?? detail;
+    } catch {}
+    throw new Error(detail);
+  }
   return res.blob();
 }
 
@@ -237,6 +255,48 @@ export async function startProcess(accession: string, topic: string): Promise<{ 
   return res.json();
 }
 
+// The three rows (here, now / on your laptop / on a cluster) for one GEO series, and the runs and kits behind them.
+export type ProcessRowId = "here" | "laptop" | "cluster";
+export type ProcessRow = {
+  id: ProcessRowId; label: string; available: boolean; reason: string; what?: string;
+  action?: "run" | "cached" | "link" | "kit" | "command"; requirements?: { time: string; memory: string; disk: string };
+  detail?: string; command?: string; kit?: string; href?: string; why_not_laptop?: string; fidelity?: string; state?: string | null;
+};
+export type ProcessOptions = {
+  accession: string; topic: string; data_type: "bulk_rnaseq" | "scrnaseq" | "riboseq" | null; data_type_label: string;
+  organism: string; samples: number; live: boolean; rows: ProcessRow[]; reason?: string;
+};
+export type RowFigure = { file: string; title: string; caption: string };
+export type RowResult = {
+  accession: string; data_type: string; tier: string; title: string; summary: string[]; figures: RowFigure[];
+  tables?: { file: string; title: string }[]; warnings?: string[]; contrast?: { field: string; reference: string; target: string };
+  samples?: { gsm: string; title: string; condition?: string }[]; skipped?: { gsm: string; title: string; reason: string }[];
+  files: { name: string; bytes: number }[]; seconds: number; tools?: Record<string, string>;
+};
+export type RowStatus = {
+  accession: string; row: ProcessRowId; data_type: string; stage: string | null; log: string[];
+  stages: Record<string, { count?: number; done?: number }>; result: ProcessResult | RowResult | null; error: string | null;
+};
+const withTopic = (topic: string) => `?topic=${encodeURIComponent(topic)}`;
+
+export async function processOptions(accession: string, topic: string, signal?: AbortSignal): Promise<ProcessOptions> {
+  const res = await fetch(`${API}/process/${accession}/options${withTopic(topic)}`, { signal, cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export async function startRow(accession: string, row: ProcessRowId, topic: string): Promise<{ stage: string; started: boolean }> {
+  const res = await fetch(`${API}/process/${accession}/run/${row}${withTopic(topic)}`, { method: "POST" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export async function rowStatus(accession: string, row: ProcessRowId, topic: string, signal?: AbortSignal): Promise<RowStatus> {
+  const res = await fetch(`${API}/process/${accession}/run/${row}${withTopic(topic)}`, { signal, cache: "no-store" });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  return res.json();
+}
+export const rowFile = (accession: string, row: ProcessRowId, name: string, topic: string) => `${API}/process/${accession}/run/${row}/files/${name}${withTopic(topic)}`;
+export const kitUrl = (accession: string, row: ProcessRowId, topic: string) => `${API}/process/${accession}/kit/${row}${withTopic(topic)}`;
+
 export type PreviewColumn = { name: string; type: "integer" | "number" | "boolean" | "text" | "empty"; missing: number; min?: string; max?: string; distinct?: number; group: string | null };
 export type FilePreview = {
   file: string; url: string; format: string; sheet: string | null; member?: { path: string; files: number } | null; skipped: number;
@@ -257,25 +317,6 @@ export type Resolved = { kind: "dataset" | "sample" | "paper"; path: string; fou
 // An identifier is one or two words with a digit (for "PMID: 123"); anything else is a question and never leaves the browser.
 // The tab's last search, kept so that back from a dataset page, and the list page, see the same results.
 export const LAST_SEARCH = "locus:last-search";
-
-// A watched search remembers the datasets it showed; a later run marks the ones locus has indexed since.
-const WATCHED = "locus:watched";
-export type Watch = { question: string; since: string; seen: string[] };
-
-export function watches(): Watch[] {
-  try {
-    return JSON.parse(localStorage.getItem(WATCHED) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-
-export function setWatch(question: string, accessions: string[] | null): Watch | null {
-  const rest = watches().filter((w) => w.question !== question);
-  const watch = accessions ? { question, since: new Date().toISOString().slice(0, 10), seen: accessions } : null;
-  localStorage.setItem(WATCHED, JSON.stringify(watch ? [watch, ...rest] : rest));
-  return watch;
-}
 
 export const looksLikeIdentifier = (text: string) => text.length <= 200 && text.trim().split(/\s+/).length <= 2 && /\d/.test(text);
 

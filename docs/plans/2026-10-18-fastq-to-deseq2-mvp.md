@@ -52,7 +52,7 @@ Outputs land in `data/process/<GSE>/` (gitignored). A copy of the small outputs 
 ## Machine constraints (pgx, verified 17 Oct 23:00)
 
 - ARM64 (NVIDIA GB10), 20 cores, ~11 GB RAM free. **vLLM on :8000 holds ~110 GB and must not be stopped**: locus search runs on it (`LOCAL_LLM_URL` in `.env`, no Anthropic key).
-- The other session works in `/home/jlw/omics-agent` (branch `main`). The overnight run works only in the worktree `/home/jlw/omics-agent-pipeline` (branch `juri-processing-pipeline`). Use API port 8020 and web port 3020, because 8000 and 8010 are taken.
+- The other session works in `/home/jlw/fast/locus/omics-agent` (branch `main`). The overnight run works only in the worktree `/home/jlw/fast/locus/omics-agent.wt/juri-processing-pipeline` (branch `juri-processing-pipeline`). Use API port 8020 and web port 3020, because 8000 and 8010 are taken.
 - `.env` and `data/` in the worktree are symlinks to the main checkout.
 
 ## Out of scope tonight
@@ -83,7 +83,7 @@ If time runs short, deliver in this order: 2 → 3 → 4 → PNGs → 5 → 6. A
 - 2026-10-17 23:48 BST: `uv run omics process GSE273888 --topic "mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2, mTOR signaling"` exit 0 from a clean `data/process/GSE273888/` in 172 s (fetch 30 s, salmon ~25 s per sample at <1 GB RSS, R ~40 s). 62,646 genes counted, 6,471 with an adjusted p-value, 84 with padj < 0.05 (44 up, 40 down). Mapping rate 89.3–89.8%, library type IU. PCA: no_treatment PC1 mean −2.85, 100_nm_rapamycin +2.85 (PC1 25%, PC2 20.3%); every sample on the correct side. Top genes include DDIT4 (−0.72) and SCD (−0.49), both mTORC1-dependent transcripts (via ATF4 and SREBP), falling after rapamycin as expected; CCN2, CCN1, THBS1 rise.
 - 2026-10-17 23:49 BST: `uv run pytest` 8 passed (contrast selection, cap and refusals, `.count` writing, tx2gene, top genes). API on 8020: POST /process/GSE273888 → `{"stage": "done"}` (cached), GET returns the result, files endpoint 200 for a `.count` file and 404 for an unknown name. `npm run build` and `npm run lint` pass.
 - 2026-10-18 00:03 BST: the web search through the Next.js dev proxy died with `ERR_INCOMPLETE_CHUNKED_ENCODING` about 40 s after submit: on the local model the triage stage sends nothing for minutes and the proxy closes the idle stream (not seen with Claude, whose stages take seconds). Fix: `/search` now writes a `{"stage": "working"}` heartbeat line every 10 s of silence, and the web client skips it.
-- 2026-10-18 00:04 BST: **incident.** `pkill -f "[o]mics-api"`, meant for the API on 8020, also killed the other session's API on 8010 (same command line). Restarted it at once from `/home/jlw/omics-agent` with its own `.env` (`OMICS_API_PORT=8010`), log in `/tmp/api8010-restarted-by-pipeline-session.log`; 8010 answered 200 within 30 s. Nothing in that checkout was edited. vLLM on 8000 and the web app on 3000 were not touched.
+- 2026-10-18 00:04 BST: **incident.** `pkill -f "[o]mics-api"`, meant for the API on 8020, also killed the other session's API on 8010 (same command line). Restarted it at once from `/home/jlw/fast/locus/omics-agent` with its own `.env` (`OMICS_API_PORT=8010`), log in `/tmp/api8010-restarted-by-pipeline-session.log`; 8010 answered 200 within 30 s. Nothing in that checkout was edited. vLLM on 8000 and the web app on 3000 were not touched.
 - 2026-10-18 00:09 BST: web flow rehearsed headlessly (Playwright, Chromium) on port 3020 against the API on 8020: the same question, results after 4 min (plan and labels cached), GSE273888 opened, **Process** clicked, panel rendered with PCA, volcano, MA, top genes and 19 download links. Screenshots: `docs/evidence/process/GSE273888/web-results-panel.png` (page) and `web-results-panel-crop.png` (panel). `npm run build` and `npm run lint` pass.
 
 ### Acceptance criteria at hand-over (2026-10-18 00:10 BST)
@@ -101,3 +101,5 @@ If time runs short, deliver in this order: 2 → 3 → 4 → PNGs → 5 → 6. A
 
 Known limits: one run per sample (the first ENA run), human and mouse only, mouse index not yet built, the triage stage of the search is not cached so a repeated question can rank differently; the web search on the local model takes 4–8 minutes.
 - 2026-10-18 00:40 BST: Phase 2 (explanation with a number guard, SDRF counts for PRIDE) followed in `2026-10-18-phase2-explain-and-sdrf.md`; the `process` run now has an `explain` stage and `explanation.md`.
+
+_Paths updated 2026-10-27: the checkouts moved from ~/omics-agent* to ~/fast/locus/omics-agent(.wt/<branch>) and the index from ~/locus-data to ~/fast/locus/data on 25 Oct 2026._

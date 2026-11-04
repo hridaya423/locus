@@ -129,5 +129,5 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--ring);outline-offse
 @keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
 .animate-sweep{animation:sweep 1.1s linear infinite}
 .tabular{font-variant-numeric:tabular-nums}
-@media (prefers-reduced-motion: reduce){*,::before,::after{animation-duration:.01ms!important;animation-iteration-count:1!important}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+@media (prefers-reduced-motion: reduce){*,::before,::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}html{scroll-behavior:auto!important}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 ::view-transition-group(search-bar){animation-duration:.55s;animation-timing-function:cubic-bezier(.16,1,.3,1)}

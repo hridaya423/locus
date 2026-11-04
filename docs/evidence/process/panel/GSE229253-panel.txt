@@ -1,0 +1,17 @@
+Single-cell RNA-seq, Homo sapiens, 33 samples · where it can run, and what it costs for this dataset
+HERE, NOW
+QC, clustering, UMAP, marker genes and pseudobulk differential expression from the authors' matrices
+GEO holds per-sample matrices for 33 of 33 samples; 8 would be used, 214 MB to download
+18 min · memory 3.8 GB · disk 0.1 GB
+Show the results
+ON YOUR LAPTOP
+kb-python counts from subsampled reads, then the same scanpy analysis
+8 samples
+2.8 h · memory about 4 GB (kb ref and kb count on the standard human index) · disk 20 GB
+Download the kit (zip)
+ON A CLUSTER
+nf-core/scrnaseq (STARsolo) on the full reads, as a Slurm kit
+8 samples
+14 h · memory 48 GB per STARsolo task (the human index alone is about 32 GB) · disk 151 GB
+not a laptop job: a human STARsolo index needs about 32 GB of memory
+Download the kit (zip)

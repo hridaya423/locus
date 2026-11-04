@@ -1,0 +1,380 @@
+{
+  "accession": "GSE229253",
+  "tier": "here",
+  "pipeline": "locus singlecell",
+  "data_type": "scrnaseq",
+  "topic": "lung adenocarcinoma recurrence, tumour-adjacent normal lung",
+  "tools": {
+    "scanpy": "1.12.4",
+    "anndata": "0.13.4",
+    "leidenalg": "0.12.0",
+    "igraph": "1.0.0",
+    "python": "3.14.8",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "apeglm": "1.32.0"
+  },
+  "source": "authors' processed per-sample matrices from GEO; reads were not recounted",
+  "files_used": [
+    {
+      "gsm": "GSM7157645",
+      "name": "GSM7157645_CID005976-1.counts_matrix.mtx.gz",
+      "bytes": 15578922,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157645/suppl/GSM7157645_CID005976-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157645",
+      "name": "GSM7157645_CID005976-1.counts_barcodes.tsv.gz",
+      "bytes": 20934,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157645/suppl/GSM7157645_CID005976-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157645",
+      "name": "GSM7157645_CID005976-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157645/suppl/GSM7157645_CID005976-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157647",
+      "name": "GSM7157647_CID005978-1.counts_matrix.mtx.gz",
+      "bytes": 34353892,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157647/suppl/GSM7157647_CID005978-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157647",
+      "name": "GSM7157647_CID005978-1.counts_barcodes.tsv.gz",
+      "bytes": 21917,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157647/suppl/GSM7157647_CID005978-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157647",
+      "name": "GSM7157647_CID005978-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157647/suppl/GSM7157647_CID005978-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157649",
+      "name": "GSM7157649_CID005980-1.counts_matrix.mtx.gz",
+      "bytes": 34621924,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157649/suppl/GSM7157649_CID005980-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157649",
+      "name": "GSM7157649_CID005980-1.counts_barcodes.tsv.gz",
+      "bytes": 24813,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157649/suppl/GSM7157649_CID005980-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157649",
+      "name": "GSM7157649_CID005980-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157649/suppl/GSM7157649_CID005980-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157651",
+      "name": "GSM7157651_CID005982-1.counts_matrix.mtx.gz",
+      "bytes": 18696178,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157651/suppl/GSM7157651_CID005982-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157651",
+      "name": "GSM7157651_CID005982-1.counts_barcodes.tsv.gz",
+      "bytes": 15970,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157651/suppl/GSM7157651_CID005982-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157651",
+      "name": "GSM7157651_CID005982-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157651/suppl/GSM7157651_CID005982-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157644",
+      "name": "GSM7157644_CID005975-1.counts_matrix.mtx.gz",
+      "bytes": 14107247,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157644/suppl/GSM7157644_CID005975-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157644",
+      "name": "GSM7157644_CID005975-1.counts_barcodes.tsv.gz",
+      "bytes": 16347,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157644/suppl/GSM7157644_CID005975-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157644",
+      "name": "GSM7157644_CID005975-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157644/suppl/GSM7157644_CID005975-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157646",
+      "name": "GSM7157646_CID005977-1.counts_matrix.mtx.gz",
+      "bytes": 25750508,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157646/suppl/GSM7157646_CID005977-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157646",
+      "name": "GSM7157646_CID005977-1.counts_barcodes.tsv.gz",
+      "bytes": 13807,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157646/suppl/GSM7157646_CID005977-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157646",
+      "name": "GSM7157646_CID005977-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157646/suppl/GSM7157646_CID005977-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157648",
+      "name": "GSM7157648_CID005979-1.counts_matrix.mtx.gz",
+      "bytes": 28175486,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157648/suppl/GSM7157648_CID005979-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157648",
+      "name": "GSM7157648_CID005979-1.counts_barcodes.tsv.gz",
+      "bytes": 15542,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157648/suppl/GSM7157648_CID005979-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157648",
+      "name": "GSM7157648_CID005979-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157648/suppl/GSM7157648_CID005979-1.counts_features.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157650",
+      "name": "GSM7157650_CID005981-1.counts_matrix.mtx.gz",
+      "bytes": 40440182,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157650/suppl/GSM7157650_CID005981-1.counts_matrix.mtx.gz"
+    },
+    {
+      "gsm": "GSM7157650",
+      "name": "GSM7157650_CID005981-1.counts_barcodes.tsv.gz",
+      "bytes": 22702,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157650/suppl/GSM7157650_CID005981-1.counts_barcodes.tsv.gz"
+    },
+    {
+      "gsm": "GSM7157650",
+      "name": "GSM7157650_CID005981-1.counts_features.tsv.gz",
+      "bytes": 272786,
+      "url": "https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM7157nnn/GSM7157650/suppl/GSM7157650_CID005981-1.counts_features.tsv.gz"
+    }
+  ],
+  "qc": {
+    "min_genes": 200,
+    "min_cells": 3,
+    "mito_max": 0.1,
+    "resolution": 0.5,
+    "min_cells_per_sample_for_pseudobulk": 10,
+    "nuclei": true,
+    "leiden_flavor": "igraph, 2 iterations",
+    "markers": "wilcoxon, one cluster against the rest",
+    "pseudobulk": "raw counts summed per cluster and sample; DESeq2 ~ condition; apeglm shrinkage when it converges"
+  },
+  "contrast": {
+    "field": "source name",
+    "reference": "lung_adjacent_normal",
+    "target": "tumor",
+    "levels": {
+      "control": "Lung adjacent normal",
+      "case": "Tumor"
+    }
+  },
+  "samples": [
+    {
+      "gsm": "GSM7157645",
+      "title": "NYU1057-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 5226,
+      "cells_after": 5226
+    },
+    {
+      "gsm": "GSM7157647",
+      "title": "NYU1321-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 5470,
+      "cells_after": 5470
+    },
+    {
+      "gsm": "GSM7157649",
+      "title": "NYU1351-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 6273,
+      "cells_after": 6273
+    },
+    {
+      "gsm": "GSM7157651",
+      "title": "NYU1364-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 3877,
+      "cells_after": 3874
+    },
+    {
+      "gsm": "GSM7157644",
+      "title": "NYU1057-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3964,
+      "cells_after": 3960
+    },
+    {
+      "gsm": "GSM7157646",
+      "title": "NYU1321-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3294,
+      "cells_after": 3294
+    },
+    {
+      "gsm": "GSM7157648",
+      "title": "NYU1351-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3761,
+      "cells_after": 3751
+    },
+    {
+      "gsm": "GSM7157650",
+      "title": "NYU1364-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 5710,
+      "cells_after": 5688
+    }
+  ],
+  "skipped": [
+    {
+      "gsm": "GSM7157653",
+      "title": "NYU1368-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157654",
+      "title": "NYU1435-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157656",
+      "title": "NYU1534-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157658",
+      "title": "NYU1555-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157660",
+      "title": "NYU1562-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157662",
+      "title": "NYU1630-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157664",
+      "title": "NYU1738-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157667",
+      "title": "NYU1845-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157668",
+      "title": "NYU268-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157670",
+      "title": "NYU318-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157676",
+      "title": "NYU965-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157652",
+      "title": "NYU1368-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157655",
+      "title": "NYU1534-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157657",
+      "title": "NYU1555-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157659",
+      "title": "NYU1562-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157661",
+      "title": "NYU1630-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157663",
+      "title": "NYU1636-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157665",
+      "title": "NYU178-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157666",
+      "title": "NYU1845-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157669",
+      "title": "NYU318-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157671",
+      "title": "NYU32-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157672",
+      "title": "NYU608-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157673",
+      "title": "NYU689-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157674",
+      "title": "NYU706-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157675",
+      "title": "NYU965-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    }
+  ],
+  "started": "2026-10-18T21:28:21+00:00",
+  "finished": "2026-10-18T22:03:00+00:00",
+  "seconds": 2079
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { MUTED_LINK } from "@/components/page-kit";
 import { datasetPath, foundAll, geneAcross, genePath, type GeneAcross, type GeneRow } from "@/lib/api";
 
@@ -77,7 +78,10 @@ export function GenePage({ gene }: { gene: string }) {
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 content-start gap-10">
       <nav className="flex items-center justify-between gap-4">
-        <Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link>
+        <div className="flex min-w-0 items-center gap-5">
+          <Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link>
+          <BackToResults />
+        </div>
         <form onSubmit={(e) => { e.preventDefault(); if (next.trim() && scope) router.push(genePath(next.trim(), scope.accessions, scope.hint)); }}>
           <input value={next} onChange={(e) => setNext(e.target.value)} placeholder="Another gene" aria-label="Another gene"
             className="h-9 w-40 rounded-md border border-rule bg-card px-3 text-[16px] outline-none transition-colors duration-150 placeholder:text-muted-foreground focus:border-foreground sm:text-[13px]" />

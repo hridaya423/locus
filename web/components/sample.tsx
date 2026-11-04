@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { About } from "@/components/dataset";
 import { Aside } from "@/components/aside";
 import { Files } from "@/components/files";
@@ -65,6 +66,7 @@ export function SamplePage({ dataset, accession }: { dataset: string; accession:
           <Link href="/" aria-label="locus home" className="leading-none">
             <Wordmark className="text-[30px]" />
           </Link>
+          <BackToResults className="max-sm:hidden" />
           <Link href={datasetPath(dataset)} className={cn("flex min-w-0 items-center gap-1.5 text-[13px]", MUTED_LINK)}>
             <ChevronLeft aria-hidden className="size-3.5 shrink-0" />
             <span className="font-mono">{dataset}</span>

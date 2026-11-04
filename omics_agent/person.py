@@ -4,16 +4,37 @@ surname and initials, so a common name mixes people; the count says how many pap
 
 import re
 import unicodedata
-from functools import lru_cache
 
-import httpx
-
-from . import store
-from .paper import EPMC
+from . import pace, store
 
 PAGE = 100
+CACHE_SECONDS = 6 * 3600
+# A person page's answer, per name, for 6 hours (the identity check on the same page keeps its answer as long, so the
+# page's counts and the coverage sentence agree). Failures are not kept.
+PEOPLE = pace.TtlCache(CACHE_SECONDS, size=256)
 TITLES = re.compile(r"^(dr|prof|professor|mr|mrs|ms|sir)\.?$", re.I)
 PARTICLES = {"van", "von", "der", "den", "de", "del", "della", "da", "di", "du", "le", "la", "dos", "das", "ter", "ten"}
+
+
+def split_name(name: str) -> tuple[list[str], list[str]] | None:
+    """(given-name words, surname words) of a name as people write it ('Carson C Thoreen', 'Thoreen, Carson C.',
+    'Ludwig van der Berg'); None for a name already in Europe PMC's form ('Zhang Y') or with no given name."""
+    if re.fullmatch(r"[A-Za-zÀ-ÿ' -]+ [A-Z]{1,4}", name.strip()):
+        return None
+    if "," in name:
+        surname, _, given = name.partition(",")
+        return given.split(), surname.split()
+    parts = [p for p in name.replace(".", ". ").split() if not TITLES.match(p)]
+    if len(parts) < 2:
+        return None
+    cut = len(parts) - 1
+    while cut > 1 and parts[cut - 1].lower() in PARTICLES:
+        cut -= 1
+    return parts[:cut], parts[cut:]
+
+
+def initials_of(words: list[str]) -> str:
+    return "".join(w[0] for part in words for w in part.replace(".", " ").replace("-", " ").split() if w[0].isalpha()).upper()
 
 
 def author_query(name: str) -> str | None:
@@ -21,26 +42,19 @@ def author_query(name: str) -> str | None:
     a name already in that form ('Zhang Y', from a paper's author list) is kept."""
     if re.fullmatch(r"[A-Za-zÀ-ÿ' -]+ [A-Z]{1,4}", name.strip()):
         return name.strip()
-    if "," in name:
-        surname, _, given = name.partition(",")
-        words, last = given.split(), surname.split()
-    else:
-        parts = [p for p in name.replace(".", ". ").split() if not TITLES.match(p)]
-        if len(parts) < 2:
-            return None
-        cut = len(parts) - 1
-        while cut > 1 and parts[cut - 1].lower() in PARTICLES:
-            cut -= 1
-        words, last = parts[:cut], parts[cut:]
-    initials = "".join(w[0] for part in words for w in part.replace(".", " ").replace("-", " ").split() if w[0].isalpha())
-    return f"{' '.join(last)} {initials.upper()}".strip() if last and initials else None
+    split = split_name(name)
+    if not split:
+        return None
+    words, last = split
+    initials = initials_of(words)
+    return f"{' '.join(last)} {initials}".strip() if last and initials else None
 
 
 def _plain(text: str) -> str:
     return "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)).lower()
 
 
-def _datasets(papers: list[dict]) -> dict[str, list[dict]]:
+def datasets_of(papers: list[dict]) -> dict[str, list[dict]]:
     """Locus datasets whose stored paper IDs include each paper's PMID or DOI, in one pass over the index."""
     keys = {f'"pmid:{p["pmid"]}"': p["key"] for p in papers if p.get("pmid")} | {f'"doi:{p["doi"].lower()}"': p["key"] for p in papers if p.get("doi")}
     if not keys:
@@ -56,13 +70,24 @@ def _datasets(papers: list[dict]) -> dict[str, list[dict]]:
     return found
 
 
-@lru_cache(maxsize=64)
-def person(name: str) -> dict:
+def person(name: str, admit=None) -> dict:
+    """The person page's answer, kept 6 hours per name. httpx errors (PaceTimeout among them) pass through. `admit`,
+    when given, is called only on a cache miss, before any upstream work (a rate limit that cached answers skip)."""
+    if (hit := PEOPLE.get(name)) is not None:
+        return hit
+    if admit is not None:
+        admit()
+    with pace.UPSTREAM:
+        out = _person(name)
+    PEOPLE.put(name, out)
+    return out
+
+
+def _person(name: str) -> dict:
     query = author_query(name)
     if not query:
         return {"name": name, "available": False, "reason": "the name has no surname and given name to search by"}
-    body = httpx.get(f"{EPMC}/search", params={"query": f'AUTH:"{query}"', "format": "json", "resultType": "lite", "pageSize": PAGE, "sort": "P_PDATE_D desc"},
-                     timeout=30).raise_for_status().json()
+    body = pace.epmc_get("/search", {"query": f'AUTH:"{query}"', "format": "json", "resultType": "lite", "pageSize": PAGE, "sort": "P_PDATE_D desc"})
     papers = []
     for r in body["resultList"]["result"]:
         preprint = r.get("source") == "PPR" or "preprint" in (r.get("pubType") or "")
@@ -73,7 +98,7 @@ def person(name: str) -> dict:
             "supplementary": r.get("hasSuppl") == "Y", "accessions_in_text": r.get("hasTMAccessionNumbers") == "Y",
             "last_author": _plain(r.get("authorString", "")).rstrip(".").split(", ")[-1] == _plain(query),
         })
-    linked = _datasets(papers)
+    linked = datasets_of(papers)
     for p in papers:
         p["datasets"] = linked.get(p["key"], [])
     journals: dict[str, int] = {}

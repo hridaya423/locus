@@ -2,6 +2,8 @@ import hashlib
 import json
 import os
 import re
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -12,7 +14,8 @@ import httpx
 from . import answer, assay, compare, index, methods, samples, samplesheet, sdrf, store
 from .sources import Dataset, cellxgene_diseases, download_plan, search_cellxgene, search_geo, search_pride
 
-PLANNER = "claude-sonnet-5-5"
+# OMICS_PLANNER_MODEL swaps the planner, for example to claude-haiku-5-5 so a whole search runs on Haiku.
+PLANNER = os.environ.get("OMICS_PLANNER_MODEL") or "claude-sonnet-5-5"
 WORKER = "claude-haiku-5-5"
 # How many triaged candidates are screened, and how many GEO datasets get their samples counted. In tests on five
 # questions, ranks 41-60 still passed the screen at close to the rate of ranks 1-40 on rich topics (IPF: 12 of 20,
@@ -131,6 +134,13 @@ def _numbered(properties: dict) -> dict:
     }
 
 
+def _sized(schema: dict, size: int) -> dict:
+    """A numbered schema whose answers list must hold exactly `size` answers, one per candidate in the batch. Without
+    it, the local model closed the list early in about one batch in ten when its answer could not be pretty-printed."""
+    answers = schema["properties"]["answers"] | {"minItems": size, "maxItems": size}
+    return schema | {"properties": schema["properties"] | {"answers": answers}}
+
+
 TRIAGE_SCHEMA = _numbered({"score": {"type": "integer", "enum": [0, 1, 2, 3]}})
 # The written reason comes first so the checks follow from it; answers without it were inconsistent.
 SCREEN_SCHEMA = _numbered({"reason": {"type": "string"}} | CHECKS | {"evidence": {"type": "string"}})
@@ -143,27 +153,74 @@ client = anthropic.Anthropic()
 LOCAL_LLM_URL = os.environ.get("LOCAL_LLM_URL", "").rstrip("/")
 LOCAL_LLM_MODEL = os.environ.get("LOCAL_LLM_MODEL", "")
 LOCAL_LLM_THINK = os.environ.get("LOCAL_LLM_THINK") == "1"
+# LOCAL_LLM_COMPACT_JSON=1 sends the server a grammar that allows no newlines or indentation between JSON tokens
+# instead of the schema, so an answer is not pretty-printed: the same fields and values in about a third fewer output
+# tokens, which is what sets a stage's wall time. The grammars are built from the schemas by scripts/build_grammars.py
+# (xgrammar, any_whitespace=False) into grammars.json; a schema without one falls back to the schema. The plan schema has
+# none on purpose: it is one call per question, and the constrained plans repeated or lost search terms. The same effect
+# server-wide, without this flag, is vLLM's --structured-outputs-config disable_any_whitespace=true (then also for plans).
+LOCAL_LLM_COMPACT_JSON = os.environ.get("LOCAL_LLM_COMPACT_JSON") == "1"
+GRAMMARS_FILE = Path(__file__).with_name("grammars.json")
+GRAMMARS: dict[str, str] = json.loads(GRAMMARS_FILE.read_text()) if LOCAL_LLM_COMPACT_JSON and GRAMMARS_FILE.exists() else {}
+# PLAN_LLM_URL, PLAN_LLM_MODEL and PLAN_LLM_KEY send only the planning call to another OpenAI-compatible service, for
+# example Gemini's (https://generativelanguage.googleapis.com/v1beta/openai), while every other call stays local.
+# Planning is one call per question and sets the search terms, so it is where a stronger model helps most.
+PLAN_LLM_URL = os.environ.get("PLAN_LLM_URL", "").rstrip("/")
+PLAN_LLM_MODEL = os.environ.get("PLAN_LLM_MODEL", "")
+PLAN_LLM_KEY = os.environ.get("PLAN_LLM_KEY", "")
+# ANSWER_LLM_URL, ANSWER_LLM_MODEL and ANSWER_LLM_KEY send the batched triage and screening calls to an OpenAI-compatible
+# service the same way. Any batch it refuses (busy, rate-limited) is asked of the default model instead.
+ANSWER_LLM_URL = os.environ.get("ANSWER_LLM_URL", "").rstrip("/")
+ANSWER_LLM_MODEL = os.environ.get("ANSWER_LLM_MODEL", "")
+ANSWER_LLM_KEY = os.environ.get("ANSWER_LLM_KEY", "")
+# OMICS_FRESH_ANSWERS=1 ignores remembered triage and screen answers, so a timing run measures real model calls.
+FRESH_ANSWERS = os.environ.get("OMICS_FRESH_ANSWERS") == "1"
+# Every model call, local, planning service or Claude, is recorded here (stage, seconds, model, tokens in and out;
+# for Claude also the cached tokens read and written) so a run can be profiled; `run` resets it.
+TRACE: list[dict] = []
+STAGE = ["start"]
 
 
-def _ask_local(prompt: str, schema: dict, cached: str, think: bool, max_tokens: int) -> dict:
-    """The same contract as `_ask`, on a local model; the server constrains decoding to the JSON schema."""
+def schema_key(schema: dict) -> str:
+    return hashlib.sha1(json.dumps(schema, sort_keys=True).encode()).hexdigest()[:16]
+
+
+def _ask_openai(url: str, model: str, prompt: str, schema: dict, cached: str, max_tokens: int, key: str = "",
+                extra: dict | None = None) -> dict:
+    """One call to an OpenAI-compatible chat endpoint that constrains its answer to the JSON schema, or to a grammar
+    when `extra` carries one (vLLM's `structured_outputs`)."""
+    started = time.monotonic()
     response = httpx.post(
-        f"{LOCAL_LLM_URL}/chat/completions",
+        f"{url}/chat/completions",
+        headers={"Authorization": f"Bearer {key}"} if key else {},
         json={
-            "model": LOCAL_LLM_MODEL,
+            "model": model,
             "max_tokens": max_tokens,
             "temperature": 0,
             "messages": [{"role": "user", "content": "\n\n".join(filter(None, (cached, prompt)))}],
-            "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema}},
-            "chat_template_kwargs": {"enable_thinking": think and LOCAL_LLM_THINK},
+            **({} if "structured_outputs" in (extra or {}) else
+               {"response_format": {"type": "json_schema", "json_schema": {"name": "answer", "schema": schema}}}),
+            **(extra or {}),
         },
         timeout=1800,
     )
     response.raise_for_status()
-    choice = response.json()["choices"][0]
+    body = response.json()
+    usage = body.get("usage") or {}
+    TRACE.append({"stage": STAGE[0], "seconds": round(time.monotonic() - started, 2), "model": body.get("model") or model,
+                  "tokens_in": usage.get("prompt_tokens", 0), "tokens_out": usage.get("completion_tokens", 0), "max_tokens": max_tokens})
+    choice = body["choices"][0]
     if choice["finish_reason"] == "length":
-        raise RuntimeError("The local model ran out of tokens before finishing its answer.")
+        raise RuntimeError("The model ran out of tokens before finishing its answer.")
     return json.loads(choice["message"]["content"])
+
+
+def _ask_local(prompt: str, schema: dict, cached: str, think: bool, max_tokens: int) -> dict:
+    """The same contract as `_ask`, on a local vLLM server; `chat_template_kwargs` is a vLLM extension."""
+    grammar = GRAMMARS.get(schema_key(schema))
+    return _ask_openai(LOCAL_LLM_URL, LOCAL_LLM_MODEL, prompt, schema, cached, max_tokens,
+                       extra={"chat_template_kwargs": {"enable_thinking": think and LOCAL_LLM_THINK},
+                              **({"structured_outputs": {"grammar": grammar}} if grammar else {})})
 
 
 def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: str = "", think: bool = True, max_tokens: int = 16000) -> dict:
@@ -174,7 +231,8 @@ def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: st
     if LOCAL_LLM_URL:
         return _ask_local(prompt, schema, cached, think, max_tokens)
     # Sonnet can route a safety decline to a fallback model; Haiku has no server-side fallback.
-    fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if model == PLANNER else {}
+    fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if model.startswith("claude-sonnet") else {}
+    started = time.monotonic()
     response = client.beta.messages.create(
         model=model,
         max_tokens=max_tokens,
@@ -186,6 +244,11 @@ def _ask(prompt: str, schema: dict, effort: str, model: str = WORKER, cached: st
         **fallback,
         **({} if think else {"thinking": {"type": "disabled"}}),
     )
+    usage = response.usage
+    TRACE.append({"stage": STAGE[0], "seconds": round(time.monotonic() - started, 2), "model": response.model,
+                  "tokens_in": usage.input_tokens, "tokens_out": usage.output_tokens,
+                  "cache_read": getattr(usage, "cache_read_input_tokens", 0) or 0,
+                  "cache_write": getattr(usage, "cache_creation_input_tokens", 0) or 0, "max_tokens": max_tokens})
     if response.stop_reason == "refusal":
         raise RuntimeError("The model declined the request.")
     return json.loads(next(b.text for b in response.content if b.type == "text"))
@@ -234,6 +297,13 @@ matched_assays: when the question needs several assays from the same samples (fo
 
 
 def _plan(question: str) -> dict:
+    if PLAN_LLM_URL:
+        try:
+            return _ask_openai(PLAN_LLM_URL, PLAN_LLM_MODEL, f"Research question:\n{question}", PLAN_SCHEMA,
+                               PLAN_PROMPT.format(vocabulary="; ".join(cellxgene_diseases())), 16000, key=PLAN_LLM_KEY)
+        except (httpx.HTTPError, ValueError, KeyError) as error:
+            # A free hosted tier can be busy (503) or rate-limited (429); the search still runs, planned locally.
+            print(f"planning service failed ({error}); planning on the default model", file=sys.stderr)
     return _ask(
         f"Research question:\n{question}",
         PLAN_SCHEMA,
@@ -414,9 +484,13 @@ def _workbench_facts(dataset: Dataset) -> None:
 
 
 def _fetch_samples(dataset: Dataset) -> None:
-    """Warm the on-disk sample cache: Gemma's curated groups if they exist, else the GEO sample records."""
-    if dataset.source == "GEO" and not samples.gemma_fields(dataset.accession):
-        samples.geo_fields(dataset.accession)
+    """Warm the on-disk sample cache: Gemma's curated groups if they exist, else the GEO sample records.
+    A fetch that still fails after the retries leaves that dataset without sample counts; it does not end the search."""
+    try:
+        if dataset.source == "GEO" and not samples.gemma_fields(dataset.accession):
+            samples.geo_fields(dataset.accession)
+    except httpx.HTTPError as e:
+        print(f"samples for {dataset.accession} not fetched: {e}", flush=True)
 
 
 def prefetch(pool: list[Dataset]) -> None:
@@ -447,8 +521,14 @@ def add_facts(search_plan: dict, candidates: list[Dataset]) -> None:
     with ThreadPoolExecutor(max_workers=10) as workers:
         list(workers.map(_fetch_samples, geo))
     # Fetching is rate-limited; labelling is not, so every labelling call runs at once.
+    def geo_facts(d: Dataset) -> None:
+        try:
+            _geo_facts(topic, d)
+        except httpx.HTTPError as e:
+            print(f"facts for {d.accession} skipped: {e}", flush=True)
+
     with ThreadPoolExecutor(max_workers=len(geo) + len(pride) or 1) as workers:
-        list(workers.map(lambda d: _geo_facts(topic, d), geo))
+        list(workers.map(geo_facts, geo))
         list(workers.map(lambda d: _sdrf_facts(topic, d), pride))
     workbench = [d for d in candidates if d.source in ("MetabolomicsWorkbench", "MetaboLights")][:MAX_FACTS]
     with ThreadPoolExecutor(max_workers=8) as workers:
@@ -474,8 +554,61 @@ Candidate datasets:
 
 For every numbered candidate, give a one-sentence reason a non-expert can follow, then answer the four checks from its text. Answer 'unclear' when the text does not say. For evidence, copy one short exact phrase from that candidate's text that supports the checks."""
 
-TRIAGE_BATCH = 25
-SCREEN_BATCH = 4
+# Batch sizes and listing lengths; the environment can override them for timing experiments (docs/evidence/qwen/).
+TRIAGE_BATCH = int(os.environ.get("OMICS_TRIAGE_BATCH") or 25)
+SCREEN_BATCH = int(os.environ.get("OMICS_SCREEN_BATCH") or 4)
+SCREEN_CHARS = int(os.environ.get("OMICS_SCREEN_CHARS") or 1500)
+TRIAGE_CHARS = int(os.environ.get("OMICS_TRIAGE_CHARS") or 250)
+# Compact triage answers: one list of scores in listing order instead of {n, score} objects, a sixth of the output
+# tokens (about 87 against 554 for 25 candidates). Without a length constraint the model dropped one score in most
+# batches (docs/evidence/qwen/README.md), so the schema fixes the list's length to the batch's; a list of the wrong
+# length still falls back to the numbered form for that batch.
+TRIAGE_COMPACT = os.environ.get("OMICS_TRIAGE_COMPACT") == "1"
+TRIAGE_COMPACT_SCHEMA = {"type": "object", "properties": {"scores": {"type": "array", "items": {"type": "integer", "enum": [0, 1, 2, 3]}}},
+                         "required": ["scores"], "additionalProperties": False}
+
+
+def _compact_schema(size: int) -> dict:
+    """The compact triage schema with exactly `size` scores."""
+    scores = TRIAGE_COMPACT_SCHEMA["properties"]["scores"] | {"minItems": size, "maxItems": size}
+    return TRIAGE_COMPACT_SCHEMA | {"properties": {"scores": scores}}
+TRIAGE_COMPACT_NOTE = "\n\nReturn one list of scores, in the same order as the numbered datasets, one score per dataset."
+# Shorter screening answers: the reason capped at 15 words and the evidence at 10, which halves the output tokens
+# that set the screening stage's wall time on the local model. Changes the prompt, so it starts its own answer cache.
+SCREEN_SHORT = os.environ.get("OMICS_SCREEN_SHORT") == "1"
+SCREEN_SHORT_NOTE = " Keep each reason under 15 words and each evidence phrase under 10 words."
+
+
+# Keyed triage answers: one object with a score under each candidate's number, every key required, so the answer
+# cannot misalign or stop short; about 200 output tokens for 25 candidates against 322 for the numbered objects.
+TRIAGE_KEYED = os.environ.get("OMICS_TRIAGE_KEYED") == "1"
+TRIAGE_KEYED_NOTE = "\n\nReturn an object with one score per dataset, keyed by the dataset's number."
+
+
+def _keyed_schema(size: int) -> dict:
+    return {"type": "object", "properties": {str(i): {"type": "integer", "enum": [0, 1, 2, 3]} for i in range(size)},
+            "required": [str(i) for i in range(size)], "additionalProperties": False}
+
+
+def _keyed_scores(question: str, candidates: list[Dataset]) -> dict[str, dict]:
+    """Triage scores keyed by candidate number, one call per batch; remembered like the numbered answers."""
+    version = hashlib.sha1((TRIAGE_PROMPT + TRIAGE_KEYED_NOTE + json.dumps(_keyed_schema(TRIAGE_BATCH))).encode()).hexdigest()[:8]
+    slot = "question " + hashlib.sha1(" ".join(question.lower().split()).encode()).hexdigest()[:16]
+    kind = f"triage answers #{version}"
+    known = {} if FRESH_ANSWERS else store.cached_facts(slot, kind) or {}
+    missing = [d for d in candidates if d.accession not in known]
+    batches = [missing[i:i + TRIAGE_BATCH] for i in range(0, len(missing), TRIAGE_BATCH)]
+
+    def ask(batch: list[Dataset]) -> dict[str, dict]:
+        prompt = TRIAGE_PROMPT.replace("{question}", question).replace("{listing}", _listing(batch, TRIAGE_CHARS)) + TRIAGE_KEYED_NOTE
+        scores = _ask(prompt, _keyed_schema(len(batch)), effort="low", think=False)
+        return {d.accession: {"n": i, "score": scores[str(i)]} for i, d in enumerate(batch)}
+
+    with ThreadPoolExecutor(max_workers=len(batches) or 1) as workers:
+        known |= {k: v for part in workers.map(ask, batches) for k, v in part.items()}
+    if missing:
+        store.cache_facts(slot, kind, known)
+    return {d.accession: known[d.accession] for d in candidates if d.accession in known}
 
 
 def _listing(batch: list[Dataset], chars: int) -> str:
@@ -489,13 +622,44 @@ def _answers(name: str, template: str, question: str, schema: dict, candidates: 
     version = hashlib.sha1((template + json.dumps(schema)).encode()).hexdigest()[:8]
     slot = "question " + hashlib.sha1(" ".join(question.lower().split()).encode()).hexdigest()[:16]
     kind = f"{name} answers #{version}"
-    known = store.cached_facts(slot, kind) or {}
+    known = {} if FRESH_ANSWERS else store.cached_facts(slot, kind) or {}
     missing = [d for d in candidates if d.accession not in known]
     batches = [missing[i:i + size] for i in range(0, len(missing), size)]
 
     def ask(batch: list[Dataset]) -> dict[str, dict]:
         prompt = template.replace("{question}", question).replace("{listing}", _listing(batch, chars))
-        return {batch[a["n"]].accession: a for a in _ask(prompt, schema, effort=effort, think=think)["answers"] if 0 <= a["n"] < len(batch)}
+        sized = _sized(schema, len(batch))
+        reply = None
+        if ANSWER_LLM_URL:
+            try:
+                reply = _ask_openai(ANSWER_LLM_URL, ANSWER_LLM_MODEL, prompt, sized, "", 16000, key=ANSWER_LLM_KEY)
+            except (httpx.HTTPError, ValueError, KeyError) as error:
+                print(f"{name} service failed ({str(error)[:120]}); asking the default model", file=sys.stderr)
+        reply = reply or _ask(prompt, sized, effort=effort, think=think)
+        return {batch[a["n"]].accession: a for a in reply["answers"] if 0 <= a["n"] < len(batch)}
+
+    with ThreadPoolExecutor(max_workers=len(batches) or 1) as workers:
+        known |= {k: v for part in workers.map(ask, batches) for k, v in part.items()}
+    if missing:
+        store.cache_facts(slot, kind, known)
+    return {d.accession: known[d.accession] for d in candidates if d.accession in known}
+
+
+def _compact_scores(question: str, candidates: list[Dataset]) -> dict[str, dict]:
+    """Triage scores as one list per batch; a batch whose list has the wrong length is asked again in the numbered form."""
+    version = hashlib.sha1((TRIAGE_PROMPT + TRIAGE_COMPACT_NOTE + json.dumps(TRIAGE_COMPACT_SCHEMA) + " fixed length").encode()).hexdigest()[:8]
+    slot = "question " + hashlib.sha1(" ".join(question.lower().split()).encode()).hexdigest()[:16]
+    kind = f"triage answers #{version}"
+    known = {} if FRESH_ANSWERS else store.cached_facts(slot, kind) or {}
+    missing = [d for d in candidates if d.accession not in known]
+    batches = [missing[i:i + TRIAGE_BATCH] for i in range(0, len(missing), TRIAGE_BATCH)]
+
+    def ask(batch: list[Dataset]) -> dict[str, dict]:
+        prompt = TRIAGE_PROMPT.replace("{question}", question).replace("{listing}", _listing(batch, TRIAGE_CHARS)) + TRIAGE_COMPACT_NOTE
+        scores = _ask(prompt, _compact_schema(len(batch)), effort="low", think=False)["scores"]
+        if len(scores) != len(batch):
+            return _answers("triage", TRIAGE_PROMPT, question, TRIAGE_SCHEMA, batch, TRIAGE_BATCH, TRIAGE_CHARS, "low", think=False)
+        return {d.accession: {"n": i, "score": s} for i, (d, s) in enumerate(zip(batch, scores))}
 
     with ThreadPoolExecutor(max_workers=len(batches) or 1) as workers:
         known |= {k: v for part in workers.map(ask, batches) for k, v in part.items()}
@@ -507,14 +671,17 @@ def _answers(name: str, template: str, question: str, schema: dict, candidates: 
 def triage(question: str, candidates: list[Dataset], keep: int) -> list[Dataset]:
     """A cheap first ranking over the whole pool: Haiku scores titles and summary openings in parallel batches."""
     # Thinking off: in tests it changed the top 40 about as much as two thinking runs differ, at a third of the time.
-    scores = {k: v["score"] for k, v in _answers("triage", TRIAGE_PROMPT, question, TRIAGE_SCHEMA, candidates, TRIAGE_BATCH, 250, "low", think=False).items()}
+    answers = (_keyed_scores(question, candidates) if TRIAGE_KEYED else _compact_scores(question, candidates) if TRIAGE_COMPACT
+               else _answers("triage", TRIAGE_PROMPT, question, TRIAGE_SCHEMA, candidates, TRIAGE_BATCH, TRIAGE_CHARS, "low", think=False))
+    scores = {k: v["score"] for k, v in answers.items()}
     ranked = sorted(candidates, key=lambda d: scores.get(d.accession, 0), reverse=True)
     return [d for d in ranked if scores.get(d.accession, 0) > 0][:keep]
 
 
 def screen(question: str, candidates: list[Dataset]) -> dict[str, dict]:
     """Haiku answers the four checks for every candidate, with a reason and a quoted phrase, in small parallel batches."""
-    return _answers("screen", SCREEN_PROMPT, question, SCREEN_SCHEMA, candidates, SCREEN_BATCH, 1500, "medium")
+    template = SCREEN_PROMPT + SCREEN_SHORT_NOTE if SCREEN_SHORT else SCREEN_PROMPT
+    return _answers("screen", template, question, SCREEN_SCHEMA, candidates, SCREEN_BATCH, SCREEN_CHARS, "medium")
 
 
 def relevant(candidates: list[Dataset], verdicts: dict[str, dict]) -> list[Dataset]:
@@ -658,23 +825,41 @@ def bundles(hits: list[dict]) -> list[list[dict]]:
 
 def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> dict:
     """The whole search: plan, gather wide, screen, count samples for survivors, grade, bundle.
-    Shared by the CLI, API, and MCP server."""
+    Shared by the CLI, API, and MCP server. The result's `timings` gives the seconds each stage took."""
+    TRACE.clear()
+    timings: dict[str, float] = {}
+    clock = [time.monotonic()]
+
+    def stage(name: str) -> None:
+        now = time.monotonic()
+        timings[STAGE[0]] = round(timings.get(STAGE[0], 0) + now - clock[0], 1)
+        STAGE[0], clock[0] = name, now
+
+    stage("plan")
     search_plan = plan(question)
     progress("plan", search_plan)
+    stage("gather")
     pool = gather(search_plan, question)
     progress("candidates", {"count": len(pool)})
+    stage("triage")
     candidates = triage(question, pool, limit)
+    stage("prefetch")
     prefetch(candidates)
+    stage("screen")
     verdicts = screen(question, candidates)
     keep = relevant(candidates, verdicts)
     progress("screened", {"count": len(keep)})
+    stage("facts")
     add_facts(search_plan, keep)
     progress("facts", {"count": sum(1 for d in keep if d.facts)})
+    stage("grade")
     hits = grade(search_plan, keep, verdicts)
     add_papers(hits)
     for h in hits:
         h["download_plan"] = download_plan(h["accession"], h["source"], h["url"])
     groups = bundles(hits)
+    stage("done")
+    timings.pop("start", None)
     return {
         "answer": answer.pick(search_plan, hits),
         "question": question,
@@ -682,4 +867,5 @@ def run(question: str, limit: int = KEEP, progress=lambda stage, data: None) -> 
         "candidates": len(pool),
         "datasets": [{k: v for k, v in h.items() if k != "text"} for h in hits],
         "same_paper": [[h["accession"] for h in g] for g in groups],
+        "timings": timings,
     }

@@ -10,6 +10,8 @@ import { SAMPLE_TYPE, datasetPath, repositoryName, samplesheet, type Check, type
 import { Evidence, Methods, Ready } from "@/components/row-details";
 import { MASS_SPEC, ProtocolLine } from "@/components/assay";
 import { ProcessPanel } from "@/components/process-panel";
+import { SaveControl } from "@/components/save-control";
+import { hitSnapshot } from "@/lib/lists";
 
 const DATA_TYPE: [RegExp, string][] = [
   [/expression profiling by high throughput sequencing/i, "RNA-seq"],
@@ -142,11 +144,12 @@ function Grains({ facts }: { facts: Facts }) {
 }
 
 // A native checkbox, restyled: the box fills with ink and the tick draws itself in.
-export function Checkbox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string }) {
+export function Checkbox({ checked, mixed = false, onChange, label, id }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string; id?: string }) {
   return (
     <label className="relative mt-[2px] grid size-4 cursor-pointer place-items-center before:absolute before:-inset-3 before:content-['']">
       <input
         type="checkbox"
+        id={id}
         checked={checked}
         ref={(el) => { if (el) el.indeterminate = mixed; }}
         onChange={onChange}
@@ -236,8 +239,9 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
   const plan = hit.download_plan;
   const page = datasetPath(hit.accession);
   const riboseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
-  // Bulk RNA-seq GEO series with counted case and control samples can run the laptop-tier pipeline.
-  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total)?rnaseq$/.test(norm(a))) && (facts?.case ?? 0) >= 2 && (facts?.control ?? 0) >= 2;
+  // GEO series of the data types locus processes (bulk and single-cell RNA-seq, Ribo-seq) get the three-row Process panel,
+  // which says for each row whether it can run on this dataset and why not.
+  const rnaseq = hit.source === "GEO" && (facts?.assays ?? []).some((a) => /^(bulk|mrna|polya|total|sc|sn|singlecell|singlenucle(us|i))?rnaseq$|^(riboseq|tisseq|ribosomeprofiling)$/.test(norm(a)));
   const [processing, setProcessing] = useState(false);
 
   async function exportSamplesheet() {
@@ -268,13 +272,16 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
         </td>
         <td className="min-w-0 py-3 pr-2 align-top">
           <div className="grid min-w-0 gap-1">
-            <Link href={page} onClick={rememberScroll} className="w-fit text-sm leading-snug text-foreground underline decoration-transparent underline-offset-4 transition-colors duration-150 hover:decoration-foreground">
-              {hit.title}
-            </Link>
+            <div className="flex min-w-0 items-start justify-between gap-2">
+              <Link href={page} onClick={rememberScroll} className="w-fit min-w-0 text-sm leading-snug text-foreground underline decoration-transparent underline-offset-4 transition-colors duration-150 hover:decoration-foreground">
+                {hit.title}
+              </Link>
+              <SaveControl accession={hit.accession} snapshot={hitSnapshot(hit, assayOf(hit))} compact />
+            </div>
             <button type="button" onClick={toggle} aria-expanded={expanded} aria-label={`Details of ${hit.accession}`} className="grid w-full min-w-0 cursor-pointer gap-1 text-left">
               <span className="flex min-w-0 flex-wrap items-baseline gap-x-2" title={meta}>
                 <span className="shrink-0 font-mono text-[12px] font-medium text-foreground/80">{shortAccession(hit)}</span>
-                {watched?.fresh.has(hit.accession) && <span className="label shrink-0 text-signal" title={`Not in this search when you started watching it on ${watched.since}`}>new</span>}
+                {watched?.fresh.has(hit.accession) && <span className="label shrink-0 text-signal" data-new-since={watched.since} title={`New since your last run of this search. Watching since ${watched.since}.`}>new</span>}
                 <span className="label line-clamp-2 min-w-0 basis-full text-muted-foreground sm:line-clamp-1 sm:basis-0 sm:grow">{meta}</span>
               </span>
               {!branch && hit.paper && (
@@ -349,7 +356,7 @@ export function DatasetRow({ hit, matched, topic, selected, onSelect, branch, co
                     <button type="button" onClick={() => setProcessing(true)} className={cn(ACTION, "w-fit")}>
                       Process
                     </button>
-                    <span className="text-xs text-muted-foreground">subsampled reads → salmon → counts → DESeq2, on this machine</span>
+                    <span className="text-xs text-muted-foreground">here, now · on your laptop · on a cluster, with what each costs for this dataset</span>
                   </span>
                 )}
                 {processing && <ProcessPanel accession={hit.accession} topic={topic} />}

@@ -1,0 +1,452 @@
+{
+  "accession": "GSE229253",
+  "data_type": "scrnaseq",
+  "tier": "here",
+  "title": "tumor vs lung_adjacent_normal from 'source name', 8 samples, 37,536 nuclei after QC, 32 clusters",
+  "summary": [
+    "4 tumor and 4 lung_adjacent_normal samples from the authors' processed matrices in GEO: 37,575 nuclei before QC, 37,536 after removing nuclei with fewer than 200 genes or more than 10% mitochondrial counts (the single-nucleus cut-off), and genes seen in fewer than 3 nuclei.",
+    "32 Leiden clusters at resolution 0.5: the largest has 3,914 nuclei, the smallest 61.",
+    "Pseudobulk DESeq2 (tumor vs lung_adjacent_normal) ran in 8 of 32 clusters that had at least 2 samples per condition with 10 or more nuclei: 309 gene tests at padj < 0.05 in total, most in cluster 15 (155 of 10,266 tested).",
+    "14 of the 32 clusters are more than 90% one sample (5 from GSM7157645, 3 from GSM7157649, 2 from GSM7157648, 1 from GSM7157647, 1 from GSM7157646, 1 from GSM7157644, 1 from GSM7157650): donor or batch structure rather than shared cell types, since no integration is run here; the pseudobulk test skips them.",
+    "25 of 33 samples were left out: 25 beyond the cap of 4 samples per condition."
+  ],
+  "figures": [
+    {
+      "file": "umap.png",
+      "title": "UMAP",
+      "caption": "Left: UMAP of 37,536 nuclei in 32 Leiden clusters, numbered on the plot; right: the same nuclei coloured by condition (tumor orange, lung_adjacent_normal blue)."
+    },
+    {
+      "file": "markers_dotplot.png",
+      "title": "Marker genes",
+      "caption": "The top 3 Wilcoxon marker genes of each of the 32 clusters (86 genes): dot size is the fraction of nuclei in the cluster expressing the gene, colour its mean expression scaled from 0 to 1 per gene."
+    }
+  ],
+  "tables": [
+    {
+      "file": "pseudobulk_de.tsv",
+      "title": "Pseudobulk differential expression per cluster"
+    },
+    {
+      "file": "markers.tsv",
+      "title": "Top markers per cluster"
+    },
+    {
+      "file": "cells_per_cluster.tsv",
+      "title": "Cells per cluster and sample"
+    },
+    {
+      "file": "qc.tsv",
+      "title": "QC per sample"
+    }
+  ],
+  "warnings": [
+    "Samples are nested in people: cells from the same donor are not independent; pseudobulk per sample avoids that, but n is the number of samples, not cells.",
+    "Clusters are Leiden communities, not annotated cell types; read the marker genes before naming them.",
+    "The matrices are the authors' processed output (their cell calling, reference and filtering); locus did not recount the reads.",
+    "14 clusters are more than 90% one sample; no batch integration (Harmony, scVI) is run here, so cluster membership partly reflects the donor."
+  ],
+  "contrast": {
+    "field": "source name",
+    "reference": "lung_adjacent_normal",
+    "target": "tumor"
+  },
+  "samples": [
+    {
+      "gsm": "GSM7157645",
+      "title": "NYU1057-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 5226,
+      "cells_after": 5226
+    },
+    {
+      "gsm": "GSM7157647",
+      "title": "NYU1321-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 5470,
+      "cells_after": 5470
+    },
+    {
+      "gsm": "GSM7157649",
+      "title": "NYU1351-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 6273,
+      "cells_after": 6273
+    },
+    {
+      "gsm": "GSM7157651",
+      "title": "NYU1364-N (snRNA-seq)",
+      "condition": "lung_adjacent_normal",
+      "layout": "mtx",
+      "cells_before": 3877,
+      "cells_after": 3874
+    },
+    {
+      "gsm": "GSM7157644",
+      "title": "NYU1057-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3964,
+      "cells_after": 3960
+    },
+    {
+      "gsm": "GSM7157646",
+      "title": "NYU1321-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3294,
+      "cells_after": 3294
+    },
+    {
+      "gsm": "GSM7157648",
+      "title": "NYU1351-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 3761,
+      "cells_after": 3751
+    },
+    {
+      "gsm": "GSM7157650",
+      "title": "NYU1364-T (snRNA-seq)",
+      "condition": "tumor",
+      "layout": "mtx",
+      "cells_before": 5710,
+      "cells_after": 5688
+    }
+  ],
+  "skipped": [
+    {
+      "gsm": "GSM7157653",
+      "title": "NYU1368-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157654",
+      "title": "NYU1435-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157656",
+      "title": "NYU1534-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157658",
+      "title": "NYU1555-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157660",
+      "title": "NYU1562-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157662",
+      "title": "NYU1630-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157664",
+      "title": "NYU1738-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157667",
+      "title": "NYU1845-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157668",
+      "title": "NYU268-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157670",
+      "title": "NYU318-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157676",
+      "title": "NYU965-N (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157652",
+      "title": "NYU1368-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157655",
+      "title": "NYU1534-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157657",
+      "title": "NYU1555-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157659",
+      "title": "NYU1562-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157661",
+      "title": "NYU1630-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157663",
+      "title": "NYU1636-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157665",
+      "title": "NYU178-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157666",
+      "title": "NYU1845-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157669",
+      "title": "NYU318-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157671",
+      "title": "NYU32-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157672",
+      "title": "NYU608-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157673",
+      "title": "NYU689-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157674",
+      "title": "NYU706-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    },
+    {
+      "gsm": "GSM7157675",
+      "title": "NYU965-T (snRNA-seq)",
+      "reason": "beyond the cap of 4 samples per condition"
+    }
+  ],
+  "cells": {
+    "before": 37575,
+    "after": 37536
+  },
+  "genes": 28004,
+  "clusters": 32,
+  "pseudobulk": [
+    {
+      "cluster": "1",
+      "samples": {
+        "lung_adjacent_normal": 4,
+        "tumor": 3
+      },
+      "genes_tested": 2379,
+      "significant": 17,
+      "up": 1,
+      "down": 16,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "11",
+      "samples": {
+        "lung_adjacent_normal": 2,
+        "tumor": 2
+      },
+      "genes_tested": 11548,
+      "significant": 0,
+      "up": 0,
+      "down": 0,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "12",
+      "samples": {
+        "lung_adjacent_normal": 3,
+        "tumor": 3
+      },
+      "genes_tested": 7142,
+      "significant": 4,
+      "up": 1,
+      "down": 3,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "13",
+      "samples": {
+        "lung_adjacent_normal": 4,
+        "tumor": 4
+      },
+      "genes_tested": 13441,
+      "significant": 2,
+      "up": 1,
+      "down": 1,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "15",
+      "samples": {
+        "lung_adjacent_normal": 4,
+        "tumor": 4
+      },
+      "genes_tested": 10266,
+      "significant": 155,
+      "up": 82,
+      "down": 73,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "4",
+      "samples": {
+        "lung_adjacent_normal": 4,
+        "tumor": 4
+      },
+      "genes_tested": 9561,
+      "significant": 122,
+      "up": 35,
+      "down": 87,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "6",
+      "samples": {
+        "lung_adjacent_normal": 2,
+        "tumor": 2
+      },
+      "genes_tested": 1751,
+      "significant": 7,
+      "up": 0,
+      "down": 7,
+      "shrinkage": "apeglm"
+    },
+    {
+      "cluster": "8",
+      "samples": {
+        "lung_adjacent_normal": 4,
+        "tumor": 2
+      },
+      "genes_tested": 11911,
+      "significant": 2,
+      "up": 0,
+      "down": 2,
+      "shrinkage": "apeglm"
+    }
+  ],
+  "files": [
+    {
+      "name": "manifest.json",
+      "bytes": 12377
+    },
+    {
+      "name": "qc.tsv",
+      "bytes": 548
+    },
+    {
+      "name": "cells_per_cluster.tsv",
+      "bytes": 1003
+    },
+    {
+      "name": "markers.tsv",
+      "bytes": 11075
+    },
+    {
+      "name": "pseudobulk_de.tsv",
+      "bytes": 5065659
+    },
+    {
+      "name": "pseudobulk_summary.json",
+      "bytes": 2133
+    },
+    {
+      "name": "samples.tsv",
+      "bytes": 671
+    },
+    {
+      "name": "umap.png",
+      "bytes": 718045
+    },
+    {
+      "name": "umap.pdf",
+      "bytes": 1252889
+    },
+    {
+      "name": "markers_dotplot.png",
+      "bytes": 2930873
+    },
+    {
+      "name": "markers_dotplot.pdf",
+      "bytes": 572868
+    },
+    {
+      "name": "analysed.h5ad",
+      "bytes": 168426558
+    },
+    {
+      "name": "process.log",
+      "bytes": 4972
+    },
+    {
+      "name": "pseudobulk/cells.tsv",
+      "bytes": 9111
+    },
+    {
+      "name": "pseudobulk/cluster_1.counts.tsv",
+      "bytes": 639769
+    },
+    {
+      "name": "pseudobulk/cluster_11.counts.tsv",
+      "bytes": 471899
+    },
+    {
+      "name": "pseudobulk/cluster_12.counts.tsv",
+      "bytes": 571255
+    },
+    {
+      "name": "pseudobulk/cluster_13.counts.tsv",
+      "bytes": 721713
+    },
+    {
+      "name": "pseudobulk/cluster_15.counts.tsv",
+      "bytes": 735715
+    },
+    {
+      "name": "pseudobulk/cluster_4.counts.tsv",
+      "bytes": 726875
+    },
+    {
+      "name": "pseudobulk/cluster_6.counts.tsv",
+      "bytes": 479858
+    },
+    {
+      "name": "pseudobulk/cluster_8.counts.tsv",
+      "bytes": 598888
+    }
+  ],
+  "seconds": 2079,
+  "tools": {
+    "scanpy": "1.12.4",
+    "anndata": "0.13.4",
+    "leidenalg": "0.12.0",
+    "igraph": "1.0.0",
+    "python": "3.14.8",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "apeglm": "1.32.0"
+  }
+}

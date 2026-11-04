@@ -1,0 +1,84 @@
+{
+  "genes": 20431,
+  "genes_tested": 10301,
+  "genes_with_padj_te": 7704,
+  "classes": {
+    "translationally regulated": 463,
+    "buffered": 9,
+    "transcriptional": 36,
+    "intensified": 6,
+    "unchanged": 9787
+  },
+  "te_up": 152,
+  "te_down": 326,
+  "top_translational": [
+    {
+      "gene": "VDAC1",
+      "log2fc_te": -1.219,
+      "padj_te": 4.29e-36,
+      "log2fc_rna": 0.087,
+      "log2fc_ribo": -1.16
+    },
+    {
+      "gene": "PABPC1",
+      "log2fc_te": -3.091,
+      "padj_te": 1.39e-28,
+      "log2fc_rna": 0.202,
+      "log2fc_ribo": -2.915
+    },
+    {
+      "gene": "GAPDH",
+      "log2fc_te": -2.224,
+      "padj_te": 2.67e-24,
+      "log2fc_rna": 0.305,
+      "log2fc_ribo": -1.947
+    },
+    {
+      "gene": "CSDE1",
+      "log2fc_te": -1.135,
+      "padj_te": 7.9e-22,
+      "log2fc_rna": 0.061,
+      "log2fc_ribo": -1.107
+    },
+    {
+      "gene": "PRPS2",
+      "log2fc_te": -1.511,
+      "padj_te": 1.01e-18,
+      "log2fc_rna": 0.278,
+      "log2fc_ribo": -1.267
+    },
+    {
+      "gene": "KARS",
+      "log2fc_te": -1.144,
+      "padj_te": 2.69e-18,
+      "log2fc_rna": 0.163,
+      "log2fc_ribo": -1.008
+    },
+    {
+      "gene": "HIST1H2AG",
+      "log2fc_te": -1.278,
+      "padj_te": 2.31e-17,
+      "log2fc_rna": -0.105,
+      "log2fc_ribo": -1.412
+    },
+    {
+      "gene": "CCT2",
+      "log2fc_te": -1.046,
+      "padj_te": 4.11e-17,
+      "log2fc_rna": 0.234,
+      "log2fc_ribo": -0.841
+    }
+  ],
+  "design": {
+    "te": "~ condition + assay + condition:assay",
+    "rna": "~ condition (RNA-seq libraries)",
+    "ribo": "~ condition (Ribo-seq libraries)",
+    "te_coefficient": "conditiontorin_1.assayribo",
+    "filter": ">= 10 counts in >= 4 libraries of each assay"
+  },
+  "versions": {
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "ggplot2": "4.0.3"
+  }
+}

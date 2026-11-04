@@ -77,8 +77,8 @@ Computed once per reference (GTF + genome FASTA), independent of any dataset, an
 
 ## Open items
 
-- Laptop-tier Ribo-seq path (transcriptome alignment and P-site projection) is designed, not built.
+- Laptop-tier Ribo-seq path: built on 18–19 October 2026 (`omics_agent/riboseq.py`): fastp trimming with a linker scan, bowtie2 against rRNA then one GENCODE transcript per gene, P-site offsets per read length, metagene and footprint-length figures, CDS counts, ΔTE by DESeq2 with an interaction term. Transcript coordinates only; no projection to the genome. Checked on GSE132703 (`docs/evidence/process/GSE132703/`).
 - Whether nf-core/riboseq can run without STAR needs checking.
 - Which modalities marked "not offered" on the laptop tier deserve a reduced version.
-- How the processing step is surfaced in the GUI without cluttering the search view (next brainstorm step).
+- How the processing step is surfaced in the GUI: decided 18 October 2026 as three rows per data type (here, now / on your laptop / on a cluster), each with its requirements for the dataset and a reason when it cannot run; see `docs/plans/2026-10-19-modalities-overnight.md` and `omics_agent/options.py`.
 - Metadata availability gates which analyses are valid per dataset; see `metadata-informed-analysis-plans.md` (17 Oct 2026).

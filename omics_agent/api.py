@@ -8,19 +8,30 @@ from typing import Annotated
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Path, Query
+from fastapi import FastAPI, HTTPException, Path, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 load_dotenv()
 
-from . import agent, assay, browse, design, design_check, everywhere, lists, paper, person, preview, process, qc, record, resolve, sources, subset, table, volcano, why  # noqa: E402  (needs the API key loaded first)
+from . import samples, store  # noqa: E402
+from . import agent, assay, browse, design, design_check, everywhere, follows, kits, lists, maxquant, options, pace, paper, person, preview, process, qc, record, resolve, saved, settings, sources, subset, table, users, volcano, watches, why  # noqa: E402  (needs the API key loaded first)
 
 HEARTBEAT = 10
 
 app = FastAPI(title="omics-agent")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://localhost:3020"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://localhost:3020"], allow_methods=["*"], allow_headers=["Content-Type"])
+# Accounts: /account/* routes and the shared {"error": {...}} shape (users.py holds sessions, CSRF guard, rate limits).
+users.install(app)
+# Saved datasets and named lists under /lists/* (saved.py); the gene-list checker keeps POST /list.
+saved.install(app)
+# Watched searches kept in an account under /follows/questions (watches.py).
+watches.install(app)
+# Followed researchers by ORCID under /follows/people, and /person/identity for the person page (follows.py).
+follows.install(app)
+# Settings under /account (settings.py): name, passkeys, recovery codes, ORCID unlink, export, delete the account.
+settings.install(app)
 
 
 class SearchIn(BaseModel):
@@ -255,6 +266,8 @@ def why_matched(body: WhyIn, accession: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z
 
 
 JOBS: dict[str, dict] = {}
+# OMICS_PROCESS=cached serves earlier runs only: a public server shows them but does not start new ones.
+PROCESS_LIVE = os.environ.get("OMICS_PROCESS", "live") != "cached"
 JOBS_LOCK = threading.Lock()
 
 
@@ -277,6 +290,12 @@ def process_start(topic: str = "", accession: str = Path(pattern=r"^GSE\d+$")) -
             return {"accession": accession, "stage": state["stage"], "started": False}
         if state["stage"] == "done":
             return {"accession": accession, "stage": "done", "started": False}
+        if not PROCESS_LIVE:
+            JOBS[accession] = {"stage": "error", "log": [], "result": None, "error": (
+                f"This public site shows runs that were computed beforehand. To process {accession} yourself, install "
+                f"locus and run `uv run omics process {accession}`: about 3 minutes on a laptop for a small study "
+                "(see the README, \"Process a dataset\").")}
+            return {"accession": accession, "stage": "error", "started": False}
         job = JOBS[accession] = {"stage": "plan", "log": [], "result": None, "error": None}
 
     def progress(stage: str, data) -> None:
@@ -315,10 +334,156 @@ def process_file(accession: str = Path(pattern=r"^GSE\d+$"), name: str = Path(pa
     return FileResponse(path, filename=path.name)
 
 
+
+# ---------------------------------------------------------------- the three rows, for every data type
+
+ROW = Path(pattern=r"^(here|laptop|cluster)$")
+
+
+def _runner(kind: str, row: str):
+    """The function that runs one row of one data type on this machine, or None when the row is a kit or a link."""
+    if kind == "bulk_rnaseq" and row == "laptop":
+        return lambda accession, topic, progress: process.run(accession, topic, progress=progress)
+    if kind == "scrnaseq" and row == "here":
+        from . import singlecell
+        return lambda accession, topic, progress: singlecell.run_here(accession, topic, process.out_dir(accession) / f"{kind}-{row}", progress=progress)
+    if kind == "riboseq" and row == "here":
+        from . import riboseq
+        return lambda accession, topic, progress: riboseq.run_here(accession, topic, process.out_dir(accession) / f"{kind}-{row}", progress=progress)
+    if kind == "riboseq" and row == "laptop":
+        from . import riboseq
+        return lambda accession, topic, progress: riboseq.run_laptop(accession, topic, process.out_dir(accession) / f"{kind}-{row}", progress=progress)
+    return None
+
+
+def _run_dir(accession: str, kind: str, row: str):
+    return process.out_dir(accession) if kind == "bulk_rnaseq" else process.out_dir(accession) / f"{kind}-{row}"
+
+
+def _run_state(accession: str, kind: str, row: str) -> dict:
+    # Bulk RNA-seq's "here, now" is the laptop run computed earlier, so both rows read the same job.
+    if kind == "bulk_rnaseq":
+        return _job_state(accession)
+    if job := JOBS.get(f"{accession}/{kind}/{row}"):
+        return job
+    result_file = _run_dir(accession, kind, row) / "result.json"
+    if result_file.exists():
+        return {"stage": "done", "log": [], "result": json.loads(result_file.read_text()), "error": None}
+    return {"stage": None, "log": [], "result": None, "error": None}
+
+
+@app.get("/process/{accession}/options")
+def process_options(topic: str = "", accession: str = Path(pattern=r"^GSE\d+$")) -> dict:
+    """The three rows (here, now / on your laptop / on a cluster) for one GEO series: which apply to this dataset, what
+    each costs in time, memory and disk, and the reason when a row cannot work. `topic` is the search's terms."""
+    try:
+        out = options.options(accession, topic, PROCESS_LIVE)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    for row in out["rows"]:
+        if row.get("action") in ("run", "cached"):
+            state = _run_state(accession, out["data_type"], row["id"])
+            row["state"] = state["stage"]
+    return out
+
+
+@app.post("/process/{accession}/run/{row}", status_code=202)
+def process_row_start(topic: str = "", accession: str = Path(pattern=r"^GSE\d+$"), row: str = ROW) -> dict:
+    """Starts one row's analysis on this machine in the background: the bulk RNA-seq laptop pipeline, a single-cell or
+    Ribo-seq 'here, now' analysis of the authors' files, or the Ribo-seq laptop path. Kits are fetched, not run."""
+    opts = options.options(accession, topic, PROCESS_LIVE)
+    kind = opts["data_type"]
+    chosen = next((r for r in opts["rows"] if r["id"] == row), None)
+    if not kind or not chosen or not chosen["available"]:
+        raise HTTPException(409, (chosen or {}).get("reason") or opts.get("reason") or f"{accession} has no {row} row")
+    if (kind, row) == ("bulk_rnaseq", "laptop"):
+        return process_start(topic, accession)
+    runner = _runner(kind, row)
+    if runner is None:
+        raise HTTPException(409, f"the {row} row of {opts['data_type_label']} is a kit: GET /process/{accession}/kit/{row}")
+    if row == "laptop" and not PROCESS_LIVE:
+        raise HTTPException(409, "This public site does not run laptop pipelines; use the command shown or install locus.")
+    key = f"{accession}/{kind}/{row}"
+    with JOBS_LOCK:
+        state = _run_state(accession, kind, row)
+        if state["stage"] and state["stage"] != "error":
+            return {"accession": accession, "row": row, "stage": state["stage"], "started": False}
+        job = JOBS[key] = {"stage": "plan", "log": [], "result": None, "error": None}
+
+    def progress(stage: str, data) -> None:
+        if stage == "log":
+            job["log"] = (job["log"] + [data])[-200:]
+        else:
+            job["stage"] = stage
+            job.setdefault("stages", {})[stage] = data if isinstance(data, dict) and stage != "done" else {}
+
+    def work() -> None:
+        try:
+            job["result"] = runner(accession, topic, progress)
+            job["stage"] = "done"
+        except Exception as error:
+            job["stage"], job["error"] = "error", str(error)
+
+    threading.Thread(target=work, daemon=True).start()
+    return {"accession": accession, "row": row, "stage": "plan", "started": True}
+
+
+@app.get("/process/{accession}/run/{row}")
+def process_row_status(topic: str = "", accession: str = Path(pattern=r"^GSE\d+$"), row: str = ROW) -> dict:
+    """The row's job: stage, last log lines, per-stage data, and the result once done (result.json's shape)."""
+    kind = _kind_of(accession, topic)
+    state = _run_state(accession, kind, row)
+    return {"accession": accession, "row": row, "data_type": kind, "stage": state["stage"], "log": state["log"][-30:], "stages": state.get("stages", {}),
+            "result": state["result"] if state["stage"] == "done" else None, "error": state["error"]}
+
+
+@app.get("/process/{accession}/run/{row}/files/{name:path}")
+def process_row_file(accession: str = Path(pattern=r"^GSE\d+$"), row: str = ROW, name: str = Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9_./-]{0,120}$"), topic: str = "") -> FileResponse:
+    """One output of a finished row run."""
+    kind = _kind_of(accession, topic)
+    if kind == "bulk_rnaseq":
+        return process_file(accession, name)
+    state = _run_state(accession, kind, row)
+    path = _run_dir(accession, kind, row) / name
+    if ".." in name or not state["result"] or name not in {f["name"] for f in state["result"].get("files", [])} or not path.is_file():
+        raise HTTPException(404, f"{accession} {row} has no file {name}")
+    return FileResponse(path, filename=path.name)
+
+
+@app.get("/process/{accession}/kit/{row}")
+def process_kit(topic: str = "", accession: str = Path(pattern=r"^GSE\d+$"), row: str = ROW) -> Response:
+    """The zip for one row: a laptop kit or a cluster (Slurm / nf-core) kit, built from the records and ENA runs."""
+    try:
+        name, data = kits.kit(accession, topic, row)
+    except ValueError as error:
+        raise HTTPException(404, str(error))
+    return Response(data, media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
+def _kind_of(accession: str, topic: str) -> str:
+    records = samples.geo_records(accession)
+    labels = agent.geo_labels(topic or store.summary(accession).split(". ")[0] or accession, accession, store.summary(accession)) if records else None
+    return options.data_type(records, labels) or ""
+
+
 @app.get("/files/{accession}")
 def files(accession: str = Path(pattern=r"^PXD\d{6}$")) -> dict:
     """The author-processed files of a PRIDE project and a summary of its raw files."""
     return sources.pride_files(accession)
+
+
+@app.get("/maxquant-kit/{accession}")
+def maxquant_kit(accession: str = Path(pattern=r"^PXD\d{6}$")) -> Response:
+    """A MaxQuant search kit for one PRIDE project (mqpar.xml from its SDRF, download and run scripts, a Slurm script and a
+    README), as a zip. Generated and validated here; the search runs on an x86-64 workstation or cluster, not on this
+    machine. 404 when the project has no SDRF, 422 when the SDRF states a design the kit cannot map."""
+    try:
+        data = maxquant.export_kit(accession)
+    except LookupError as error:
+        raise HTTPException(404, str(error))
+    except ValueError as error:
+        raise HTTPException(422, str(error))
+    return Response(data, media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{accession}-maxquant.zip"'})
 
 
 @app.get("/preview/{accession}")
@@ -351,16 +516,26 @@ def cite_paper(q: str = Query(min_length=6, max_length=300)) -> dict:
     """The paper a citation-like query names (surname, year and a title word) and its locus datasets; {} when none."""
     try:
         return paper.cite(q) or {}
+    except pace.PaceTimeout:
+        raise HTTPException(503, BUSY, headers={"Retry-After": str(pace.RETRY_AFTER)})
     except httpx.HTTPError:
         return {}
 
 
+BUSY = "locus is reading Europe PMC for many people at once. Please try again in a few seconds."
+
+
 @app.get("/person")
-def person_page(name: str = Query(min_length=3, max_length=120)) -> dict:
+def person_page(request: Request, name: str = Query(min_length=3, max_length=120)) -> dict:
     """A contributor's papers in Europe PMC (author search by surname and initials), their journals, which papers have
-    supplementary files, and the locus datasets those papers deposited or cite."""
+    supplementary files, and the locus datasets those papers deposited or cite. Answers that need Europe PMC are
+    rate-limited per caller and overall (follows.PERSON_LIMIT); cached answers are not counted. 503 with Retry-After
+    when the Europe PMC pacing or the upstream cap is full."""
+    ip = users.client_ip(request)
     try:
-        return person.person(name)
+        return person.person(name, admit=lambda: follows.PERSON_LIMIT.check(ip))
+    except pace.PaceTimeout:
+        raise HTTPException(503, BUSY, headers={"Retry-After": str(pace.RETRY_AFTER)})
     except httpx.HTTPError:
         raise HTTPException(502, "Europe PMC did not answer. Please try again.")
 
@@ -373,6 +548,8 @@ def paper_page(identifier: str, offset: int = Query(0, ge=0)) -> dict:
         return paper.paper(identifier, offset)
     except LookupError as error:
         raise HTTPException(404, str(error))
+    except pace.PaceTimeout:
+        raise HTTPException(503, BUSY, headers={"Retry-After": str(pace.RETRY_AFTER)})
     except httpx.HTTPError:
         raise HTTPException(502, "Europe PMC did not answer. Please try again.")
 
@@ -382,6 +559,7 @@ def main() -> None:
 
     from . import index
 
+    users.connect().close()  # create or migrate the users DB (OMICS_USERS_DB) before serving
     # Load the embedding model and vectors before serving, so the first search does not pay for it.
     index.semantic_search("warm up", ["GEO"], "", 1)
     # OMICS_API_PORT lets the API move off 8000 when that port is taken; the web app's OMICS_API_URL must match.

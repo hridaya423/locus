@@ -32,16 +32,26 @@ def _ncbi_pace() -> None:
 
 
 def ncbi_get(url: str, params: dict) -> httpx.Response:
-    """NCBI allows 3 requests a second, or 10 with NCBI_API_KEY; back off and retry when throttled."""
+    """NCBI allows 3 requests a second, or 10 with NCBI_API_KEY; back off and retry when throttled, and also on a
+    server error or a dropped connection (GEO answers 503 now and then), so one bad response does not end a search."""
     if key := os.environ.get("NCBI_API_KEY"):
         params = {**params, "api_key": key}
     for attempt in range(4):
         _ncbi_pace()
-        response = httpx.get(url, params=params, timeout=60)
-        if response.status_code != 429 and "API rate limit exceeded" not in response.text[:200]:
+        try:
+            response = httpx.get(url, params=params, timeout=60)
+        except httpx.TransportError:
+            if attempt == 3:
+                raise
+            time.sleep(2 + 2 * attempt)
+            continue
+        if response.status_code == 429 or "API rate limit exceeded" in response.text[:200]:
+            time.sleep(1 + attempt)
+        elif response.status_code >= 500 and attempt < 3:
+            time.sleep(2 + 2 * attempt)
+        else:
             response.raise_for_status()
             return response
-        time.sleep(1 + attempt)
     response.raise_for_status()
     return response
 

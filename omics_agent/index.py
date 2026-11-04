@@ -48,7 +48,8 @@ def _encoder():
 def _vectors() -> tuple[np.ndarray, list[str], dict[str, tuple[str, str]]]:
     ids = json.loads(VECTOR_IDS.read_text())
     meta = {a: (s, o) for a, s, o in store.connect().execute("SELECT accession, source, organism FROM datasets")}
-    return np.load(VECTORS), ids, meta
+    # Memory-mapped so a small server can page the 1.3 GB matrix instead of holding all of it.
+    return np.load(VECTORS, mmap_mode="r"), ids, meta
 
 
 def semantic_search(question: str, sources: list[str], organism: str, limit: int) -> list[str]:

@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { DesignBars, useSelection, type Selection } from "@/components/design";
 import { size } from "@/components/row-details";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
@@ -14,12 +14,13 @@ import { Aside } from "@/components/aside";
 import { AssayList, assayNames, useAssays, type AssayState } from "@/components/assay";
 import { QualitySection } from "@/components/qc";
 import { FirstLookSection } from "@/components/first-look";
+import { SaveControl } from "@/components/save-control";
+import { recordSnapshot } from "@/lib/lists";
 import { dataType } from "@/components/result-card";
 import { MarkedText, MarkedTitle, MatchedLine, goToMatch, hasMatch, useFound, useMatches, type Matches } from "@/components/matches";
 import { datasetRecord, filePreview, repositoryName, type DatasetRecord, type FilePreview, type Hit } from "@/lib/api";
 
 export function DatasetPage({ accession }: { accession: string }) {
-  const router = useRouter();
   const [rec, setRec] = useState<DatasetRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -51,12 +52,7 @@ export function DatasetPage({ accession }: { accession: string }) {
           <Link href="/" aria-label="locus home" className="leading-none">
             <Wordmark className="text-[30px]" />
           </Link>
-          {context && (
-            <button type="button" onClick={() => (history.length > 1 ? router.back() : router.push("/"))} className={cn("flex items-center gap-1.5 text-[13px]", MUTED_LINK)}>
-              <ArrowLeft aria-hidden className="size-3.5" />
-              Results for {context.topic}
-            </button>
-          )}
+          <BackToResults />
         </div>
         {(rec?.url || context?.hit.url) && source && (
           <a href={rec?.url ?? context?.hit.url} target="_blank" rel="noreferrer" className={cn("group/link flex shrink-0 items-center gap-1 text-[13px]", MUTED_LINK)}>
@@ -96,8 +92,10 @@ function Header({ accession, rec, hit, assays }: { accession: string; rec: Datas
   const bytes = rec?.files.reduce((n, f) => n + (f.bytes ?? 0), 0) ?? 0;
   const processed = rec?.files.filter((f) => f.processed).length ?? 0;
   const unknown = rec || hit ? "not stated" : "…";
+  const readableType = measured.length ? measured.join(", ") : dataType(rec?.modality ?? hit?.modality ?? "");
+  const snapshot = recordSnapshot(rec, hit, { organism, dataType: readableType, samples });
   const figures: [string, React.ReactNode][] = [
-    ["Data type", measured.length ? <span title={`Read from the methods: ${measured.join(", ")}`}>{measured.slice(0, 2).join(", ")}{measured.length > 2 && <span className="text-muted-foreground"> +{measured.length - 2}</span>}</span> : dataType(rec?.modality ?? hit?.modality ?? "") || unknown],
+    ["Data type", measured.length ? <span title={`Read from the methods: ${measured.join(", ")}`}>{measured.slice(0, 2).join(", ")}{measured.length > 2 && <span className="text-muted-foreground"> +{measured.length - 2}</span>}</span> : readableType || unknown],
     ["Organism", organism.length ? <span title={organism.join(", ")}>{organism[0]}{organism.length > 1 && <span className="text-muted-foreground"> +{organism.length - 1}</span>}</span> : unknown],
     ["Samples", samples ? <span className="tabular">{samples.toLocaleString()}</span> : unknown],
     ["Files", rec ? (rec.files.length ? <span className="tabular">{rec.files.length.toLocaleString()} <span className="text-muted-foreground">· {bytes ? size(bytes) : "size not stated"}</span></span> : CONTROLLED.has(rec.source) ? "controlled access" : "none listed") : "…"],
@@ -105,11 +103,14 @@ function Header({ accession, rec, hit, assays }: { accession: string; rec: Datas
   return (
     <header className="grid gap-6">
       <div className="grid gap-3">
-        <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-[12.5px]">
-          <span className="font-medium">{accession}</span>
-          {source && <span className="text-muted-foreground">{repositoryName(source)}</span>}
-          {published && <span className="text-muted-foreground tabular">{published.slice(0, 10)}</span>}
-        </p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-[12.5px]">
+            <span className="font-medium">{accession}</span>
+            {source && <span className="text-muted-foreground">{repositoryName(source)}</span>}
+            {published && <span className="text-muted-foreground tabular">{published.slice(0, 10)}</span>}
+          </p>
+          <SaveControl accession={accession} snapshot={snapshot} />
+        </div>
         <h1 className="max-w-4xl font-display text-[34px] leading-[1.08] sm:text-[44px]">{rec ? <MarkedTitle accession={accession} title={rec.title} /> : (hit?.title ?? accession)}</h1>
       </div>
       <dl className="grid grid-cols-2 border-y border-rule sm:grid-cols-4">

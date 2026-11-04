@@ -1,0 +1,9 @@
+sample	condition	cells_before	cells_after	removed_low_genes	removed_high_mito	median_genes	median_counts	median_mito_pct
+GSM7157645	lung_adjacent_normal	5226	5226	0	0	865	1434	0.0
+GSM7157647	lung_adjacent_normal	5470	5470	0	0	1924	3676	0.06
+GSM7157649	lung_adjacent_normal	6273	6273	0	0	1602	3135	0.04
+GSM7157651	lung_adjacent_normal	3877	3874	0	3	1455	2667	0.63
+GSM7157644	tumor	3964	3960	4	0	1066	1573	0.0
+GSM7157646	tumor	3294	3294	0	0	2369	4435	0.04
+GSM7157648	tumor	3761	3751	0	10	2253	4491	0.36
+GSM7157650	tumor	5710	5688	0	22	2202	3931	0.88
