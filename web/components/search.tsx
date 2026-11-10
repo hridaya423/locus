@@ -8,7 +8,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
-import { LAST_SEARCH, cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, watches, type Cited, type Plan, type Result, type Watch } from "@/lib/api";
+import { LAST_SEARCH, cite, datasetPath, looksLikeCitation, looksLikeIdentifier, rememberFound, resolve, search, type Cited, type Plan, type Result } from "@/lib/api";
+import { markSeen, useWatches } from "@/lib/watches";
+import { HOME_EVENT, SEARCH_EVENT, rememberSearch } from "@/lib/recent";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { MicButton, useDictation } from "@/components/dictation";
 import { SCROLL } from "@/components/result-card";
@@ -132,31 +134,29 @@ export function Search() {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [result, setResult] = useState<Result | null>(null);
   const [cited, setCited] = useState<{ question: string; paper: Cited } | null>(null);
-  const [watched, setWatched] = useState<Watch[]>([]);
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setWatched(watches()), []);
+  const watched = useWatches().watches;
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const field = useRef<HTMLTextAreaElement>(null);
   const current = useRef<AbortController | null>(null);
 
-  // A search is kept for the tab's session, so coming back from a dataset page lands on the same results and row.
+  // A search is kept for the tab's session, so coming back to /?q=<question> lands on the same results and row.
+  // Plain "/" is the home page, so the logo always leads home rather than back to the last results.
   useLayoutEffect(() => {
     const asked = new URLSearchParams(location.search).get("q")?.trim();
     const saved = sessionStorage.getItem(LAST);
     const last: Result | null = saved ? JSON.parse(saved) : null;
-    if (asked && asked !== last?.question) {
+    if (asked && asked !== last?.question?.trim()) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setQ(asked);
       open(asked, true);
       return;
     }
-    if (!last) return;
+    if (!last || !asked) return;
     setQ(last.question);
     setPlan(last.plan);
     setResult(last);
-    if (!asked) history.replaceState(null, "", `/?q=${encodeURIComponent(last.question)}`);
     const y = Number(sessionStorage.getItem(SCROLL));
     sessionStorage.removeItem(SCROLL);
     if (y) requestAnimationFrame(() => window.scrollTo(0, y));
@@ -181,6 +181,29 @@ export function Search() {
       live = false;
     };
   }, [q]);
+
+  // The command palette runs a typed question here when the search page is already open (F8).
+  const opener = useRef(open);
+  const homer = useRef(() => {});
+  useEffect(() => {
+    opener.current = open;
+    homer.current = home;
+  });
+  useEffect(() => {
+    const ask = (e: Event) => {
+      const text = (e as CustomEvent<string>).detail;
+      if (!text?.trim()) return;
+      setQ(text.trim());
+      opener.current(text);
+    };
+    const leave = () => homer.current();
+    window.addEventListener(SEARCH_EVENT, ask);
+    window.addEventListener(HOME_EVENT, leave);
+    return () => {
+      window.removeEventListener(SEARCH_EVENT, ask);
+      window.removeEventListener(HOME_EVENT, leave);
+    };
+  }, []);
 
   useEffect(() => {
     if (!running) return;
@@ -208,8 +231,10 @@ export function Search() {
     }
   }
 
-  async function run(question: string, animate = true) {
-    if (!question.trim()) return;
+  async function run(typed: string, animate = true) {
+    // One form of the question everywhere: the address, the search, the kept result and the watch key (watches.ts).
+    const question = typed.trim();
+    if (!question) return;
     setMiss(null);
     history.replaceState(null, "", `/?q=${encodeURIComponent(question.trim())}`);
     // A new search replaces the one in flight, so a stalled stream can never lock the page.
@@ -224,8 +249,13 @@ export function Search() {
     };
     // The bar glides from the centre to the top instead of jumping.
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (document.startViewTransition && animate && !still) document.startViewTransition(() => flushSync(reset));
-    else reset();
+    // The transition runs its callback a frame or more later, so the search starts only after the reset has happened:
+    // otherwise a fast answer (a cached search) lands first and the late reset wipes it (F4's finding).
+    if (document.startViewTransition && animate && !still) {
+      await document.startViewTransition(() => flushSync(reset)).updateCallbackDone.catch(() => {});
+      if (controller.signal.aborted) return;
+    } else reset();
+    rememberSearch(question);
     try {
       await search(question, (s) => {
         if (controller.signal.aborted) return;
@@ -236,9 +266,20 @@ export function Search() {
         if (s.stage === "done") {
           setResult(s.data);
           rememberFound(s.data);
-          try {
-            sessionStorage.setItem(LAST, JSON.stringify(s.data));
-          } catch {}
+          const keep = (r: Result) => {
+            try {
+              sessionStorage.setItem(LAST, JSON.stringify(r));
+            } catch {}
+          };
+          keep(s.data);
+          // A watched search marks what this run shows for the first time, then counts it as seen for the next run.
+          const data = s.data;
+          markSeen(data.question, data.datasets.map((d) => d.accession), (n) => {
+            if (controller.signal.aborted) return;
+            const marked = { ...data, new_since: n };
+            setResult(marked);
+            keep(marked);
+          }).catch(() => {});
         }
       }, controller.signal);
     } catch (e) {
@@ -250,8 +291,18 @@ export function Search() {
 
   const idle = !running && !result && !error && !plan;
 
+  // Home from the results: the page stays mounted when only the query changes, so clear the search as well.
+  function home() {
+    current.current?.abort();
+    setQ(""); setPlan(null); setResult(null); setError(null); setReached([]); setCounts({}); setSeconds(0); setRunning(false);
+    setCited(null); setMiss(null);
+  }
+
   return (
     <div className={cn("mx-auto w-full max-w-3xl grid grid-cols-1 content-start gap-6", idle && "min-h-[calc(100dvh-10rem)] content-center")}>
+      {!idle && (
+        <nav><Link href="/" onClick={home} aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link></nav>
+      )}
       {idle && (
         <div className="grid justify-items-center gap-5 text-center animate-in fade-in slide-in-from-bottom-2 duration-700">
           <Wordmark className="text-[88px] sm:text-[120px]" />
@@ -299,9 +350,9 @@ export function Search() {
         </p>
       )}
       {idle && watched.length > 0 && (
-        <ul className="grid justify-items-center gap-1 text-[13px]">
+        <ul className="grid justify-items-center gap-1 text-[13px]" data-watched-list>
           {watched.slice(0, 3).map((w) => (
-            <li key={w.question}>
+            <li key={w.question} data-watched={w.question}>
               <span className="text-muted-foreground">Watching since {w.since}: </span>
               <a href={`/?q=${encodeURIComponent(w.question)}`} className={LINK}>{w.question}</a>
             </li>

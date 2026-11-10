@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "framer-motion";
+import { AccountMenu } from "@/components/account-menu";
+import { GuestImport } from "@/components/guest-import";
+import { CommandPalette } from "@/components/command-palette";
+import { Toaster } from "@/components/toast";
 import "./globals.css";
 
 const serif = Instrument_Serif({ variable: "--font-instrument", subsets: ["latin"], weight: "400" });
@@ -17,7 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${serif.variable} ${body.variable} ${mono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <MotionConfig reducedMotion="user">
-          <main className="flex-1 w-full px-5 pt-12 pb-24">{children}</main>
+          <AccountMenu />
+          <main className="flex-1 w-full px-5 pt-12 pb-[calc(6rem+var(--dock,0px))]">
+            <GuestImport />
+            {children}
+          </main>
+          <Toaster />
+          <CommandPalette />
         </MotionConfig>
       </body>
     </html>

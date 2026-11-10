@@ -1,0 +1,369 @@
+{
+  "accession": "GSE132703",
+  "data_type": "riboseq",
+  "tier": "laptop",
+  "title": "Torin 1 vs DMSO from 'treatment', 4 + 4 Ribo-seq/RNA-seq pairs, 3,174 genes tested",
+  "summary": [
+    "2,000,000 reads per library were subsampled from ENA; rRNA took 56%\u201387% of the Ribo-seq reads and 4%\u201326% of all reads aligned to the one-transcript-per-gene transcriptome.",
+    "Three-nucleotide periodicity (share of P-sites in frame 0 within CDSs) per Ribo-seq library: GSM3889077 0.45, GSM3889078 0.43, GSM3889085 0.44, GSM3889086 0.45, GSM3889079 0.42, GSM3889080 0.43, GSM3889087 0.46, GSM3889088 0.46.",
+    "Torin 1 versus DMSO ('treatment'): 4 Ribo-seq/RNA-seq pairs against 4, 3,174 genes tested of 19,857 counted.",
+    "At padj < 0.05, 23 genes are translationally regulated (\u0394TE changes while the mRNA does not), 0 are buffered, 1 change transcriptionally with the ribosomes following the mRNA, 0 are intensified and 3,150 are unchanged.",
+    "\u0394TE falls in 21 genes and rises in 2.",
+    "The translationally regulated genes with the smallest \u0394TE adjusted p-values are GAPDH, PABPC1, YBX1, HSPA8, VIM, CCT2, CSDE1, HNRNPDL."
+  ],
+  "figures": [
+    {
+      "file": "metagene.png",
+      "title": "Metagene",
+      "caption": "P-site coverage around start and stop codons, pooled over 8 Ribo-seq libraries, coloured by reading frame; periodicity per library GSM3889077 0.45, GSM3889078 0.43, GSM3889085 0.44, GSM3889086 0.45, GSM3889079 0.42, GSM3889080 0.43, GSM3889087 0.46, GSM3889088 0.46."
+    },
+    {
+      "file": "footprint_lengths.png",
+      "title": "Footprint lengths",
+      "caption": "Read-length distribution after trimming per Ribo-seq library; modal lengths GSM3889077 32 nt, GSM3889078 32 nt, GSM3889085 33 nt, GSM3889086 31 nt, GSM3889079 32 nt, GSM3889080 32 nt, GSM3889087 32 nt, GSM3889088 31 nt."
+    },
+    {
+      "file": "deltate_scatter.png",
+      "title": "\u0394TE",
+      "caption": "\u0394 RNA against \u0394 Ribo (log2 fold change, Torin 1 vs DMSO) for 3,174 genes; 23 translationally regulated, 0 buffered, 1 transcriptional, 0 intensified at padj < 0.05; the dashed line is \u0394 Ribo = \u0394 RNA."
+    }
+  ],
+  "tables": [
+    {
+      "file": "deltate_results.tsv",
+      "title": "\u0394TE per gene"
+    },
+    {
+      "file": "counts.tsv",
+      "title": "CDS counts per library"
+    }
+  ],
+  "warnings": [
+    "The laptop tier is a lower-fidelity approximation of nf-core/riboseq: reads were subsampled, aligned with bowtie2 to one GENCODE transcript per gene (no genome alignment, no splice-aware mapping, no multi-isoform handling), and P-site offsets came from a simple mode rule rather than riboWaltz or a trained model.",
+    "'genotype/variation' takes 2 values among the chosen libraries (sgLARP1, wild-type); the contrast pools them.",
+    "4 libraries (GSM3889081, GSM3889082, GSM3889083, GSM3889084) had more than half of their reads match neither rRNA nor a protein-coding transcript; such reads are usually other non-coding RNA (tRNA, snoRNA) that the one-transcript-per-gene reference does not hold, so the counts rest on the smaller mRNA fraction."
+  ],
+  "contrast": {
+    "field": "treatment",
+    "reference": "dmso",
+    "target": "torin_1",
+    "levels": {
+      "control": "DMSO",
+      "case": "Torin 1"
+    }
+  },
+  "samples": [
+    {
+      "gsm": "GSM3889077",
+      "title": "35YW: hek293_dmso_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 1,
+      "condition": "dmso",
+      "fraction_rrna": 0.7539,
+      "fraction_aligned": 0.1771,
+      "periodicity": 0.4504
+    },
+    {
+      "gsm": "GSM3889081",
+      "title": "35YW: hek293_dmso_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 1,
+      "condition": "dmso",
+      "fraction_rrna": 0.0247,
+      "fraction_aligned": 0.1871,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889078",
+      "title": "35YW: hek293_dmso_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 2,
+      "condition": "dmso",
+      "fraction_rrna": 0.7687,
+      "fraction_aligned": 0.1434,
+      "periodicity": 0.4286
+    },
+    {
+      "gsm": "GSM3889082",
+      "title": "35YW: hek293_dmso_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 2,
+      "condition": "dmso",
+      "fraction_rrna": 0.0282,
+      "fraction_aligned": 0.2201,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889085",
+      "title": "93C: larp1sko_dmso_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 3,
+      "condition": "dmso",
+      "fraction_rrna": 0.5568,
+      "fraction_aligned": 0.2444,
+      "periodicity": 0.4368
+    },
+    {
+      "gsm": "GSM3889089",
+      "title": "93C: larp1sko_dmso_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 3,
+      "condition": "dmso",
+      "fraction_rrna": 0.6566,
+      "fraction_aligned": 0.143,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889086",
+      "title": "93C: larp1sko_dmso_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 4,
+      "condition": "dmso",
+      "fraction_rrna": 0.6078,
+      "fraction_aligned": 0.2562,
+      "periodicity": 0.452
+    },
+    {
+      "gsm": "GSM3889090",
+      "title": "93C: larp1sko_dmso_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 4,
+      "condition": "dmso",
+      "fraction_rrna": 0.6321,
+      "fraction_aligned": 0.1356,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889079",
+      "title": "35YW: hek293_torin_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 5,
+      "condition": "torin_1",
+      "fraction_rrna": 0.8384,
+      "fraction_aligned": 0.0661,
+      "periodicity": 0.4246
+    },
+    {
+      "gsm": "GSM3889083",
+      "title": "35YW: hek293_torin_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 5,
+      "condition": "torin_1",
+      "fraction_rrna": 0.0261,
+      "fraction_aligned": 0.1906,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889080",
+      "title": "35YW: hek293_torin_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 6,
+      "condition": "torin_1",
+      "fraction_rrna": 0.8661,
+      "fraction_aligned": 0.0449,
+      "periodicity": 0.4342
+    },
+    {
+      "gsm": "GSM3889084",
+      "title": "35YW: hek293_torin_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 6,
+      "condition": "torin_1",
+      "fraction_rrna": 0.0262,
+      "fraction_aligned": 0.1973,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889087",
+      "title": "93C: larp1sko_torin_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 7,
+      "condition": "torin_1",
+      "fraction_rrna": 0.7032,
+      "fraction_aligned": 0.1517,
+      "periodicity": 0.4629
+    },
+    {
+      "gsm": "GSM3889091",
+      "title": "93C: larp1sko_torin_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 7,
+      "condition": "torin_1",
+      "fraction_rrna": 0.6042,
+      "fraction_aligned": 0.1592,
+      "periodicity": null
+    },
+    {
+      "gsm": "GSM3889088",
+      "title": "93C: larp1sko_torin_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 8,
+      "condition": "torin_1",
+      "fraction_rrna": 0.6755,
+      "fraction_aligned": 0.1355,
+      "periodicity": 0.4552
+    },
+    {
+      "gsm": "GSM3889092",
+      "title": "93C: larp1sko_torin_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 8,
+      "condition": "torin_1",
+      "fraction_rrna": 0.6236,
+      "fraction_aligned": 0.1539,
+      "periodicity": null
+    }
+  ],
+  "skipped": [
+    {
+      "gsm": "GSM3889093",
+      "title": "LP: larp1dko_dmso_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889094",
+      "title": "LP: larp1dko_dmso_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889095",
+      "title": "LP: larp1dko_torin_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889096",
+      "title": "LP: larp1dko_torin_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889097",
+      "title": "LP: larp1dko_dmso_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889098",
+      "title": "LP: larp1dko_dmso_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889099",
+      "title": "LP: larp1dko_torin_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889100",
+      "title": "LP: larp1dko_torin_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM4146393",
+      "title": "larp1dko_dmso_RPF_rep1_reseq",
+      "reason": "no RNA-seq library shares its title and characteristics, so it has no pair"
+    },
+    {
+      "gsm": "GSM4146394",
+      "title": "larp1dko_dmso_RPF_rep2_reseq",
+      "reason": "no RNA-seq library shares its title and characteristics, so it has no pair"
+    },
+    {
+      "gsm": "GSM4146395",
+      "title": "larp1dko_torin_RPF_rep1_reseq",
+      "reason": "no RNA-seq library shares its title and characteristics, so it has no pair"
+    },
+    {
+      "gsm": "GSM4146396",
+      "title": "larp1dko_torin_RPF_rep2_reseq",
+      "reason": "no RNA-seq library shares its title and characteristics, so it has no pair"
+    }
+  ],
+  "classes": {
+    "translationally regulated": 23,
+    "buffered": 0,
+    "transcriptional": 1,
+    "intensified": 0,
+    "unchanged": 3150
+  },
+  "genes_tested": 3174,
+  "periodicity": {
+    "GSM3889077": 0.4504,
+    "GSM3889078": 0.4286,
+    "GSM3889085": 0.4368,
+    "GSM3889086": 0.452,
+    "GSM3889079": 0.4246,
+    "GSM3889080": 0.4342,
+    "GSM3889087": 0.4629,
+    "GSM3889088": 0.4552
+  },
+  "files": [
+    {
+      "name": "counts.tsv",
+      "bytes": 833914
+    },
+    {
+      "name": "samples.tsv",
+      "bytes": 412
+    },
+    {
+      "name": "deltate_results.tsv",
+      "bytes": 369685
+    },
+    {
+      "name": "deltate_summary.json",
+      "bytes": 1795
+    },
+    {
+      "name": "deltate_scatter.png",
+      "bytes": 140014
+    },
+    {
+      "name": "deltate_scatter.pdf",
+      "bytes": 141851
+    },
+    {
+      "name": "metagene.png",
+      "bytes": 122985
+    },
+    {
+      "name": "metagene.pdf",
+      "bytes": 22750
+    },
+    {
+      "name": "footprint_lengths.png",
+      "bytes": 185523
+    },
+    {
+      "name": "footprint_lengths.pdf",
+      "bytes": 25512
+    },
+    {
+      "name": "psite_summary.json",
+      "bytes": 89995
+    },
+    {
+      "name": "manifest.json",
+      "bytes": 119848
+    }
+  ],
+  "seconds": 240,
+  "stage_seconds": {
+    "plan": 1.1,
+    "reference": 0.0,
+    "fetch": 22.6,
+    "clean": 42.0,
+    "align": 147.0,
+    "psite": 9.4,
+    "count": 7.1,
+    "deltate": 10.6
+  },
+  "tools": {
+    "locus riboseq": "laptop",
+    "fastp": "1.4.0",
+    "bowtie2": "2.5.5",
+    "samtools": "1.24",
+    "pysam": "0.24.1",
+    "matplotlib": "3.11.2",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "ggplot2": "4.0.3"
+  }
+}

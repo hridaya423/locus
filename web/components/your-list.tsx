@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { checkList, checkListAcross, datasetPath, foundAll, type ListAcross, type ListCheck } from "@/lib/api";
 
@@ -105,7 +106,7 @@ export function ListPage() {
   const ds = result?.dataset;
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 content-start gap-10">
-      <nav><Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link></nav>
+      <nav className="flex items-center gap-5"><Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link><BackToResults /></nav>
       <header className="grid gap-3">
         <h1 className="font-display text-[34px] leading-[1.08] sm:text-[44px]">Your list</h1>
         <p className="max-w-[68ch] text-[15px] text-muted-foreground">Paste the proteins or genes from your experiment: gene symbols, UniProt accessions or FASTA headers.</p>

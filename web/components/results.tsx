@@ -6,7 +6,8 @@ import { ArrowDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motionTier } from "@/lib/springs";
 import { useRouter } from "next/navigation";
-import { datasetPath, genePath, repositoryName, setWatch, watches, type Hit, type Result, type Watch } from "@/lib/api";
+import { datasetPath, genePath, repositoryName, type Hit, type Result } from "@/lib/api";
+import { TOO_LONG, WATCH_LIMITS, findWatch, setWatch, useWatches, watchKey } from "@/lib/watches";
 import { LINK as LINK_CLASS } from "@/components/page-kit";
 import { CompareDialog, Connector } from "@/components/compare";
 import { Checkbox, CountCell, DatasetRow, NewSince, ROW, SEP, Stem, assayOf, materialOf, rememberScroll, unfold } from "@/components/result-card";
@@ -232,10 +233,28 @@ export function Results({ result }: { result: Result }) {
   const [copied, setCopied] = useState(false);
   const [comparing, setComparing] = useState(false);
   const section = useRef<HTMLElement>(null);
-  const [toggled, setToggled] = useState(0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const watch = useMemo<Watch | null>(() => watches().find((w) => w.question === result.question) ?? null, [result.question, toggled]);
-  const fresh = useMemo(() => (watch ? { since: watch.since, fresh: new Set(result.datasets.map((d) => d.accession).filter((a) => !watch.seen.includes(a))) } : null), [watch, result]);
+  const watched = useWatches();
+  const [watching, setWatching] = useState(false);
+  const [watchError, setWatchError] = useState("");
+  const watch = findWatch(watched.watches, result.question);
+  const tooLong = !watch && watchKey(result.question).length > WATCH_LIMITS.question;
+  // New: shown for the first time by this run (kept with the result), or not yet in what the watch has seen.
+  const fresh = useMemo(() => {
+    if (!watch) return null;
+    const unseen = result.datasets.map((d) => d.accession).filter((a) => !watch.seen.includes(a));
+    return { since: watch.since, fresh: new Set([...(result.new_since?.fresh ?? []), ...unseen]) };
+  }, [watch, result]);
+  const toggleWatch = async () => {
+    setWatching(true);
+    setWatchError("");
+    try {
+      await setWatch(result.question, watch ? null : result.datasets.map((d) => d.accession));
+    } catch (e) {
+      setWatchError(e instanceof Error && e.message ? e.message : "locus could not change this watch. Please try again.");
+    } finally {
+      setWatching(false);
+    }
+  };
 
   // The backend's same-study groups (one paper, or one title across repositories) collapse into one row.
   const visible = useMemo(() => {
@@ -278,11 +297,16 @@ export function Results({ result }: { result: Result }) {
           <span className="text-sm font-medium">No dataset meets every requirement</span>
         )}
         {strongCount !== result.datasets.length && <Tally value={result.datasets.length} label="relevant" />}
-        <button type="button" onClick={() => { setWatch(result.question, watch ? null : result.datasets.map((d) => d.accession)); setToggled((n) => n + 1); }}
-          className="ml-auto text-[13px] font-normal text-muted-foreground underline decoration-rule underline-offset-4 transition-colors duration-150 hover:text-foreground hover:decoration-foreground"
-          title={watch ? "Stop watching this search" : "Later runs of this search mark the datasets locus adds after today"}>
-          {watch ? `Watching since ${watch.since}${fresh?.fresh.size ? ` · ${fresh.fresh.size} new` : ""}` : "Watch this search"}
-        </button>
+        {tooLong ? (
+          <span className="ml-auto text-[13px] font-normal text-muted-foreground" data-watch="too-long">{TOO_LONG}</span>
+        ) : (
+          <button type="button" onClick={toggleWatch} disabled={watching || watched.status === "loading"} data-watch={watch ? "on" : "off"}
+            className="ml-auto text-[13px] disabled:opacity-60 font-normal text-muted-foreground underline decoration-rule underline-offset-4 transition-colors duration-150 hover:text-foreground hover:decoration-foreground"
+            title={watch ? "Stop watching this search" : "Each later run of this search marks the datasets the run before it did not show"}>
+            {watch ? `Watching since ${watch.since}${fresh?.fresh.size ? ` · ${fresh.fresh.size} new since your last run` : ""}` : "Watch this search"}
+          </button>
+        )}
+        {watchError && <span role="alert" className="basis-full text-right text-[13px] font-normal text-destructive">{watchError}</span>}
       </h2>
 
       {!!result.answer?.length && <StartWith answer={result.answer} />}
@@ -323,7 +347,7 @@ export function Results({ result }: { result: Result }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12, transition: motionTier.ui.exit }}
             transition={motionTier.ui}
-            className="fixed inset-x-4 bottom-4 z-10 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-foreground px-4 py-2.5 text-sm text-background shadow-[0_12px_32px_-12px_rgb(17_17_16/0.5)]"
+            className="fixed inset-x-4 bottom-[calc(1rem+var(--dock,0px))] z-10 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-foreground px-4 py-2.5 text-sm text-background shadow-[0_12px_32px_-12px_rgb(17_17_16/0.5)]"
           >
             <span className="font-mono tabular">{picked.length} selected</span>
             {pair && (

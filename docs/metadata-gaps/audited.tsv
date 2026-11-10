@@ -1,0 +1,1121 @@
+accession	source	domain	datatype	year	vertebrate	poor	stated	applicable	sdrf	f_tissue_cell	f_disease_condition	f_intervention	f_age_stage	f_sex	f_environment_host	f_sample_table	f_paper	f_raw_files	f_organism
+PRJNA1275561	ENA	Cancer	Bulk RNA-seq	2025–26	False	False	3	4	False	samples	missing	samples	samples	samples	samples	samples	missing	study	samples
+PRJNA936267	ENA	Microbial genomes	Genome & variation	2023–24	False	True	1	3	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+PRJNA308540	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA769460	ENA	Other / basic biology	Genome & variation	2020–22	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE21858	GEO	Neuroscience	Microarray	2011–15	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+PXD041313	PRIDE	Cancer	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+MTBLS11671	MetaboLights	Cancer	Metabolomics	2025–26	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	samples
+PRJEB96761	ENA	Cardiometabolic & organ	Single-cell	2025–26	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	samples
+GSE301404	GEO	Neuroscience	Epigenomics	2025–26	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	study
+GSE316924	GEO	Other / basic biology	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD005370	PRIDE	Cancer	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD036004	PRIDE	Other / basic biology	Proteomics	2023–24	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD055400	PRIDE	Development & stem cells	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE307575	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1504503	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE99220	GEO	Cardiometabolic & organ	Bulk RNA-seq	2016–19	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+GSE29369	GEO	Other / basic biology	Other assays	2011–15	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE322049	GEO	Other / basic biology	Epigenomics	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PRJNA189863	ENA	Microbial genomes	Genome & variation	2011–15	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	study	study	samples
+GSE136257	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD075774	PRIDE	Cancer	Proteomics	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE333297	GEO	Other / basic biology	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD081194	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA948195	ENA	Cardiometabolic & organ	Genome & variation	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJEB23295	ENA	Infection & immunity	Genome & variation	2016–19	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA716262	ENA	Other / basic biology	Genome & variation	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE76670	GEO	Development & stem cells	Microarray	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PXD056978	PRIDE	Other / basic biology	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+ST001488	MetabolomicsWorkbench	Neuroscience	Metabolomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE167793	GEO	Other / basic biology	Epigenomics	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PXD028990	PRIDE	Cancer	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD012993	PRIDE	Microbiome & environment	Proteomics	2016–19	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA420993	ENA	Other / basic biology	Other assays	2016–19	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA459381	ENA	Microbiome & environment	Single-cell	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE54869	GEO	Other / basic biology	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA990578	ENA	Infection & immunity	Bulk RNA-seq	2023–24	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA315762	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+ST003920	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA525305	ENA	Other / basic biology	Genome & variation	2016–19	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE117689	GEO	Plant & agriculture	Microarray	2016–19	False	False	2	3	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+GSE186763	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	study
+PRJNA470316	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA856048	ENA	Plant & agriculture	Bulk RNA-seq	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA1061342	ENA	Microbial genomes	Genome & variation	2023–24	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE189376	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1340394	ENA	Microbiome & environment	Genome & variation	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD018396	PRIDE	Microbiome & environment	Proteomics	2020–22	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE50820	GEO	Other / basic biology	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+GSE149980	GEO	Other / basic biology	Microarray	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE37386	GEO	Cancer	Microarray	2011–15	True	False	4	5	False	samples	samples	samples	samples	missing	missing	samples	study	missing	study
+GSE75370	GEO	Cardiometabolic & organ	Epigenomics	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+MTBLS593	MetaboLights	Cancer	Metabolomics	2016–19	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	samples
+ST003090	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA494862	ENA	Infection & immunity	Bulk RNA-seq	2016–19	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA659549	ENA	Microbial genomes	Bulk RNA-seq	2020–22	False	False	2	3	False	samples	samples	samples	samples	samples	missing	samples	missing	study	samples
+GSE472	GEO	Cardiometabolic & organ	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA303245	ENA	Microbiome & environment	Genome & variation	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE12002	GEO	Infection & immunity	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA675653	ENA	Microbial genomes	Genome & variation	2020–22	False	False	3	3	False	samples	samples	samples	missing	missing	samples	samples	missing	study	samples
+PXD023792	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE62524	GEO	Other / basic biology	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE96854	GEO	Other / basic biology	Microarray	2016–19	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	missing	study
+PXD064843	PRIDE	Cancer	Proteomics	2025–26	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE13943	GEO	Other / basic biology	Microarray	≤2010	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA1296049	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE270747	GEO	Plant & agriculture	Bulk RNA-seq	2025–26	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE129057	GEO	Cardiometabolic & organ	Single-cell	2016–19	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	missing	study	study
+PXD008212	PRIDE	Other / basic biology	Proteomics	2016–19	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+MTBLS478	MetaboLights	Cardiometabolic & organ	Metabolomics	2016–19	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD061558	PRIDE	Microbial genomes	Proteomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1073753	ENA	Infection & immunity	Bulk RNA-seq	2023–24	True	False	5	5	False	samples	samples	samples	samples	samples	samples	samples	missing	study	samples
+GSE291928	GEO	Cancer	Other assays	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA404849	ENA	Microbiome & environment	Other assays	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA746733	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	study	study	samples
+GSE212643	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	study	study
+ST002744	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+MTBLS8105	MetaboLights	Infection & immunity	Metabolomics	2023–24	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	study	study	samples
+GSE260799	GEO	Cancer	Single-cell	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD019735	PRIDE	Plant & agriculture	Proteomics	2020–22	True	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJNA578903	ENA	Other / basic biology	Epigenomics	2020–22	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+PXD053290	PRIDE	Development & stem cells	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA205573	ENA	Cardiometabolic & organ	Genome & variation	2011–15	False	False	4	4	False	samples	samples	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA1373344	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1151833	ENA	Microbial genomes	Genome & variation	2025–26	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE89470	GEO	Infection & immunity	Epigenomics	2016–19	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	study	study
+PXD056072	PRIDE	Plant & agriculture	Proteomics	2025–26	True	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1128015	ENA	Infection & immunity	Genome & variation	2025–26	False	False	2	4	False	samples	samples	missing	missing	missing	samples	samples	missing	study	samples
+GSE190037	GEO	Infection & immunity	Single-cell	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD040524	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+GSE172833	GEO	Other / basic biology	Epigenomics	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+GSE36712	GEO	Neuroscience	Microarray	2011–15	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PXD057629	PRIDE	Plant & agriculture	Proteomics	2025–26	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD015987	PRIDE	Cancer	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1461891	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	missing	samples
+GSE33095	GEO	Cancer	Microarray	2011–15	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	study	missing	study
+PRJDB15568	ENA	Infection & immunity	Single-cell	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE61994	GEO	Development & stem cells	Bulk RNA-seq	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA949578	ENA	Microbial genomes	Amplicon & metagenomics	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE282504	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	study
+PXD010469	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD060229	PRIDE	Neuroscience	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD035825	PRIDE	Plant & agriculture	Proteomics	2020–22	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD020974	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE334550	GEO	Cancer	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+MTBLS12437	MetaboLights	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+MTBLS12645	MetaboLights	Neuroscience	Metabolomics	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	samples
+PRJNA958164	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD041593	PRIDE	Development & stem cells	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE146066	GEO	Development & stem cells	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE88752	GEO	Cancer	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PXD043474	PRIDE	Other / basic biology	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD019119	PRIDE	Infection & immunity	Proteomics	2020–22	False	False	2	4	True	samples	study	missing	missing	missing	missing	samples	study	study	samples
+GSE274008	GEO	Cardiometabolic & organ	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA1153756	ENA	Plant & agriculture	Amplicon & metagenomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE168242	GEO	Other / basic biology	Epigenomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE128950	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB2101	ENA	Microbial genomes	Genome & variation	≤2010	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1051817	ENA	Infection & immunity	Other assays	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE76264	GEO	Other / basic biology	Microarray	2011–15	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA1070685	ENA	Development & stem cells	Bulk RNA-seq	2025–26	False	False	3	4	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PXD009176	PRIDE	Development & stem cells	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJEB31300	ENA	Infection & immunity	Amplicon & metagenomics	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	study	study	samples
+GSE82392	GEO	Development & stem cells	Epigenomics	2016–19	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	study	missing	study
+MTBLS14860	MetaboLights	Microbiome & environment	Metabolomics	2025–26	False	True	1	3	False	samples	missing	missing	samples	missing	missing	samples	missing	study	samples
+PRJNA567200	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	samples
+GSE92482	GEO	Cancer	Microarray	2016–19	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	missing	study
+GSE116044	GEO	Cancer	Microarray	2020–22	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	missing	study
+GSE18213	GEO	Development & stem cells	Microarray	≤2010	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PXD035170	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE46490	GEO	Development & stem cells	Bulk RNA-seq	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE292017	GEO	Infection & immunity	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB101917	ENA	Cancer	Single-cell	2025–26	False	False	4	4	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+PRJEB27319	ENA	Cancer	Single-cell	2016–19	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+PXD035301	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE236426	GEO	Cardiometabolic & organ	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA162895	ENA	Microbiome & environment	Genome & variation	2011–15	False	True	0	3	False	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE189824	GEO	Cardiometabolic & organ	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE175976	GEO	Development & stem cells	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	study	study	study
+PRJNA649594	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	False	4	4	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+PXD033242	PRIDE	Microbiome & environment	Proteomics	2023–24	False	True	0	3	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE17027	GEO	Neuroscience	Microarray	≤2010	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+GSE141946	GEO	Cancer	Single-cell	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJEB63533	ENA	Development & stem cells	Genome & variation	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJDB40542	ENA	Microbial genomes	Genome & variation	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJEB66482	ENA	Microbiome & environment	Genome & variation	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1419905	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE292073	GEO	Plant & agriculture	Bulk RNA-seq	2025–26	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA449490	ENA	Other / basic biology	Other assays	2016–19	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+GSE76201	GEO	Other / basic biology	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA235417	ENA	Other / basic biology	Genome & variation	2011–15	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD005973	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+ST001837	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD045663	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE216562	GEO	Other / basic biology	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PXD010925	PRIDE	Other / basic biology	Proteomics	2020–22	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD072107	PRIDE	Other / basic biology	Proteomics	2025–26	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1379522	ENA	Infection & immunity	Bulk RNA-seq	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE221438	GEO	Microbial genomes	Bulk RNA-seq	2023–24	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD027546	PRIDE	Development & stem cells	Proteomics	2020–22	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJNA328907	ENA	Microbial genomes	Bulk RNA-seq	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	study	study	samples
+PRJNA668527	ENA	Cancer	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	samples	missing	samples	missing	samples	missing	study	samples
+PRJNA88581	ENA	Microbial genomes	Genome & variation	2011–15	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1226290	ENA	Infection & immunity	Genome & variation	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE122884	GEO	Cancer	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJDB15059	ENA	Plant & agriculture	Genome & variation	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA723995	ENA	Other / basic biology	Amplicon & metagenomics	2020–22	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA609525	ENA	Other / basic biology	Genome & variation	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1215048	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD041552	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD015446	PRIDE	Other / basic biology	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE235400	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE167513	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1233901	ENA	Microbial genomes	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE177640	GEO	Other / basic biology	Epigenomics	2020–22	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+GSE230586	GEO	Other / basic biology	Epigenomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB56397	ENA	Microbiome & environment	Genome & variation	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	study	study	samples
+PXD009391	PRIDE	Other / basic biology	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1284556	ENA	Infection & immunity	Bulk RNA-seq	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	samples	samples	missing	study	samples
+PRJNA1518401	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST000251	MetabolomicsWorkbench	Infection & immunity	Metabolomics	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA1184118	ENA	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PXD040731	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+GSE296211	GEO	Cancer	Other assays	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA433185	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE163518	GEO	Other / basic biology	Epigenomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA826906	ENA	Plant & agriculture	Genome & variation	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJEB57395	ENA	Other / basic biology	Epigenomics	2020–22	False	False	4	4	False	samples	samples	samples	samples	missing	samples	samples	missing	study	samples
+GSE98052	GEO	Infection & immunity	Single-cell	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJNA1256188	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST000081	MetabolomicsWorkbench	Cancer	Metabolomics	2011–15	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+GSE256035	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+PXD047878	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD034539	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJDB16169	ENA	Other / basic biology	Other assays	2025–26	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD012459	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE243989	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+ST002728	MetabolomicsWorkbench	Neuroscience	Metabolomics	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA1271594	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PXD041164	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+PXD021270	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA1504953	ENA	Microbiome & environment	Genome & variation	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE32745	GEO	Infection & immunity	Microarray	2011–15	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	missing	study
+PXD019380	PRIDE	Infection & immunity	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE228499	GEO	Cancer	Single-cell	2023–24	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	study	study
+MTBLS12317	MetaboLights	Infection & immunity	Metabolomics	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD001795	PRIDE	Infection & immunity	Proteomics	2011–15	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE316538	GEO	Neuroscience	Single-cell	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	study
+PRJNA1198715	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	False	3	4	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE186380	GEO	Cancer	Microarray	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE232713	GEO	Other / basic biology	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	study	study
+PRJNA1314130	ENA	Microbial genomes	Epigenomics	2025–26	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE249850	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD064880	PRIDE	Neuroscience	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE258984	GEO	Other / basic biology	Epigenomics	2023–24	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	missing	study
+MTBLS14019	MetaboLights	Cardiometabolic & organ	Metabolomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA293042	ENA	Cancer	Single-cell	2011–15	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	study	samples
+PRJNA527140	ENA	Infection & immunity	Genome & variation	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE309543	GEO	Cancer	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD073349	PRIDE	Cancer	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+GSE224006	GEO	Other / basic biology	Bulk RNA-seq	2025–26	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	missing	study	study
+PXD046863	PRIDE	Microbiome & environment	Proteomics	2025–26	True	True	1	3	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA1504249	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA670448	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD029688	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE126393	GEO	Other / basic biology	Other assays	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	missing	missing	study
+PRJNA997009	ENA	Other / basic biology	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+MTBLS14677	MetaboLights	Microbial genomes	Metabolomics	2025–26	False	True	1	3	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+GSE279595	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	study	study
+PXD021756	PRIDE	Cancer	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD031324	PRIDE	Infection & immunity	Proteomics	2020–22	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE545	GEO	Cancer	Other assays	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA1340823	ENA	Microbiome & environment	Bulk RNA-seq	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1537020	ENA	Plant & agriculture	Genome & variation	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	missing	missing
+PRJNA926931	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1346698	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD035854	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA664445	ENA	Plant & agriculture	Epigenomics	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PXD047223	PRIDE	Cancer	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+ST004929	MetabolomicsWorkbench	Neuroscience	Metabolomics	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA631293	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	True	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE305312	GEO	Neuroscience	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE79809	GEO	Cancer	Microarray	2016–19	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+GSE297488	GEO	Plant & agriculture	Bulk RNA-seq	2025–26	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PXD063973	PRIDE	Microbial genomes	Proteomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA223512	ENA	Other / basic biology	Genome & variation	2011–15	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD048033	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE176549	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	study
+GSE141065	GEO	Cardiometabolic & organ	Microarray	2020–22	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	study	missing	study
+PRJNA813900	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA567464	ENA	Plant & agriculture	Other assays	2016–19	False	True	1	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD047053	PRIDE	Infection & immunity	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA1402556	ENA	Microbiome & environment	Other assays	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE122445	GEO	Neuroscience	Epigenomics	2016–19	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+PRD000014	PRIDE	Other / basic biology	Proteomics	≤2010	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+GSE163160	GEO	Infection & immunity	Single-cell	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	study	study
+PRJEB1492	ENA	Plant & agriculture	Genome & variation	2011–15	False	True	0	3	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA621664	ENA	Other / basic biology	Genome & variation	2020–22	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	study	study	samples
+PXD021577	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD020480	PRIDE	Infection & immunity	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE286868	GEO	Infection & immunity	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE267982	GEO	Cancer	Single-cell	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE36998	GEO	Infection & immunity	Microarray	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA1334316	ENA	Microbial genomes	Genome & variation	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE59321	GEO	Plant & agriculture	Microarray	2011–15	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+ST004236	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	missing	study
+PXD027969	PRIDE	Microbial genomes	Proteomics	2020–22	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJEB40172	ENA	Microbial genomes	Genome & variation	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJEB51043	ENA	Microbial genomes	Genome & variation	2020–22	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	samples
+PRJNA1008985	ENA	Plant & agriculture	Amplicon & metagenomics	2023–24	False	True	1	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD030916	PRIDE	Infection & immunity	Proteomics	2020–22	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA196978	ENA	Microbial genomes	Genome & variation	2011–15	False	True	0	3	False	missing	missing	missing	missing	samples	missing	samples	study	study	samples
+ST002851	MetabolomicsWorkbench	Cancer	Metabolomics	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	samples
+ST002581	MetabolomicsWorkbench	Other / basic biology	Metabolomics	2023–24	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	missing	study
+GSE88063	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA1165191	ENA	Microbial genomes	Genome & variation	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+PRJNA753669	ENA	Plant & agriculture	Bulk RNA-seq	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA381846	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD056850	PRIDE	Neuroscience	Proteomics	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJEB53027	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA443696	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD064944	PRIDE	Cancer	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE21384	GEO	Other / basic biology	Microarray	2011–15	True	False	3	5	False	samples	samples	missing	missing	samples	missing	samples	missing	missing	study
+GSE170472	GEO	Neuroscience	Epigenomics	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PXD019521	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE71024	GEO	Neuroscience	Epigenomics	2016–19	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD055942	PRIDE	Neuroscience	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD005106	PRIDE	Other / basic biology	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA710489	ENA	Cancer	Bulk RNA-seq	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+PRJNA731323	ENA	Microbiome & environment	Other assays	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE16972	GEO	Infection & immunity	Microarray	2011–15	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	missing	study
+PXD016276	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+GSE113969	GEO	Cardiometabolic & organ	Microarray	2020–22	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	missing	study
+PXD012344	PRIDE	Plant & agriculture	Proteomics	2016–19	False	True	1	3	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJDB1787	ENA	Development & stem cells	Other assays	2011–15	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJEB57652	ENA	Plant & agriculture	Bulk RNA-seq	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRD000089	PRIDE	Cardiometabolic & organ	Proteomics	≤2010	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD063677	PRIDE	Cancer	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD001452	PRIDE	Microbial genomes	Proteomics	2011–15	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE122423	GEO	Other / basic biology	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA1059253	ENA	Infection & immunity	Bulk RNA-seq	2025–26	False	False	4	4	False	samples	samples	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA243994	ENA	Microbiome & environment	Amplicon & metagenomics	2011–15	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST000446	MetabolomicsWorkbench	Microbial genomes	Metabolomics	2016–19	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE133614	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA627540	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE113116	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE16446	GEO	Cancer	Microarray	≤2010	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	study	missing	study
+PRJNA1315928	ENA	Microbiome & environment	Genome & variation	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE100245	GEO	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	2	3	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+PRJNA628576	ENA	Infection & immunity	Genome & variation	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE79326	GEO	Cancer	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PXD011166	PRIDE	Neuroscience	Proteomics	2020–22	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD022179	PRIDE	Other / basic biology	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA752226	ENA	Microbial genomes	Genome & variation	2020–22	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PXD009539	PRIDE	Other / basic biology	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA305942	ENA	Development & stem cells	Bulk RNA-seq	2011–15	True	False	3	5	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PXD008154	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE88223	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+GSE8575	GEO	Infection & immunity	Microarray	≤2010	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+ST002283	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2020–22	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+GSE29272	GEO	Cancer	Microarray	2011–15	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA1307508	ENA	Cardiometabolic & organ	Bulk RNA-seq	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1004758	ENA	Microbial genomes	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE195780	GEO	Cancer	Single-cell	2020–22	True	False	3	5	False	samples	samples	missing	missing	samples	missing	samples	study	study	study
+GSE270717	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA824584	ENA	Other / basic biology	Amplicon & metagenomics	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA816511	ENA	Microbial genomes	Amplicon & metagenomics	2020–22	False	False	2	3	False	missing	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJEB103005	ENA	Microbiome & environment	Genome & variation	2025–26	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA310820	ENA	Microbial genomes	Bulk RNA-seq	2016–19	False	False	2	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA1153944	ENA	Microbial genomes	Genome & variation	2023–24	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA244025	ENA	Microbial genomes	Bulk RNA-seq	2011–15	False	False	2	3	False	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+GSE74661	GEO	Other / basic biology	Microarray	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE281503	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+GSE64015	GEO	Infection & immunity	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA573845	ENA	Other / basic biology	Genome & variation	2016–19	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE232837	GEO	Cardiometabolic & organ	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE124734	GEO	Infection & immunity	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE185597	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJEB37898	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE35861	GEO	Infection & immunity	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+GSE341181	GEO	Infection & immunity	Single-cell	2025–26	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	missing	study	study
+GSE274663	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1343469	ENA	Microbiome & environment	Genome & variation	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRD000527	PRIDE	Other / basic biology	Proteomics	2011–15	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA1031824	ENA	Cardiometabolic & organ	Amplicon & metagenomics	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE30146	GEO	Development & stem cells	Epigenomics	2011–15	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+GSE187327	GEO	Other / basic biology	Epigenomics	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+GSE425	GEO	Cancer	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+MTBLS530	MetaboLights	Neuroscience	Metabolomics	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+PRJNA1061658	ENA	Microbiome & environment	Bulk RNA-seq	2023–24	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA962804	ENA	Microbial genomes	Genome & variation	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJDB5226	ENA	Cancer	Bulk RNA-seq	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJEB24965	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	samples	samples	missing	missing	missing	samples	samples	missing	study	samples
+GSE24692	GEO	Plant & agriculture	Microarray	2011–15	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE268946	GEO	Development & stem cells	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA318815	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	missing	study	samples
+GSE70475	GEO	Neuroscience	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+ST003355	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA615693	ENA	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	missing	samples	missing	missing	samples	missing	samples	missing	study	samples
+PXD033696	PRIDE	Neuroscience	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE101707	GEO	Cardiometabolic & organ	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+ST000483	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2016–19	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+GSE123130	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE283820	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE296762	GEO	Cardiometabolic & organ	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD028036	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA698378	ENA	Infection & immunity	Genome & variation	2020–22	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJEB60565	ENA	Cancer	Genome & variation	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE246312	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PXD020316	PRIDE	Neuroscience	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD050332	PRIDE	Cancer	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+MTBLS179	MetaboLights	Infection & immunity	Metabolomics	2016–19	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	study	samples
+PRJNA268360	ENA	Microbial genomes	Genome & variation	2011–15	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE97848	GEO	Development & stem cells	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE11774	GEO	Plant & agriculture	Microarray	≤2010	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PXD007582	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE77435	GEO	Cancer	Microarray	2016–19	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	missing	study
+PXD029833	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE69859	GEO	Development & stem cells	Epigenomics	2011–15	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+GSE199867	GEO	Neuroscience	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+MTBLS1370	MetaboLights	Microbiome & environment	Metabolomics	2020–22	True	False	2	3	False	samples	samples	samples	samples	samples	missing	samples	study	study	samples
+GSE33528	GEO	Neuroscience	Microarray	2011–15	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	missing	study
+PRJNA303393	ENA	Microbial genomes	Genome & variation	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+ST004488	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA797401	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA918817	ENA	Infection & immunity	Amplicon & metagenomics	2023–24	False	False	3	4	False	samples	samples	missing	samples	samples	missing	samples	missing	study	samples
+PRJNA943439	ENA	Microbial genomes	Amplicon & metagenomics	2023–24	False	False	2	3	False	missing	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA841054	ENA	Microbial genomes	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1076982	ENA	Other / basic biology	Bulk RNA-seq	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD016968	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA458324	ENA	Plant & agriculture	Other assays	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA344731	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1388484	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE37270	GEO	Infection & immunity	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PRJEB65615	ENA	Microbial genomes	Epigenomics	2023–24	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE25591	GEO	Other / basic biology	Microarray	≤2010	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+MTBLS871	MetaboLights	Cardiometabolic & organ	Metabolomics	2020–22	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	study	samples
+PRJNA1381754	ENA	Microbiome & environment	Genome & variation	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+PRJNA379354	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PXD000476	PRIDE	Plant & agriculture	Proteomics	2016–19	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+ST002692	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+GSE239760	GEO	Cancer	Microarray	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+ST003442	MetabolomicsWorkbench	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA165575	ENA	Cardiometabolic & organ	Genome & variation	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD011654	PRIDE	Other / basic biology	Proteomics	2016–19	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PXD006429	PRIDE	Neuroscience	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE316412	GEO	Cancer	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA365873	ENA	Microbiome & environment	Bulk RNA-seq	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE288837	GEO	Development & stem cells	Epigenomics	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA1089616	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJEB127835	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PRJNA827178	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	1	3	False	missing	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE12117	GEO	Cardiometabolic & organ	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA619715	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA1329187	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA500425	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE218087	GEO	Other / basic biology	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD006850	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD018985	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD064672	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	5	5	True	samples	samples	samples	samples	samples	missing	samples	missing	study	samples
+GSE28038	GEO	Infection & immunity	Microarray	2011–15	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PXD000872	PRIDE	Development & stem cells	Proteomics	2011–15	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE246441	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE139853	GEO	Development & stem cells	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE120363	GEO	Cancer	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+MTBLS629	MetaboLights	Infection & immunity	Metabolomics	2016–19	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	samples
+GSE73467	GEO	Development & stem cells	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA958268	ENA	Microbiome & environment	Genome & variation	2023–24	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA490238	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE284707	GEO	Plant & agriculture	Bulk RNA-seq	2023–24	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+MTBLS15209	MetaboLights	Other / basic biology	Metabolomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA1023708	ENA	Plant & agriculture	Amplicon & metagenomics	2023–24	False	True	0	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD020921	PRIDE	Neuroscience	Proteomics	2020–22	False	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+MTBLS13736	MetaboLights	Cardiometabolic & organ	Metabolomics	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE333009	GEO	Other / basic biology	Epigenomics	2025–26	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA261659	ENA	Other / basic biology	Bulk RNA-seq	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA732946	ENA	Cardiometabolic & organ	Genome & variation	2020–22	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE107222	GEO	Cancer	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PXD012522	PRIDE	Microbiome & environment	Proteomics	2016–19	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA437440	ENA	Other / basic biology	Other assays	2016–19	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST004266	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	missing	study
+PXD002573	PRIDE	Infection & immunity	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA175159	ENA	Microbial genomes	Genome & variation	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJEB83774	ENA	Other / basic biology	Epigenomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE119286	GEO	Neuroscience	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PXD042307	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+PRJNA508986	ENA	Microbiome & environment	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	samples	missing	missing	samples	missing	study	samples
+ST003298	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2023–24	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+PRJNA886069	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	1	3	False	samples	missing	missing	missing	samples	missing	samples	missing	study	samples
+PXD018314	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD021426	PRIDE	Other / basic biology	Proteomics	2020–22	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1012819	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJEB49864	ENA	Microbiome & environment	Other assays	2020–22	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	samples
+PRJDB11013	ENA	Plant & agriculture	Bulk RNA-seq	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PXD010938	PRIDE	Infection & immunity	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA308632	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE301608	GEO	Infection & immunity	Bulk RNA-seq	2025–26	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	missing	study
+MTBLS14266	MetaboLights	Neuroscience	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA957230	ENA	Infection & immunity	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+PRJDB17296	ENA	Infection & immunity	Genome & variation	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	study	study	samples
+PRJNA476594	ENA	Infection & immunity	Epigenomics	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA661098	ENA	Microbiome & environment	Bulk RNA-seq	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE223237	GEO	Cardiometabolic & organ	Bulk RNA-seq	2023–24	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	missing	study	study
+GSE188780	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD004016	PRIDE	Infection & immunity	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1044724	ENA	Plant & agriculture	Bulk RNA-seq	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA374140	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD004709	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	True	True	1	5	False	missing	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA1062553	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	True	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD001566	PRIDE	Cancer	Proteomics	2011–15	True	False	5	5	True	samples	samples	samples	samples	samples	missing	samples	study	study	samples
+GSE120884	GEO	Cancer	Genome & variation	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PXD027436	PRIDE	Infection & immunity	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE236197	GEO	Neuroscience	Single-cell	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA271858	ENA	Microbial genomes	Bulk RNA-seq	2011–15	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PXD067020	PRIDE	Infection & immunity	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD013295	PRIDE	Cancer	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE251774	GEO	Infection & immunity	Single-cell	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE136899	GEO	Infection & immunity	Other assays	2020–22	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE167693	GEO	Cardiometabolic & organ	Epigenomics	2020–22	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	study	missing	study
+PRJNA413645	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	True	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE47620	GEO	Cancer	Microarray	2011–15	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	missing	missing	study
+GSE273373	GEO	Infection & immunity	Single-cell	2025–26	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	study	study
+GSE304063	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA213662	ENA	Microbial genomes	Bulk RNA-seq	2011–15	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE34442	GEO	Cardiometabolic & organ	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PRJNA861882	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE279752	GEO	Other / basic biology	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE129787	GEO	Microbial genomes	Bulk RNA-seq	2023–24	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+ST005026	MetabolomicsWorkbench	Cancer	Metabolomics	2025–26	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+PRJNA524207	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE152479	GEO	Other / basic biology	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+PRJNA170088	ENA	Microbial genomes	Single-cell	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD000226	PRIDE	Cardiometabolic & organ	Proteomics	2011–15	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE135990	GEO	Development & stem cells	Epigenomics	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	study	study
+GSE294249	GEO	Infection & immunity	Single-cell	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+PRJNA1081469	ENA	Plant & agriculture	Genome & variation	2023–24	False	True	1	3	False	samples	missing	missing	missing	samples	missing	samples	missing	study	samples
+PRJNA1336447	ENA	Microbiome & environment	Genome & variation	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE231744	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE302457	GEO	Infection & immunity	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA544611	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+GSE75828	GEO	Microbial genomes	Microarray	2016–19	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+ST004371	MetabolomicsWorkbench	Neuroscience	Metabolomics	2025–26	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	missing	study
+GSE15850	GEO	Other / basic biology	Microarray	≤2010	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+PRJNA817169	ENA	Other / basic biology	Genome & variation	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJEB92289	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PRJNA1384497	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA1329593	ENA	Microbial genomes	Genome & variation	2025–26	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA521235	ENA	Other / basic biology	Other assays	2016–19	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE15491	GEO	Development & stem cells	Microarray	≤2010	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+ST003566	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PXD070295	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJEB102125	ENA	Infection & immunity	Genome & variation	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE141655	GEO	Other / basic biology	Bulk RNA-seq	2020–22	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	study	study
+PRJNA645752	ENA	Plant & agriculture	Genome & variation	2020–22	False	True	1	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1491559	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE230014	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA195787	ENA	Microbial genomes	Genome & variation	2011–15	False	False	2	3	False	missing	samples	samples	missing	missing	samples	samples	missing	study	samples
+PRD000388	PRIDE	Other / basic biology	Proteomics	2011–15	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA1256694	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST000574	MetabolomicsWorkbench	Cancer	Metabolomics	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD029675	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD000510	PRIDE	Other / basic biology	Proteomics	2011–15	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD000978	PRIDE	Cardiometabolic & organ	Proteomics	2011–15	True	False	4	5	True	samples	samples	samples	samples	missing	missing	samples	study	study	samples
+PXD023034	PRIDE	Cancer	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD061787	PRIDE	Plant & agriculture	Proteomics	2025–26	False	True	1	3	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE208513	GEO	Other / basic biology	Epigenomics	2020–22	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA691138	ENA	Cardiometabolic & organ	Single-cell	2020–22	False	False	2	4	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA597271	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD041465	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA403846	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	True	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PXD020846	PRIDE	Infection & immunity	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE9929	GEO	Development & stem cells	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE137571	GEO	Cardiometabolic & organ	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE197758	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE307444	GEO	Cardiometabolic & organ	Other assays	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+MTBLS12906	MetaboLights	Neuroscience	Metabolomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE99857	GEO	Cancer	Bulk RNA-seq	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE151796	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB94587	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE236720	GEO	Cancer	Single-cell	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PXD071059	PRIDE	Development & stem cells	Proteomics	2025–26	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE214371	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA440314	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+ST003713	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD072508	PRIDE	Cardiometabolic & organ	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD043558	PRIDE	Other / basic biology	Proteomics	2023–24	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD040451	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA347888	ENA	Microbial genomes	Bulk RNA-seq	2016–19	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE112661	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE102005	GEO	Infection & immunity	Microarray	2016–19	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	study	missing	study
+PXD017546	PRIDE	Microbial genomes	Proteomics	2020–22	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PXD053130	PRIDE	Other / basic biology	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD064048	PRIDE	Microbiome & environment	Proteomics	2025–26	True	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD048382	PRIDE	Microbial genomes	Proteomics	2023–24	False	True	0	3	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE26696	GEO	Cardiometabolic & organ	Microarray	2011–15	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PRJNA588360	ENA	Microbial genomes	Epigenomics	2020–22	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE124968	GEO	Cardiometabolic & organ	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	study
+PRJEB9412	ENA	Microbiome & environment	Genome & variation	2011–15	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE12952	GEO	Other / basic biology	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA1255865	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE1639	GEO	Microbial genomes	Microarray	≤2010	False	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PXD012405	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+GSE121962	GEO	Other / basic biology	Epigenomics	2016–19	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+GSE28306	GEO	Infection & immunity	Microarray	2011–15	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PXD023729	PRIDE	Microbial genomes	Proteomics	2020–22	False	True	1	3	True	study	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE126872	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA252242	ENA	Microbiome & environment	Other assays	2011–15	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	study	study	samples
+PRJNA1378053	ENA	Infection & immunity	Genome & variation	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE38562	GEO	Other / basic biology	Epigenomics	2011–15	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+ST002377	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE63361	GEO	Neuroscience	Microarray	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PXD002572	PRIDE	Neuroscience	Proteomics	2011–15	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE174978	GEO	Other / basic biology	Epigenomics	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+MTBLS13906	MetaboLights	Infection & immunity	Metabolomics	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA1258715	ENA	Development & stem cells	Bulk RNA-seq	2025–26	False	False	2	4	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA1062060	ENA	Microbiome & environment	Genome & variation	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD049201	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD014058	PRIDE	Cancer	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE54109	GEO	Cancer	Epigenomics	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA339196	ENA	Plant & agriculture	Epigenomics	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	study	study	samples
+GSE301581	GEO	Infection & immunity	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE78523	GEO	Cancer	Microarray	2016–19	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA539711	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD051487	PRIDE	Cardiometabolic & organ	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJNA1442074	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1490115	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+PXD031448	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	True	samples	study	missing	missing	missing	missing	samples	study	study	samples
+PXD043033	PRIDE	Neuroscience	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE325893	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	missing	study
+PXD052936	PRIDE	Infection & immunity	Proteomics	2023–24	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJDB7101	ENA	Infection & immunity	Bulk RNA-seq	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE144194	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD059471	PRIDE	Cancer	Proteomics	2025–26	True	True	1	5	False	missing	study	missing	missing	missing	missing	missing	study	study	study
+GSE165287	GEO	Neuroscience	Bulk RNA-seq	2023–24	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+GSE187070	GEO	Other / basic biology	Epigenomics	2020–22	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PXD061760	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD031009	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD016734	PRIDE	Infection & immunity	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	missing	study	study
+MTBLS9567	MetaboLights	Infection & immunity	Metabolomics	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE153246	GEO	Cancer	Microarray	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+MTBLS28	MetaboLights	Cancer	Metabolomics	2011–15	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	study	study	samples
+ST002147	MetabolomicsWorkbench	Neuroscience	Metabolomics	2020–22	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	missing	missing	study
+PRJNA168119	ENA	Microbial genomes	Genome & variation	2011–15	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE322250	GEO	Infection & immunity	Epigenomics	2025–26	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA601593	ENA	Microbiome & environment	Bulk RNA-seq	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA377789	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	study	study	samples
+PRJNA202029	ENA	Other / basic biology	Genome & variation	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE26613	GEO	Infection & immunity	Microarray	2011–15	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PRJNA1275341	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA460945	ENA	Other / basic biology	Other assays	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA964503	ENA	Plant & agriculture	Bulk RNA-seq	2023–24	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD024217	PRIDE	Other / basic biology	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PRJEB53214	ENA	Plant & agriculture	Amplicon & metagenomics	2020–22	False	True	1	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE280353	GEO	Plant & agriculture	Epigenomics	2025–26	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA173233	ENA	Microbial genomes	Genome & variation	2011–15	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	study	study	samples
+PRJNA1211838	ENA	Cancer	Amplicon & metagenomics	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE245928	GEO	Neuroscience	Microarray	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+GSE85612	GEO	Microbial genomes	Epigenomics	2016–19	False	False	2	3	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE38498	GEO	Other / basic biology	Epigenomics	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA542424	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1216727	ENA	Neuroscience	Amplicon & metagenomics	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST000658	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2016–19	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	missing	study
+GSE114845	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE240157	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1404884	ENA	Microbial genomes	Bulk RNA-seq	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+MTBLS1965	MetaboLights	Cardiometabolic & organ	Metabolomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+PXD006989	PRIDE	Microbiome & environment	Proteomics	2016–19	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE53483	GEO	Development & stem cells	Bulk RNA-seq	2011–15	False	False	2	4	False	samples	missing	samples	missing	samples	missing	samples	study	study	study
+GSE128505	GEO	Development & stem cells	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA474023	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	True	1	3	False	missing	missing	missing	samples	missing	samples	samples	missing	study	samples
+GSE279860	GEO	Other / basic biology	Epigenomics	2023–24	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+ST002664	MetabolomicsWorkbench	Other / basic biology	Metabolomics	2023–24	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	missing	study
+GSE258331	GEO	Infection & immunity	Epigenomics	2023–24	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA1503481	ENA	Other / basic biology	Genome & variation	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+PXD081552	PRIDE	Infection & immunity	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE318530	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1103393	ENA	Development & stem cells	Bulk RNA-seq	2023–24	False	False	3	4	False	samples	missing	samples	samples	samples	samples	samples	missing	study	samples
+PRJNA413281	ENA	Microbial genomes	Amplicon & metagenomics	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD056814	PRIDE	Other / basic biology	Proteomics	2025–26	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA407313	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+PXD009005	PRIDE	Infection & immunity	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE184708	GEO	Infection & immunity	Single-cell	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+MTBLS12860	MetaboLights	Development & stem cells	Metabolomics	2025–26	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA1453215	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+MTBLS14203	MetaboLights	Microbiome & environment	Metabolomics	2025–26	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE90391	GEO	Cardiometabolic & organ	Epigenomics	2016–19	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA375598	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE58237	GEO	Infection & immunity	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+GSE68182	GEO	Infection & immunity	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PXD010144	PRIDE	Infection & immunity	Proteomics	2020–22	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJNA756833	ENA	Microbial genomes	Genome & variation	2020–22	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA889245	ENA	Other / basic biology	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	missing	missing	samples
+PXD001662	PRIDE	Infection & immunity	Proteomics	2011–15	False	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE168503	GEO	Neuroscience	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA599217	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE140700	GEO	Development & stem cells	Epigenomics	2016–19	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	study
+GSE118277	GEO	Other / basic biology	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+MTBLS7060	MetaboLights	Infection & immunity	Metabolomics	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+PRJNA459815	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD054002	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+GSE72502	GEO	Other / basic biology	Bulk RNA-seq	2011–15	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE4748	GEO	Infection & immunity	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PXD064858	PRIDE	Infection & immunity	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE283052	GEO	Cancer	Other assays	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+GSE98114	GEO	Infection & immunity	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE141253	GEO	Neuroscience	Microarray	2016–19	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	missing	study
+GSE236917	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD036400	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE118884	GEO	Infection & immunity	Epigenomics	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA203223	ENA	Cardiometabolic & organ	Bulk RNA-seq	2011–15	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	study	samples
+GSE112758	GEO	Cancer	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE44570	GEO	Cancer	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA1071311	ENA	Infection & immunity	Amplicon & metagenomics	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD006857	PRIDE	Other / basic biology	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE63681	GEO	Cancer	Single-cell	2011–15	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	missing	study
+PXD060313	PRIDE	Infection & immunity	Proteomics	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA344316	ENA	Microbiome & environment	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1176698	ENA	Plant & agriculture	Bulk RNA-seq	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE35357	GEO	Development & stem cells	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PXD031804	PRIDE	Infection & immunity	Proteomics	2020–22	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE307850	GEO	Cancer	Bulk RNA-seq	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PXD002162	PRIDE	Plant & agriculture	Proteomics	2020–22	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+MTBLS12895	MetaboLights	Microbiome & environment	Metabolomics	2025–26	False	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD018636	PRIDE	Microbial genomes	Proteomics	2020–22	False	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA298480	ENA	Plant & agriculture	Bulk RNA-seq	2011–15	False	False	2	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE280378	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	missing	study	study
+PRJNA1307027	ENA	Other / basic biology	Single-cell	2025–26	False	False	2	4	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA577706	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD005443	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD038665	PRIDE	Neuroscience	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE108373	GEO	Cancer	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA300036	ENA	Other / basic biology	Genome & variation	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE300358	GEO	Cancer	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+ST004099	MetabolomicsWorkbench	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE114222	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE82678	GEO	Cardiometabolic & organ	Epigenomics	2016–19	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	study	missing	study
+GSE161005	GEO	Development & stem cells	Microarray	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJEB18596	ENA	Microbial genomes	Genome & variation	2016–19	False	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	samples
+PRJNA373185	ENA	Microbiome & environment	Single-cell	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJEB54625	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	True	0	3	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE144279	GEO	Neuroscience	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD060874	PRIDE	Other / basic biology	Proteomics	2025–26	True	True	0	5	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJNA234019	ENA	Infection & immunity	Genome & variation	2011–15	True	False	2	5	False	samples	missing	missing	missing	samples	samples	samples	missing	study	samples
+GSE202526	GEO	Cancer	Epigenomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE230226	GEO	Neuroscience	Single-cell	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	missing	study	study
+PRJNA1227447	ENA	Other / basic biology	Genome & variation	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA527702	ENA	Other / basic biology	Amplicon & metagenomics	2020–22	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE205132	GEO	Other / basic biology	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB78347	ENA	Cardiometabolic & organ	Amplicon & metagenomics	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST001399	MetabolomicsWorkbench	Microbiome & environment	Metabolomics	2020–22	True	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA595721	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	True	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+MTBLS11364	MetaboLights	Infection & immunity	Metabolomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE184509	GEO	Infection & immunity	Single-cell	2023–24	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	study
+PRJNA489681	ENA	Microbiome & environment	Genome & variation	2016–19	True	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1200794	ENA	Microbiome & environment	Genome & variation	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA930069	ENA	Other / basic biology	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJEB87470	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PXD082146	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	4	5	True	samples	samples	samples	missing	samples	missing	samples	study	study	samples
+GSE57314	GEO	Cancer	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA1265895	ENA	Cardiometabolic & organ	Amplicon & metagenomics	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE11977	GEO	Cancer	Microarray	≤2010	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	study	missing	study
+GSE219120	GEO	Cancer	Single-cell	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	samples	samples	study	missing	study
+PRJNA196073	ENA	Microbiome & environment	Genome & variation	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA877373	ENA	Microbiome & environment	Genome & variation	2020–22	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE22328	GEO	Cancer	Microarray	2011–15	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	missing	study
+PRJNA1291769	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	True	1	3	False	missing	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA485122	ENA	Microbial genomes	Genome & variation	2016–19	False	False	2	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA1148758	ENA	Other / basic biology	Other assays	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE230951	GEO	Other / basic biology	Epigenomics	2023–24	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA795480	ENA	Microbiome & environment	Genome & variation	2020–22	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE30592	GEO	Other / basic biology	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE216101	GEO	Microbial genomes	Epigenomics	2020–22	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD004413	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE176062	GEO	Cancer	Bulk RNA-seq	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+ST000011	MetabolomicsWorkbench	Other / basic biology	Metabolomics	2011–15	True	True	1	5	False	missing	missing	missing	missing	samples	samples	samples	missing	missing	study
+GSE223473	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE268382	GEO	Cardiometabolic & organ	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJDB20199	ENA	Infection & immunity	Bulk RNA-seq	2025–26	True	False	5	5	False	samples	samples	samples	samples	samples	samples	samples	missing	study	samples
+PRJNA755721	ENA	Microbial genomes	Genome & variation	2020–22	False	False	2	3	False	samples	samples	missing	samples	samples	samples	samples	missing	study	samples
+PXD064583	PRIDE	Cardiometabolic & organ	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE36386	GEO	Neuroscience	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE99491	GEO	Development & stem cells	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE232524	GEO	Development & stem cells	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD057498	PRIDE	Plant & agriculture	Proteomics	2025–26	True	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE216613	GEO	Cancer	Bulk RNA-seq	2020–22	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	study
+PXD051331	PRIDE	Other / basic biology	Proteomics	2023–24	True	False	2	5	True	samples	study	missing	missing	missing	missing	samples	study	study	samples
+GSE301759	GEO	Microbiome & environment	Other assays	2025–26	True	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJEB51349	ENA	Plant & agriculture	Amplicon & metagenomics	2020–22	False	True	1	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE217762	GEO	Infection & immunity	Single-cell	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJNA606271	ENA	Cardiometabolic & organ	Genome & variation	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE214383	GEO	Neuroscience	Single-cell	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE334158	GEO	Cancer	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD056559	PRIDE	Other / basic biology	Proteomics	2025–26	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+GSE2489	GEO	Infection & immunity	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PXD012556	PRIDE	Infection & immunity	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE123049	GEO	Plant & agriculture	Other assays	2020–22	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE149391	GEO	Neuroscience	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJEB88664	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+GSE324943	GEO	Cardiometabolic & organ	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJDB41008	ENA	Plant & agriculture	Bulk RNA-seq	2025–26	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE320817	GEO	Other / basic biology	Other assays	2025–26	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+GSE139433	GEO	Plant & agriculture	Microarray	2016–19	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE346799	GEO	Cancer	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD049082	PRIDE	Cardiometabolic & organ	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA476679	ENA	Plant & agriculture	Genome & variation	2016–19	False	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA755172	ENA	Other / basic biology	Amplicon & metagenomics	2020–22	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE323626	GEO	Other / basic biology	Epigenomics	2025–26	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+MTBLS12765	MetaboLights	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA685208	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+GSE310787	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE5937	GEO	Plant & agriculture	Microarray	≤2010	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE223833	GEO	Infection & immunity	Single-cell	2023–24	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	missing	study	study
+PRJNA503103	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	True	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA388506	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA701132	ENA	Plant & agriculture	Epigenomics	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJDB10260	ENA	Cardiometabolic & organ	Bulk RNA-seq	2020–22	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE125821	GEO	Infection & immunity	Bulk RNA-seq	2016–19	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	missing	study	study
+ST003500	MetabolomicsWorkbench	Other / basic biology	Metabolomics	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+GSE115270	GEO	Cancer	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+PRJNA672212	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE321877	GEO	Neuroscience	Epigenomics	2025–26	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJEB73711	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRD000194	PRIDE	Development & stem cells	Proteomics	2011–15	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+MTBLS12770	MetaboLights	Cancer	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+MTBLS689	MetaboLights	Cardiometabolic & organ	Metabolomics	2016–19	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	samples
+PRJNA864645	ENA	Infection & immunity	Bulk RNA-seq	2020–22	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+GSE56126	GEO	Development & stem cells	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA701379	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	2	3	False	samples	samples	missing	missing	samples	samples	samples	missing	study	samples
+PRJEB47937	ENA	Infection & immunity	Single-cell	2020–22	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+PXD023634	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	True	samples	samples	missing	missing	missing	missing	samples	study	study	samples
+PRJEB67376	ENA	Plant & agriculture	Genome & variation	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PXD018174	PRIDE	Microbiome & environment	Proteomics	2020–22	True	True	1	3	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA429516	ENA	Infection & immunity	Other assays	2016–19	False	True	0	4	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD039768	PRIDE	Other / basic biology	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+ST003794	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA285997	ENA	Microbial genomes	Other assays	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJEB89803	ENA	Microbial genomes	Epigenomics	2025–26	False	True	1	3	False	missing	samples	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA769074	ENA	Plant & agriculture	Bulk RNA-seq	2020–22	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+GSE115038	GEO	Cancer	Microarray	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	missing	study
+GSE212441	GEO	Neuroscience	Epigenomics	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+GSE23764	GEO	Cancer	Microarray	≤2010	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	missing	study
+GSE79831	GEO	Cancer	Microarray	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE190416	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+MTBLS1302	MetaboLights	Plant & agriculture	Metabolomics	2020–22	False	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJNA741404	ENA	Microbial genomes	Genome & variation	2020–22	False	False	3	3	False	samples	samples	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA778660	ENA	Microbiome & environment	Single-cell	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA309061	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA520212	ENA	Microbiome & environment	Bulk RNA-seq	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA813513	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE182858	GEO	Infection & immunity	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE123042	GEO	Infection & immunity	Microarray	2016–19	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PXD004921	PRIDE	Development & stem cells	Proteomics	2016–19	False	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PRJNA1109448	ENA	Infection & immunity	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE261889	GEO	Cancer	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	study
+PXD033498	PRIDE	Infection & immunity	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE32501	GEO	Microbiome & environment	Microarray	2011–15	False	False	2	3	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PRJNA942211	ENA	Development & stem cells	Bulk RNA-seq	2023–24	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+GSE285412	GEO	Cancer	Single-cell	2025–26	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+GSE80525	GEO	Cancer	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE137285	GEO	Other / basic biology	Epigenomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA587722	ENA	Infection & immunity	Other assays	2016–19	False	False	2	4	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE301337	GEO	Infection & immunity	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA752804	ENA	Microbiome & environment	Bulk RNA-seq	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE304580	GEO	Development & stem cells	Single-cell	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJEB2510	ENA	Microbial genomes	Genome & variation	2011–15	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE230698	GEO	Cardiometabolic & organ	Microarray	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD047783	PRIDE	Other / basic biology	Proteomics	2023–24	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+GSE206412	GEO	Development & stem cells	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+GSE172999	GEO	Infection & immunity	Epigenomics	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PRJNA1107929	ENA	Microbial genomes	Genome & variation	2023–24	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE215124	GEO	Other / basic biology	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+GSE225628	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	study
+PXD039887	PRIDE	Infection & immunity	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE342858	GEO	Cardiometabolic & organ	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+PRJNA1032719	ENA	Infection & immunity	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PXD026997	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA776730	ENA	Cardiometabolic & organ	Bulk RNA-seq	2020–22	False	True	1	4	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA972180	ENA	Other / basic biology	Bulk RNA-seq	2023–24	True	True	0	5	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE53826	GEO	Other / basic biology	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE285189	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1413895	ENA	Microbial genomes	Genome & variation	2025–26	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+GSE294290	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE24849	GEO	Infection & immunity	Microarray	2011–15	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+PRJEB56246	ENA	Microbial genomes	Epigenomics	2020–22	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA559780	ENA	Cancer	Genome & variation	2020–22	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+PRJEB64357	ENA	Microbiome & environment	Genome & variation	2025–26	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1355239	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1331516	ENA	Microbial genomes	Genome & variation	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE308260	GEO	Cardiometabolic & organ	Other assays	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1040023	ENA	Plant & agriculture	Other assays	2023–24	False	False	3	3	False	samples	missing	samples	samples	missing	samples	samples	missing	study	samples
+PRJNA326306	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+GSE11872	GEO	Cancer	Microarray	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+PRJNA1059787	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+MTBLS14968	MetaboLights	Infection & immunity	Metabolomics	2025–26	False	False	2	4	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+GSE119331	GEO	Infection & immunity	Bulk RNA-seq	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+ST002314	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+GSE295820	GEO	Cancer	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+ST004242	MetabolomicsWorkbench	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA456017	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJEB51239	ENA	Cancer	Bulk RNA-seq	2020–22	True	False	4	5	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+PRJEB46240	ENA	Microbiome & environment	Amplicon & metagenomics	2020–22	False	False	2	3	False	samples	missing	missing	samples	samples	samples	samples	missing	study	samples
+PRJNA412985	ENA	Other / basic biology	Bulk RNA-seq	2016–19	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD028545	PRIDE	Infection & immunity	Proteomics	2020–22	False	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD030128	PRIDE	Neuroscience	Proteomics	2020–22	True	True	1	5	True	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE275163	GEO	Neuroscience	Single-cell	2025–26	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+PRJNA1339229	ENA	Microbiome & environment	Bulk RNA-seq	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE279372	GEO	Infection & immunity	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE27597	GEO	Infection & immunity	Microarray	2011–15	True	False	3	5	False	samples	missing	missing	samples	samples	missing	samples	study	missing	study
+PRJNA700694	ENA	Infection & immunity	Bulk RNA-seq	2020–22	False	False	2	4	False	samples	missing	missing	samples	samples	missing	samples	missing	study	samples
+GSE125492	GEO	Infection & immunity	Single-cell	2016–19	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE36478	GEO	Cancer	Microarray	2011–15	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	missing	study
+PXD010753	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	False	False	2	4	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE281831	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE287801	GEO	Development & stem cells	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE181404	GEO	Neuroscience	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	study	study
+PRJNA330279	ENA	Microbiome & environment	Genome & variation	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE273796	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1197563	ENA	Cardiometabolic & organ	Bulk RNA-seq	2023–24	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+GSE168340	GEO	Other / basic biology	Microarray	2020–22	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	missing	missing	study
+GSE315956	GEO	Development & stem cells	Bulk RNA-seq	2025–26	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+MTBLS2148	MetaboLights	Development & stem cells	Metabolomics	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE307097	GEO	Neuroscience	Epigenomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA860824	ENA	Development & stem cells	Bulk RNA-seq	2023–24	False	False	3	4	False	samples	samples	samples	missing	missing	samples	samples	missing	study	samples
+MTBLS363	MetaboLights	Cardiometabolic & organ	Metabolomics	2016–19	False	False	2	4	False	samples	missing	missing	samples	missing	missing	samples	study	study	samples
+PRJDB41970	ENA	Other / basic biology	Bulk RNA-seq	2025–26	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+PRJDB12036	ENA	Microbiome & environment	Genome & variation	2020–22	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	study	study	samples
+PXD015847	PRIDE	Cancer	Proteomics	2020–22	True	False	2	5	True	samples	samples	missing	missing	missing	missing	samples	study	study	samples
+GSE149346	GEO	Cancer	Bulk RNA-seq	2020–22	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJNA1401151	ENA	Plant & agriculture	Genome & variation	2025–26	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA583279	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD017470	PRIDE	Cardiometabolic & organ	Proteomics	2020–22	False	True	0	4	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+GSE195743	GEO	Neuroscience	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE242192	GEO	Other / basic biology	Other assays	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA436765	ENA	Microbiome & environment	Amplicon & metagenomics	2016–19	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA1157583	ENA	Cancer	Genome & variation	2025–26	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE56463	GEO	Development & stem cells	Bulk RNA-seq	2011–15	False	True	1	4	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJNA513394	ENA	Development & stem cells	Genome & variation	2016–19	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE35005	GEO	Development & stem cells	Epigenomics	2011–15	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+PRJNA567559	ENA	Plant & agriculture	Other assays	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA830979	ENA	Other / basic biology	Amplicon & metagenomics	2020–22	True	False	2	5	False	samples	missing	missing	missing	samples	missing	samples	missing	study	samples
+PRJNA1337265	ENA	Microbiome & environment	Genome & variation	2025–26	False	False	3	3	False	samples	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA535372	ENA	Plant & agriculture	Genome & variation	2020–22	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+ST000048	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PRJNA1093236	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE270457	GEO	Neuroscience	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE18091	GEO	Other / basic biology	Microarray	2011–15	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+PRJNA944840	ENA	Other / basic biology	Bulk RNA-seq	2023–24	False	True	1	4	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE19914	GEO	Neuroscience	Microarray	≤2010	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	study	missing	study
+PRJNA653449	ENA	Microbiome & environment	Genome & variation	2020–22	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD033400	PRIDE	Cancer	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE199368	GEO	Infection & immunity	Bulk RNA-seq	2023–24	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PXD034532	PRIDE	Infection & immunity	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA281555	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	False	3	3	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+GSE192546	GEO	Cancer	Single-cell	2020–22	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	study	study
+PXD077910	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	5	5	True	samples	samples	samples	samples	samples	missing	samples	study	study	samples
+PRJEB127332	ENA	Microbial genomes	Epigenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA1422499	ENA	Neuroscience	Bulk RNA-seq	2025–26	True	False	4	5	False	samples	missing	samples	samples	samples	samples	samples	missing	study	samples
+MTBLS482	MetaboLights	Neuroscience	Metabolomics	2016–19	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD038840	PRIDE	Infection & immunity	Proteomics	2023–24	False	True	1	4	True	samples	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD045261	PRIDE	Cancer	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE138067	GEO	Infection & immunity	Epigenomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE337323	GEO	Cancer	Epigenomics	2025–26	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	study
+PXD017474	PRIDE	Cancer	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+GSE157855	GEO	Infection & immunity	Microarray	2020–22	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	missing	missing	study
+GSE85563	GEO	Other / basic biology	Bulk RNA-seq	2016–19	True	False	4	5	False	samples	samples	samples	samples	missing	missing	samples	study	study	study
+GSE70682	GEO	Infection & immunity	Microarray	2011–15	False	False	2	4	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE129617	GEO	Cancer	Microarray	2020–22	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	missing	study
+GSE72287	GEO	Development & stem cells	Epigenomics	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+MTBLS12783	MetaboLights	Cancer	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+GSE64261	GEO	Infection & immunity	Microarray	2011–15	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PXD017480	PRIDE	Infection & immunity	Proteomics	2020–22	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+GSE189278	GEO	Microbial genomes	Bulk RNA-seq	2020–22	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB80081	ENA	Microbial genomes	Epigenomics	2023–24	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+PRJNA1114402	ENA	Cardiometabolic & organ	Bulk RNA-seq	2023–24	False	False	2	4	False	samples	missing	samples	missing	samples	missing	samples	missing	study	samples
+PRJNA1481768	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	True	True	0	3	False	missing	missing	missing	missing	missing	missing	missing	missing	study	missing
+PXD076520	PRIDE	Infection & immunity	Proteomics	2025–26	True	True	1	5	False	missing	study	missing	missing	missing	missing	missing	study	study	study
+MTBLS12333	MetaboLights	Infection & immunity	Metabolomics	2025–26	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	missing	study	samples
+PXD001491	PRIDE	Cardiometabolic & organ	Proteomics	2016–19	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA997586	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	True	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA334025	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PXD035459	PRIDE	Cancer	Proteomics	2020–22	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PXD059160	PRIDE	Cancer	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD046207	PRIDE	Other / basic biology	Proteomics	2023–24	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA373438	ENA	Plant & agriculture	Bulk RNA-seq	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA384395	ENA	Microbial genomes	Bulk RNA-seq	2016–19	False	False	2	3	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+PRJNA1188200	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PRJNA329785	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE44423	GEO	Development & stem cells	Microarray	2016–19	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	missing	missing	study
+GSE190516	GEO	Other / basic biology	Microarray	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	missing	study
+PXD030815	PRIDE	Microbial genomes	Proteomics	2020–22	False	True	0	3	True	missing	missing	missing	missing	missing	missing	samples	study	study	samples
+PXD057778	PRIDE	Cancer	Proteomics	2025–26	True	True	1	5	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA778747	ENA	Cancer	Bulk RNA-seq	2023–24	False	False	4	4	False	samples	samples	samples	samples	samples	missing	samples	missing	study	samples
+GSE103698	GEO	Neuroscience	Bulk RNA-seq	2016–19	True	False	4	5	False	samples	missing	samples	samples	samples	missing	samples	study	study	study
+ST002923	MetabolomicsWorkbench	Infection & immunity	Metabolomics	2023–24	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	missing	missing	study
+GSE158803	GEO	Cancer	Single-cell	2020–22	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	study
+GSE216185	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+PRJNA301394	ENA	Plant & agriculture	Amplicon & metagenomics	2011–15	False	True	0	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+GSE147616	GEO	Microbial genomes	Bulk RNA-seq	2020–22	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJNA1263151	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	samples	missing	samples	samples	missing	study	samples
+GSE151982	GEO	Other / basic biology	Epigenomics	2020–22	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+GSE75723	GEO	Infection & immunity	Microarray	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	missing	study
+GSE330110	GEO	Infection & immunity	Bulk RNA-seq	2025–26	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	missing	study	study
+GSE86705	GEO	Other / basic biology	Epigenomics	2016–19	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA1134173	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+ST001140	MetabolomicsWorkbench	Cardiometabolic & organ	Metabolomics	2016–19	True	False	4	5	False	samples	samples	samples	samples	missing	missing	samples	missing	missing	study
+PXD043523	PRIDE	Other / basic biology	Proteomics	2023–24	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PXD010161	PRIDE	Neuroscience	Proteomics	2016–19	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+GSE265876	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	4	5	False	samples	samples	samples	missing	samples	missing	samples	study	study	study
+GSE197647	GEO	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PXD076809	PRIDE	Infection & immunity	Proteomics	2025–26	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD060391	PRIDE	Neuroscience	Proteomics	2025–26	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	missing	study	study
+MTBLS14186	MetaboLights	Neuroscience	Metabolomics	2025–26	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+PRJNA1245155	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	3	3	False	samples	missing	samples	samples	samples	samples	samples	missing	study	samples
+GSE25341	GEO	Other / basic biology	Epigenomics	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+PRJNA387017	ENA	Microbial genomes	Genome & variation	2016–19	False	True	1	3	False	missing	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD001866	PRIDE	Cardiometabolic & organ	Proteomics	2011–15	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA749180	ENA	Other / basic biology	Bulk RNA-seq	2020–22	False	False	3	4	False	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+PRJNA460108	ENA	Plant & agriculture	Other assays	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE103983	GEO	Neuroscience	Single-cell	2016–19	True	False	3	5	False	samples	missing	samples	samples	missing	missing	samples	study	study	study
+GSE266116	GEO	Cancer	Other assays	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+PRJEB100757	ENA	Infection & immunity	Single-cell	2025–26	False	False	3	4	False	samples	samples	missing	samples	samples	missing	samples	missing	study	samples
+PRJNA841351	ENA	Microbiome & environment	Amplicon & metagenomics	2023–24	False	False	2	3	False	missing	missing	samples	samples	missing	samples	samples	missing	study	samples
+PXD001243	PRIDE	Other / basic biology	Proteomics	2011–15	False	True	1	4	False	study	missing	missing	missing	missing	missing	missing	missing	study	study
+PXD035250	PRIDE	Neuroscience	Proteomics	2023–24	True	False	2	5	False	study	study	missing	missing	missing	missing	missing	study	study	study
+PXD001883	PRIDE	Plant & agriculture	Proteomics	2011–15	True	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PRJNA1281193	ENA	Microbiome & environment	Amplicon & metagenomics	2025–26	False	False	2	3	False	samples	missing	missing	missing	missing	samples	samples	missing	study	samples
+PXD053049	PRIDE	Microbial genomes	Proteomics	2023–24	False	True	0	3	True	missing	missing	missing	missing	missing	missing	missing	study	study	study
+PXD024574	PRIDE	Other / basic biology	Proteomics	2020–22	False	True	0	4	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+MTBLS589	MetaboLights	Neuroscience	Metabolomics	2020–22	True	False	2	5	False	samples	missing	missing	samples	missing	missing	samples	study	study	samples
+PRJNA696175	ENA	Other / basic biology	Other assays	2020–22	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+GSE127402	GEO	Other / basic biology	Epigenomics	2016–19	True	False	5	5	False	samples	samples	samples	samples	samples	missing	samples	study	missing	study
+PRJNA1218906	ENA	Plant & agriculture	Genome & variation	2025–26	False	True	1	3	False	samples	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA235380	ENA	Microbiome & environment	Bulk RNA-seq	2011–15	False	True	0	3	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+PRJNA1199345	ENA	Microbial genomes	Genome & variation	2023–24	False	True	1	3	False	samples	missing	missing	samples	missing	missing	samples	study	study	samples
+GSE193619	GEO	Development & stem cells	Bulk RNA-seq	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE14362	GEO	Infection & immunity	Bulk RNA-seq	≤2010	True	True	1	5	False	samples	missing	missing	missing	missing	missing	samples	study	study	study
+GSE39861	GEO	Microbial genomes	Microarray	2011–15	False	False	2	3	False	samples	missing	samples	missing	missing	missing	samples	study	missing	study
+GSE59310	GEO	Other / basic biology	Microarray	2011–15	False	False	3	4	False	samples	missing	samples	samples	samples	missing	samples	study	missing	study
+PRJEB30646	ENA	Cardiometabolic & organ	Amplicon & metagenomics	2016–19	False	True	0	4	False	missing	missing	missing	missing	missing	missing	samples	missing	study	samples
+GSE247941	GEO	Infection & immunity	Epigenomics	2023–24	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	study	study	study
+GSE186102	GEO	Cancer	Microarray	2020–22	True	False	3	5	False	samples	samples	missing	samples	missing	missing	samples	study	missing	study
+E-MTAB-16907	ArrayExpress	Other / basic biology	Bulk RNA-seq	2025–26	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-15917	ArrayExpress	Cancer	Single-cell	2025–26	True	False	4	5	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-8199	ArrayExpress	Cancer	Single-cell	2020–22	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-3019	ArrayExpress	Plant & agriculture	Epigenomics	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-ERAD-25	ArrayExpress	Infection & immunity	Bulk RNA-seq	2011–15	False	True	1	4	False	missing	samples	missing	missing	missing	missing	samples	missing	study	study
+E-MTAB-8274	ArrayExpress	Infection & immunity	Other assays	2020–22	True	False	3	5	False	missing	samples	samples	missing	samples	missing	samples	study	study	study
+E-MTAB-12351	ArrayExpress	Infection & immunity	Other assays	2023–24	False	False	2	4	False	missing	study	missing	samples	missing	missing	samples	study	study	study
+E-MTAB-5203	ArrayExpress	Cardiometabolic & organ	Microarray	2020–22	True	False	2	5	False	missing	missing	samples	samples	missing	missing	samples	missing	study	study
+E-MTAB-8943	ArrayExpress	Other / basic biology	Bulk RNA-seq	2020–22	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-TABM-38	ArrayExpress	Neuroscience	Microarray	≤2010	True	False	4	5	False	missing	samples	samples	samples	samples	missing	samples	study	study	study
+E-TABM-1109	ArrayExpress	Microbial genomes	Microarray	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-12234	ArrayExpress	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	samples	missing	missing	study	samples	study	study	study
+E-MTAB-5597	ArrayExpress	Cancer	Microarray	2016–19	True	True	1	5	False	missing	samples	missing	missing	missing	missing	samples	missing	study	study
+E-MTAB-6548	ArrayExpress	Development & stem cells	Microarray	2016–19	True	False	3	5	True	missing	study	samples	samples	missing	missing	samples	study	study	samples
+E-MTAB-850	ArrayExpress	Cancer	Microarray	2011–15	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	study	study	samples
+E-MTAB-2183	ArrayExpress	Cancer	Microarray	2011–15	True	False	2	5	True	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+E-MTAB-6260	ArrayExpress	Neuroscience	Microarray	2020–22	True	False	5	5	True	samples	samples	samples	samples	samples	samples	samples	missing	study	samples
+E-MTAB-11479	ArrayExpress	Infection & immunity	Bulk RNA-seq	2023–24	False	False	2	4	False	missing	missing	study	study	missing	missing	samples	missing	study	study
+E-MTAB-4768	ArrayExpress	Cardiometabolic & organ	Bulk RNA-seq	2016–19	False	True	1	4	False	missing	study	missing	missing	missing	missing	samples	missing	study	study
+E-MTAB-4779	ArrayExpress	Microbial genomes	Epigenomics	2016–19	False	True	1	3	True	missing	samples	samples	samples	samples	missing	samples	study	study	samples
+E-MTAB-15289	ArrayExpress	Infection & immunity	Bulk RNA-seq	2025–26	False	False	2	4	False	missing	study	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-539	ArrayExpress	Other / basic biology	Microarray	2011–15	True	False	3	5	True	samples	samples	samples	missing	missing	missing	samples	study	study	samples
+E-MTAB-3261	ArrayExpress	Other / basic biology	Bulk RNA-seq	2011–15	True	False	4	5	True	samples	missing	samples	samples	samples	missing	samples	study	study	samples
+E-MTAB-454	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	3	5	True	samples	missing	samples	samples	missing	missing	samples	study	study	samples
+E-TABM-705	ArrayExpress	Infection & immunity	Microarray	≤2010	True	False	2	5	False	samples	missing	study	missing	missing	missing	samples	study	study	study
+E-MTAB-458	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	2	5	True	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+E-MEXP-249	ArrayExpress	Neuroscience	Microarray	≤2010	True	False	2	5	False	missing	samples	missing	missing	samples	missing	samples	missing	study	study
+E-MTAB-3728	ArrayExpress	Neuroscience	Bulk RNA-seq	2011–15	False	False	2	4	True	samples	missing	missing	samples	samples	missing	samples	study	study	samples
+E-MEXP-3556	ArrayExpress	Other / basic biology	Microarray	2011–15	False	False	3	4	True	missing	samples	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-14656	ArrayExpress	Development & stem cells	Epigenomics	2023–24	False	True	1	4	False	missing	missing	missing	samples	missing	missing	samples	missing	study	study
+E-MTAB-13704	ArrayExpress	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	missing	samples	study	samples	missing	missing	samples	missing	study	study
+E-MTAB-16266	ArrayExpress	Infection & immunity	Epigenomics	2025–26	False	False	4	4	False	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+E-MEXP-3123	ArrayExpress	Cancer	Microarray	2011–15	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	samples
+E-MTAB-11755	ArrayExpress	Microbial genomes	Microarray	2020–22	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MEXP-1350	ArrayExpress	Infection & immunity	Microarray	≤2010	True	False	2	5	False	missing	samples	missing	study	missing	missing	samples	study	study	study
+E-MTAB-12707	ArrayExpress	Other / basic biology	Epigenomics	2023–24	True	False	4	5	True	samples	samples	samples	samples	missing	missing	samples	study	study	samples
+E-MTAB-7953	ArrayExpress	Infection & immunity	Epigenomics	2016–19	False	True	1	4	False	missing	missing	study	missing	missing	missing	samples	study	study	study
+E-MTAB-4298	ArrayExpress	Infection & immunity	Bulk RNA-seq	2011–15	False	False	2	4	False	samples	missing	study	missing	missing	missing	samples	missing	study	samples
+E-MTAB-3771	ArrayExpress	Other / basic biology	Bulk RNA-seq	2016–19	False	False	4	4	False	study	samples	study	study	missing	missing	samples	study	study	study
+E-MEXP-2647	ArrayExpress	Cancer	Microarray	≤2010	True	False	2	5	False	study	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-86	ArrayExpress	Other / basic biology	Microarray	≤2010	True	False	2	5	False	study	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-4778	ArrayExpress	Other / basic biology	Bulk RNA-seq	2016–19	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-8326	ArrayExpress	Infection & immunity	Microarray	2016–19	False	False	2	4	False	missing	missing	samples	study	missing	missing	samples	study	study	study
+E-MTAB-5020	ArrayExpress	Other / basic biology	Bulk RNA-seq	2011–15	True	False	4	5	True	samples	missing	samples	samples	samples	missing	samples	study	study	samples
+E-MTAB-5798	ArrayExpress	Microbial genomes	Microarray	2016–19	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MEXP-1655	ArrayExpress	Plant & agriculture	Microarray	≤2010	False	False	3	3	True	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-10322	ArrayExpress	Neuroscience	Bulk RNA-seq	2020–22	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-14087	ArrayExpress	Other / basic biology	Bulk RNA-seq	2025–26	True	True	1	5	False	missing	missing	missing	samples	missing	missing	samples	missing	study	study
+E-MEXP-200	ArrayExpress	Infection & immunity	Microarray	≤2010	True	False	5	5	True	samples	samples	samples	samples	samples	missing	samples	missing	study	samples
+E-MTAB-3642	ArrayExpress	Microbial genomes	Microarray	2011–15	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-15927	ArrayExpress	Development & stem cells	Single-cell	2025–26	True	False	3	5	True	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+E-MEXP-1153	ArrayExpress	Other / basic biology	Microarray	≤2010	True	False	2	5	False	missing	missing	samples	samples	missing	missing	samples	study	study	study
+E-MTAB-6767	ArrayExpress	Other / basic biology	Bulk RNA-seq	2016–19	False	False	2	4	False	missing	samples	missing	samples	samples	missing	samples	study	study	study
+E-MTAB-9802	ArrayExpress	Infection & immunity	Other assays	2020–22	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-5579	ArrayExpress	Infection & immunity	Microarray	2016–19	True	False	3	5	True	samples	samples	samples	missing	missing	missing	samples	missing	study	samples
+E-MTAB-2198	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	3	5	True	samples	missing	samples	samples	missing	missing	samples	study	study	samples
+E-MTAB-4775	ArrayExpress	Development & stem cells	Bulk RNA-seq	2016–19	True	False	3	5	False	samples	missing	samples	study	missing	missing	samples	study	study	study
+E-MEXP-1029	ArrayExpress	Cancer	Microarray	≤2010	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	study
+E-TABM-329	ArrayExpress	Neuroscience	Microarray	≤2010	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-639	ArrayExpress	Other / basic biology	Microarray	2011–15	False	False	3	4	False	missing	study	study	samples	samples	missing	samples	study	study	study
+E-MTAB-7260	ArrayExpress	Infection & immunity	Bulk RNA-seq	2016–19	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-14954	ArrayExpress	Other / basic biology	Bulk RNA-seq	2025–26	False	True	1	4	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-43	ArrayExpress	Other / basic biology	Microarray	≤2010	True	True	1	5	False	missing	missing	study	missing	missing	missing	samples	study	study	study
+E-MTAB-15094	ArrayExpress	Cardiometabolic & organ	Bulk RNA-seq	2025–26	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-12013	ArrayExpress	Cancer	Bulk RNA-seq	2023–24	True	False	3	5	False	samples	samples	missing	study	missing	missing	samples	missing	study	samples
+E-MEXP-145	ArrayExpress	Neuroscience	Microarray	≤2010	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-5204	ArrayExpress	Cardiometabolic & organ	Epigenomics	2020–22	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-14089	ArrayExpress	Cancer	Bulk RNA-seq	2023–24	True	False	2	5	False	missing	study	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-14997	ArrayExpress	Other / basic biology	Epigenomics	2025–26	True	False	2	5	False	missing	study	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-8355	ArrayExpress	Cancer	Bulk RNA-seq	2020–22	True	False	3	5	False	samples	missing	samples	missing	samples	missing	samples	missing	study	samples
+E-MTAB-3385	ArrayExpress	Microbial genomes	Microarray	2011–15	False	False	2	3	False	study	samples	samples	missing	missing	missing	samples	missing	study	study
+E-MEXP-835	ArrayExpress	Neuroscience	Microarray	≤2010	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	study	study	study
+E-MEXP-2426	ArrayExpress	Neuroscience	Microarray	≤2010	True	False	2	5	False	samples	missing	missing	study	missing	missing	samples	study	study	study
+E-MTAB-4108	ArrayExpress	Other / basic biology	Microarray	2016–19	True	True	1	5	False	missing	missing	samples	missing	missing	samples	samples	missing	study	samples
+E-MTAB-3855	ArrayExpress	Cancer	Microarray	2016–19	True	True	1	5	False	missing	samples	missing	missing	missing	missing	samples	missing	study	study
+E-MTAB-6407	ArrayExpress	Other / basic biology	Other assays	2016–19	True	False	3	5	False	missing	samples	study	missing	samples	missing	samples	missing	study	study
+E-MTAB-15453	ArrayExpress	Development & stem cells	Bulk RNA-seq	2025–26	True	False	2	5	False	missing	missing	study	study	missing	missing	samples	missing	study	study
+E-MTAB-4854	ArrayExpress	Cancer	Microarray	2016–19	True	False	4	5	False	missing	study	study	samples	samples	missing	samples	missing	study	study
+E-MEXP-407	ArrayExpress	Other / basic biology	Microarray	≤2010	True	False	2	5	True	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+E-TABM-1089	ArrayExpress	Cardiometabolic & organ	Microarray	2011–15	False	False	2	4	False	missing	samples	study	missing	missing	missing	samples	study	study	study
+E-MTAB-4288	ArrayExpress	Plant & agriculture	Bulk RNA-seq	2011–15	False	True	1	3	True	missing	missing	samples	missing	samples	missing	samples	study	study	samples
+E-MTAB-11779	ArrayExpress	Other / basic biology	Microarray	2020–22	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	study	study	samples
+E-TABM-26	ArrayExpress	Other / basic biology	Microarray	≤2010	True	False	2	5	False	missing	samples	missing	samples	missing	missing	samples	study	study	study
+E-MTAB-12559	ArrayExpress	Infection & immunity	Single-cell	2023–24	True	False	4	5	False	missing	samples	samples	samples	samples	missing	samples	missing	study	study
+E-MTAB-4520	ArrayExpress	Microbial genomes	Microarray	2016–19	False	True	1	3	True	missing	missing	samples	missing	missing	missing	samples	missing	study	samples
+E-MTAB-7890	ArrayExpress	Infection & immunity	Microarray	2016–19	True	False	3	5	False	samples	samples	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-14352	ArrayExpress	Neuroscience	Bulk RNA-seq	2025–26	True	False	2	5	False	samples	missing	missing	study	missing	missing	samples	missing	study	samples
+E-MTAB-10664	ArrayExpress	Cancer	Bulk RNA-seq	2020–22	True	True	1	5	False	missing	samples	missing	missing	missing	missing	samples	study	study	study
+E-MTAB-10259	ArrayExpress	Microbial genomes	Other assays	2020–22	False	True	1	3	False	missing	samples	samples	missing	missing	missing	samples	study	study	study
+E-TABM-212	ArrayExpress	Cancer	Microarray	≤2010	True	False	4	5	True	samples	missing	samples	samples	samples	missing	samples	study	study	samples
+E-MTAB-11933	ArrayExpress	Infection & immunity	Microarray	2020–22	True	False	4	5	False	missing	samples	samples	samples	samples	missing	samples	missing	study	study
+E-MEXP-3037	ArrayExpress	Microbial genomes	Microarray	2011–15	False	True	1	3	True	missing	missing	samples	missing	missing	missing	samples	study	study	samples
+E-MEXP-2823	ArrayExpress	Microbial genomes	Microarray	≤2010	False	True	1	3	True	missing	study	samples	missing	missing	missing	samples	study	study	samples
+E-MEXP-3386	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	4	5	False	samples	samples	missing	samples	samples	missing	samples	missing	study	samples
+E-BUGS-41	ArrayExpress	Microbial genomes	Microarray	≤2010	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-6799	ArrayExpress	Cancer	Microarray	2016–19	True	False	4	5	True	samples	samples	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-9517	ArrayExpress	Plant & agriculture	Bulk RNA-seq	2020–22	False	True	1	3	False	missing	study	samples	missing	missing	missing	samples	missing	study	study
+E-TABM-398	ArrayExpress	Cancer	Microarray	≤2010	True	False	2	5	False	samples	samples	missing	missing	missing	missing	samples	study	study	samples
+E-MEXP-575	ArrayExpress	Cancer	Microarray	≤2010	True	False	2	5	False	samples	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-12505	ArrayExpress	Infection & immunity	Other assays	2023–24	True	True	1	5	False	missing	missing	samples	missing	missing	missing	samples	missing	study	study
+E-MEXP-2131	ArrayExpress	Development & stem cells	Microarray	≤2010	True	False	2	5	True	samples	missing	missing	samples	missing	missing	samples	study	study	samples
+E-MTAB-13086	ArrayExpress	Plant & agriculture	Bulk RNA-seq	2023–24	False	True	1	3	False	missing	missing	samples	missing	missing	missing	samples	study	study	study
+E-MTAB-11030	ArrayExpress	Cardiometabolic & organ	Bulk RNA-seq	2020–22	True	False	2	5	False	missing	missing	study	study	missing	missing	samples	missing	study	study
+E-MTAB-1566	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	3	5	True	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-9108	ArrayExpress	Cancer	Bulk RNA-seq	2020–22	True	False	4	5	False	study	samples	samples	study	missing	missing	samples	missing	study	study
+E-MTAB-14611	ArrayExpress	Other / basic biology	Bulk RNA-seq	2025–26	True	False	2	5	False	missing	study	study	missing	missing	missing	samples	study	study	study
+E-TIGR-48	ArrayExpress	Cardiometabolic & organ	Microarray	≤2010	True	False	2	5	False	missing	missing	samples	missing	samples	missing	samples	missing	study	study
+E-MTAB-6059	ArrayExpress	Cancer	Microarray	2016–19	True	False	3	5	False	study	samples	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-9338	ArrayExpress	Neuroscience	Bulk RNA-seq	2020–22	True	False	2	5	False	missing	samples	samples	missing	missing	missing	samples	missing	study	study
+E-MTAB-1019	ArrayExpress	Infection & immunity	Microarray	2011–15	True	False	2	5	True	samples	missing	samples	missing	missing	missing	samples	study	study	samples
+E-TABM-384	ArrayExpress	Plant & agriculture	Microarray	≤2010	False	False	2	3	False	missing	missing	samples	study	missing	missing	samples	study	study	study
+E-MTAB-2097	ArrayExpress	Other / basic biology	Microarray	2011–15	True	False	3	5	True	samples	samples	samples	missing	missing	missing	samples	missing	study	samples
+E-MTAB-3191	ArrayExpress	Cancer	Microarray	2011–15	True	False	2	5	True	samples	missing	samples	missing	missing	missing	samples	missing	study	samples
+E-ATMX-21	ArrayExpress	Plant & agriculture	Microarray	≤2010	False	False	2	3	True	missing	missing	samples	samples	missing	missing	samples	study	study	samples
+E-TABM-1034	ArrayExpress	Other / basic biology	Microarray	≤2010	True	False	3	5	True	samples	samples	samples	missing	missing	missing	samples	study	study	samples
+E-SMDB-985	ArrayExpress	Other / basic biology	Microarray	≤2010	True	True	0	5	False	missing	missing	missing	missing	missing	missing	missing	study	study	study
+E-MEXP-3353	ArrayExpress	Other / basic biology	Microarray	2011–15	True	True	1	5	True	missing	missing	samples	missing	missing	missing	samples	study	study	samples
+E-MEXP-498	ArrayExpress	Other / basic biology	Other assays	≤2010	True	False	4	5	True	samples	missing	samples	samples	samples	missing	samples	missing	study	samples
+E-ERAD-228	ArrayExpress	Cardiometabolic & organ	Bulk RNA-seq	2011–15	True	False	3	5	True	samples	missing	samples	samples	missing	missing	samples	missing	study	samples
+E-MTAB-14026	ArrayExpress	Microbial genomes	Other assays	2023–24	False	True	1	3	False	missing	missing	study	missing	missing	missing	missing	missing	study	study

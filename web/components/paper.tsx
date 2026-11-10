@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { size } from "@/components/row-details";
 import { dataType } from "@/components/result-card";
@@ -38,9 +39,12 @@ export function PaperPage({ id }: { id: string }) {
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 content-start gap-10">
       <nav className="flex items-center justify-between gap-4">
-        <Link href="/" aria-label="locus home" className="leading-none">
-          <Wordmark className="text-[30px]" />
-        </Link>
+        <div className="flex min-w-0 items-center gap-5">
+          <Link href="/" aria-label="locus home" className="leading-none">
+            <Wordmark className="text-[30px]" />
+          </Link>
+          <BackToResults />
+        </div>
         {source && (
           <a href={source} target="_blank" rel="noreferrer" className={cn("flex shrink-0 items-center gap-1 text-[13px]", MUTED_LINK)}>
             {rec?.sources.doi ? "Paper at the publisher" : "Paper at Europe PMC"}
@@ -53,7 +57,7 @@ export function PaperPage({ id }: { id: string }) {
         <p className="text-sm">Europe PMC has no paper {id}. <Link href={`/?q=${encodeURIComponent(id)}`} className={LINK}>Search instead</Link>.</p>
       ) : error ? (
         <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
-          {error === "502" ? "Europe PMC did not answer." : "locus could not read this paper."}
+          {error === "502" ? "Europe PMC did not answer." : error === "503" ? "locus is reading Europe PMC for many people at once. Please try again in a few seconds." : "locus could not read this paper."}
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
         </p>
       ) : !rec ? (

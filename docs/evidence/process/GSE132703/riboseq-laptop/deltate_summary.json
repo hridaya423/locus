@@ -1,0 +1,84 @@
+{
+  "genes": 19857,
+  "genes_tested": 3174,
+  "genes_with_padj_te": 713,
+  "classes": {
+    "translationally regulated": 23,
+    "buffered": 0,
+    "transcriptional": 1,
+    "intensified": 0,
+    "unchanged": 3150
+  },
+  "te_up": 2,
+  "te_down": 21,
+  "top_translational": [
+    {
+      "gene": "GAPDH",
+      "log2fc_te": -2.03,
+      "padj_te": 1.27e-14,
+      "log2fc_rna": 0.323,
+      "log2fc_ribo": -1.737
+    },
+    {
+      "gene": "PABPC1",
+      "log2fc_te": -2.42,
+      "padj_te": 5.86e-11,
+      "log2fc_rna": -0.107,
+      "log2fc_ribo": -2.547
+    },
+    {
+      "gene": "YBX1",
+      "log2fc_te": -2.397,
+      "padj_te": 4.08e-06,
+      "log2fc_rna": 0.318,
+      "log2fc_ribo": -2.083
+    },
+    {
+      "gene": "HSPA8",
+      "log2fc_te": -2.384,
+      "padj_te": 0.00221,
+      "log2fc_rna": -1.024,
+      "log2fc_ribo": -3.458
+    },
+    {
+      "gene": "VIM",
+      "log2fc_te": -1.78,
+      "padj_te": 0.00221,
+      "log2fc_rna": 0.585,
+      "log2fc_ribo": -1.214
+    },
+    {
+      "gene": "CCT2",
+      "log2fc_te": -0.808,
+      "padj_te": 0.00221,
+      "log2fc_rna": 0.203,
+      "log2fc_ribo": -0.626
+    },
+    {
+      "gene": "CSDE1",
+      "log2fc_te": -0.916,
+      "padj_te": 0.00461,
+      "log2fc_rna": 0.113,
+      "log2fc_ribo": -0.848
+    },
+    {
+      "gene": "HNRNPDL",
+      "log2fc_te": -0.896,
+      "padj_te": 0.00461,
+      "log2fc_rna": 0.164,
+      "log2fc_ribo": -0.75
+    }
+  ],
+  "design": {
+    "te": "~ condition + assay + condition:assay",
+    "rna": "~ condition (RNA-seq libraries)",
+    "ribo": "~ condition (Ribo-seq libraries)",
+    "te_coefficient": "conditiontorin_1.assayribo",
+    "filter": ">= 10 counts in >= 4 libraries of each assay"
+  },
+  "versions": {
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "ggplot2": "4.0.3"
+  }
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { LINK, MUTED_LINK } from "@/components/page-kit";
 import { browseValue, datasetPath, repositoryName, type Browse } from "@/lib/api";
 
@@ -34,7 +35,7 @@ export function BrowsePage() {
   };
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 content-start gap-10">
-      <nav><Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link></nav>
+      <nav className="flex items-center gap-5"><Link href="/" aria-label="locus home" className="leading-none"><Wordmark className="text-[30px]" /></Link><BackToResults /></nav>
       <header className="grid gap-3">
         <p className="font-mono text-[12.5px] text-muted-foreground">{field}</p>
         <h1 className="max-w-4xl font-display text-[34px] leading-[1.08] sm:text-[44px]">{value}</h1>

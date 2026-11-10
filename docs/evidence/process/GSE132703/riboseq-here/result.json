@@ -1,0 +1,259 @@
+{
+  "accession": "GSE132703",
+  "data_type": "riboseq",
+  "tier": "here",
+  "title": "Torin 1 vs DMSO from 'treatment', 4 + 4 Ribo-seq/RNA-seq pairs, 10,301 genes tested",
+  "summary": [
+    "The counts are the authors' own quantification as deposited in GEO, not locus's; locus only joined and tested them.",
+    "Torin 1 versus DMSO ('treatment'): 4 Ribo-seq/RNA-seq pairs against 4, 10,301 genes tested of 20,431 counted.",
+    "At padj < 0.05, 463 genes are translationally regulated (\u0394TE changes while the mRNA does not), 9 are buffered, 36 change transcriptionally with the ribosomes following the mRNA, 6 are intensified and 9,787 are unchanged.",
+    "\u0394TE falls in 326 genes and rises in 152.",
+    "The translationally regulated genes with the smallest \u0394TE adjusted p-values are VDAC1, PABPC1, GAPDH, CSDE1, PRPS2, KARS, HIST1H2AG, CCT2."
+  ],
+  "figures": [
+    {
+      "file": "deltate_scatter.png",
+      "title": "\u0394TE",
+      "caption": "\u0394 RNA against \u0394 Ribo (log2 fold change, Torin 1 vs DMSO) for 10,301 genes; 463 translationally regulated, 9 buffered, 36 transcriptional, 6 intensified at padj < 0.05; the dashed line is \u0394 Ribo = \u0394 RNA."
+    }
+  ],
+  "tables": [
+    {
+      "file": "deltate_results.tsv",
+      "title": "\u0394TE per gene"
+    }
+  ],
+  "warnings": [
+    "'genotype/variation' takes 2 values among the chosen libraries (sgLARP1, wild-type); the contrast pools them."
+  ],
+  "contrast": {
+    "field": "treatment",
+    "reference": "dmso",
+    "target": "torin_1",
+    "levels": {
+      "control": "DMSO",
+      "case": "Torin 1"
+    }
+  },
+  "samples": [
+    {
+      "gsm": "GSM3889077",
+      "title": "35YW: hek293_dmso_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 1,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889081",
+      "title": "35YW: hek293_dmso_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 1,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889078",
+      "title": "35YW: hek293_dmso_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 2,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889082",
+      "title": "35YW: hek293_dmso_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 2,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889085",
+      "title": "93C: larp1sko_dmso_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 3,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889089",
+      "title": "93C: larp1sko_dmso_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 3,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889086",
+      "title": "93C: larp1sko_dmso_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 4,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889090",
+      "title": "93C: larp1sko_dmso_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 4,
+      "condition": "dmso"
+    },
+    {
+      "gsm": "GSM3889079",
+      "title": "35YW: hek293_torin_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 5,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889083",
+      "title": "35YW: hek293_torin_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 5,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889080",
+      "title": "35YW: hek293_torin_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 6,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889084",
+      "title": "35YW: hek293_torin_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 6,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889087",
+      "title": "93C: larp1sko_torin_RPF_rep1",
+      "assay": "riboseq",
+      "pair": 7,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889091",
+      "title": "93C: larp1sko_torin_RNA_rep1",
+      "assay": "rnaseq",
+      "pair": 7,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889088",
+      "title": "93C: larp1sko_torin_RPF_rep2",
+      "assay": "riboseq",
+      "pair": 8,
+      "condition": "torin_1"
+    },
+    {
+      "gsm": "GSM3889092",
+      "title": "93C: larp1sko_torin_RNA_rep2",
+      "assay": "rnaseq",
+      "pair": 8,
+      "condition": "torin_1"
+    }
+  ],
+  "skipped": [
+    {
+      "gsm": "GSM3889093",
+      "title": "LP: larp1dko_dmso_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889094",
+      "title": "LP: larp1dko_dmso_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889095",
+      "title": "LP: larp1dko_torin_RPF_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889096",
+      "title": "LP: larp1dko_torin_RPF_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889097",
+      "title": "LP: larp1dko_dmso_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889098",
+      "title": "LP: larp1dko_dmso_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889099",
+      "title": "LP: larp1dko_torin_RNA_rep1",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM3889100",
+      "title": "LP: larp1dko_torin_RNA_rep2",
+      "reason": "beyond the cap of 4 pairs per condition"
+    },
+    {
+      "gsm": "GSM4146393",
+      "title": "larp1dko_dmso_RPF_rep1_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146394",
+      "title": "larp1dko_dmso_RPF_rep2_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146395",
+      "title": "larp1dko_torin_RPF_rep1_reseq",
+      "reason": "no count table or reads for this library"
+    },
+    {
+      "gsm": "GSM4146396",
+      "title": "larp1dko_torin_RPF_rep2_reseq",
+      "reason": "no count table or reads for this library"
+    }
+  ],
+  "classes": {
+    "translationally regulated": 463,
+    "buffered": 9,
+    "transcriptional": 36,
+    "intensified": 6,
+    "unchanged": 9787
+  },
+  "genes_tested": 10301,
+  "files": [
+    {
+      "name": "counts.tsv",
+      "bytes": 1051276
+    },
+    {
+      "name": "samples.tsv",
+      "bytes": 412
+    },
+    {
+      "name": "deltate_results.tsv",
+      "bytes": 1311193
+    },
+    {
+      "name": "deltate_summary.json",
+      "bytes": 1812
+    },
+    {
+      "name": "deltate_scatter.png",
+      "bytes": 153704
+    },
+    {
+      "name": "deltate_scatter.pdf",
+      "bytes": 406335
+    },
+    {
+      "name": "manifest.json",
+      "bytes": 8685
+    }
+  ],
+  "seconds": 23,
+  "tools": {
+    "locus riboseq": "here",
+    "R": "4.5.3",
+    "DESeq2": "1.50.2",
+    "ggplot2": "4.0.3"
+  }
+}

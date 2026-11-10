@@ -6,7 +6,7 @@ import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
 import { Preview } from "@/components/preview";
 import { size } from "@/components/row-details";
 import type { Selection } from "@/components/design";
-import { repositoryName, type DatasetRecord, type RecordFile } from "@/lib/api";
+import { maxquantKit, repositoryName, type DatasetRecord, type RecordFile } from "@/lib/api";
 
 type Group = { name: string; files: RecordFile[]; bytes: number; processed: number };
 
@@ -73,6 +73,7 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
         </figure>
       )}
       {list.map((g) => <FileGroup key={g.name} group={g} accession={rec.accession} />)}
+      {rec.source === "PRIDE" && rec.accession.startsWith("PXD") && rec.files.some((f) => !f.processed) && <MaxquantKit accession={rec.accession} />}
       {plan && downloads(plan) && !nothing && (
         <details id="download-commands" className="group/plan scroll-mt-16">
           <summary className={cn("flex w-fit cursor-pointer list-none items-center gap-1 text-[13px] [&::-webkit-details-marker]:hidden", MUTED_LINK)}>
@@ -89,6 +90,38 @@ export function Files({ rec, selection }: { rec: DatasetRecord; selection?: Sele
         </details>
       )}
     </section>
+  );
+}
+
+// A zip of mqpar.xml and resume-safe scripts built from the project's SDRF. locus writes it; the search runs elsewhere.
+function MaxquantKit({ accession }: { accession: string }) {
+  const [state, setState] = useState<"idle" | "writing" | { failed: string }>("idle");
+  async function download() {
+    setState("writing");
+    try {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(await maxquantKit(accession));
+      a.download = `${accession}-maxquant.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setState("idle");
+    } catch (error) {
+      setState({ failed: error instanceof Error ? error.message : "The kit could not be written. Try again." });
+    }
+  }
+  return (
+    <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px]">
+      <button type="button" onClick={download} disabled={state === "writing"} className={cn("inline-flex w-fit items-center gap-1 font-medium disabled:cursor-wait", LINK)}>
+        <Download aria-hidden className="size-3.5" /> MaxQuant kit
+      </button>
+      <span role="status" className={cn("text-[12.5px]", typeof state === "object" ? "text-warn" : "text-muted-foreground")}>
+        {typeof state === "object"
+          ? state.failed
+          : state === "writing"
+            ? "Writing…"
+            : "mqpar.xml and run scripts from the SDRF, to reprocess the raw files on an x86-64 workstation or cluster with 16 GB of RAM."}
+      </span>
+    </p>
   );
 }
 

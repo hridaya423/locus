@@ -1,0 +1,386 @@
+{
+ "population": 832348,
+ "audited_live": 1120,
+ "estimated_poor": 269531.1877777779,
+ "poor_rate": 0.32382031046843124,
+ "groups": {
+  "domain": {
+   "Plant & agriculture": {
+    "poor_rate": 0.44451448789084197,
+    "ci90": [
+     0.3336613371045365,
+     0.5381612546436811
+    ],
+    "n_audited": 79,
+    "estimated_poor": 33697.90000000001,
+    "datasets": 52820.0
+   },
+   "Microbiome & environment": {
+    "poor_rate": 0.4215821335731916,
+    "ci90": [
+     0.34687437477053557,
+     0.49653511659249233
+    ],
+    "n_audited": 119,
+    "estimated_poor": 57845.29555555559,
+    "datasets": 156860.0
+   },
+   "Cardiometabolic & organ": {
+    "poor_rate": 0.3494263416251277,
+    "ci90": [
+     0.24196005896832617,
+     0.4622209642556056
+    ],
+    "n_audited": 108,
+    "estimated_poor": 19110.89555555556,
+    "datasets": 55272.0
+   },
+   "Other / basic biology": {
+    "poor_rate": 0.3393144382493069,
+    "ci90": [
+     0.27607043687992744,
+     0.4043744268892197
+    ],
+    "n_audited": 191,
+    "estimated_poor": 48628.17555555558,
+    "datasets": 149253.0
+   },
+   "Microbial genomes": {
+    "poor_rate": 0.3190866188843531,
+    "ci90": [
+     0.24270233332212157,
+     0.41062801064843196
+    ],
+    "n_audited": 108,
+    "estimated_poor": 34505.20000000001,
+    "datasets": 92486.0
+   },
+   "Infection & immunity": {
+    "poor_rate": 0.3025630477414322,
+    "ci90": [
+     0.23315452988320326,
+     0.3623355290516075
+    ],
+    "n_audited": 196,
+    "estimated_poor": 36236.36222222223,
+    "datasets": 124478.0
+   },
+   "Development & stem cells": {
+    "poor_rate": 0.2561314817986841,
+    "ci90": [
+     0.166409566747371,
+     0.3591212294070332
+    ],
+    "n_audited": 60,
+    "estimated_poor": 10989.728333333334,
+    "datasets": 44691.0
+   },
+   "Cancer": {
+    "poor_rate": 0.20871558483190286,
+    "ci90": [
+     0.14634063478278783,
+     0.2722782271109785
+    ],
+    "n_audited": 179,
+    "estimated_poor": 22759.07555555556,
+    "datasets": 107736.0
+   },
+   "Neuroscience": {
+    "poor_rate": 0.13885311793089514,
+    "ci90": [
+     0.07639902389379076,
+     0.21271459605198545
+    ],
+    "n_audited": 80,
+    "estimated_poor": 5758.555000000001,
+    "datasets": 48752.0
+   }
+  },
+  "year": {
+   "\u22642010": {
+    "poor_rate": 0.483099080181788,
+    "ci90": [
+     0.3476203128261717,
+     0.6089964838853739
+    ],
+    "n_audited": 58,
+    "estimated_poor": 13767.193333333333,
+    "datasets": 25551.0
+   },
+   "2011\u201315": {
+    "poor_rate": 0.2909956048580383,
+    "ci90": [
+     0.21448008951335348,
+     0.3642024256598206
+    ],
+    "n_audited": 138,
+    "estimated_poor": 29550.30944444445,
+    "datasets": 93372.0
+   },
+   "2016\u201319": {
+    "poor_rate": 0.3592361742460409,
+    "ci90": [
+     0.2970062048848847,
+     0.4203684370032242
+    ],
+    "n_audited": 224,
+    "estimated_poor": 63417.75722222226,
+    "datasets": 171541.0
+   },
+   "2020\u201322": {
+    "poor_rate": 0.2620187963317755,
+    "ci90": [
+     0.2068098796707678,
+     0.31620123204278766
+    ],
+    "n_audited": 235,
+    "estimated_poor": 46316.67833333335,
+    "datasets": 195994.0
+   },
+   "2023\u201324": {
+    "poor_rate": 0.290956357210491,
+    "ci90": [
+     0.2269188680316331,
+     0.35293922905065406
+    ],
+    "n_audited": 198,
+    "estimated_poor": 44106.02666666669,
+    "datasets": 165309.0
+   },
+   "2025\u201326": {
+    "poor_rate": 0.36661750733541476,
+    "ci90": [
+     0.31611775781789286,
+     0.4208430767661145
+    ],
+    "n_audited": 267,
+    "estimated_poor": 72373.22277777782,
+    "datasets": 180576.0
+   }
+  },
+  "datatype": {
+   "Proteomics": {
+    "poor_rate": 0.7100000000000001,
+    "ci90": [
+     0.6549999999999999,
+     0.76
+    ],
+    "n_audited": 200,
+    "estimated_poor": 29898.810000000034,
+    "datasets": 42151.0
+   },
+   "Other assays": {
+    "poor_rate": 0.5126284221707568,
+    "ci90": [
+     0.37003446082718927,
+     0.6488462444958456
+    ],
+    "n_audited": 45,
+    "estimated_poor": 21816.266666666666,
+    "datasets": 55531.0
+   },
+   "Amplicon & metagenomics": {
+    "poor_rate": 0.5060240963855422,
+    "ci90": [
+     0.428110599078341,
+     0.5946267696267695
+    ],
+    "n_audited": 83,
+    "estimated_poor": 53871.7666666667,
+    "datasets": 114501.0
+   },
+   "Genome & variation": {
+    "poor_rate": 0.4680439641655908,
+    "ci90": [
+     0.39611346765922,
+     0.5440380889210946
+    ],
+    "n_audited": 120,
+    "estimated_poor": 71829.02222222227,
+    "datasets": 147233.0
+   },
+   "Single-cell": {
+    "poor_rate": 0.2672722471589012,
+    "ci90": [
+     0.14858694660415192,
+     0.3807459925082888
+    ],
+    "n_audited": 54,
+    "estimated_poor": 12854.366666666667,
+    "datasets": 43501.0
+   },
+   "Metabolomics": {
+    "poor_rate": 0.26080998409396794,
+    "ci90": [
+     0.17824452465434945,
+     0.3399954117215214
+    ],
+    "n_audited": 80,
+    "estimated_poor": 2131.599999999999,
+    "datasets": 8175.0
+   },
+   "Bulk RNA-seq": {
+    "poor_rate": 0.19391049545920533,
+    "ci90": [
+     0.15308941858160605,
+     0.2399368149156081
+    ],
+    "n_audited": 273,
+    "estimated_poor": 48560.71666666668,
+    "datasets": 252903.0
+   },
+   "Microarray": {
+    "poor_rate": 0.19387673674081585,
+    "ci90": [
+     0.1425531493452452,
+     0.24937433201805437
+    ],
+    "n_audited": 176,
+    "estimated_poor": 20124.78333333333,
+    "datasets": 95799.0
+   },
+   "Epigenomics": {
+    "poor_rate": 0.10929998473289139,
+    "ci90": [
+     0.050110830866120046,
+     0.16602705079489996
+    ],
+    "n_audited": 89,
+    "estimated_poor": 8443.855555555558,
+    "datasets": 72554.0
+   }
+  }
+ },
+ "field_missing": {
+  "tissue_cell": 0.24264514762254888,
+  "disease_condition": 0.8180105506036047,
+  "intervention": 0.4767333762106982,
+  "age_stage": 0.6551414869070286,
+  "sex": 0.7693197561553743,
+  "environment_host": 0.2837725300852386,
+  "sample_table": 0.07299214257604858,
+  "paper": 0.6323280747155436
+ },
+ "field_per_sample": {
+  "tissue_cell": 0.7214008583749425,
+  "disease_condition": 0.15657773724585372,
+  "intervention": 0.5200221875679136,
+  "age_stage": 0.34117810778032015,
+  "sex": 0.2306802438446258,
+  "environment_host": 0.7162274699147612
+ },
+ "by_source": {
+  "ENA": {
+   "n_audited": 360,
+   "datasets": 461758,
+   "poor_rate": 0.41944444444444445,
+   "missing_tissue_cell": 0.3916666666666667,
+   "missing_disease_condition": 0.8721804511278196,
+   "missing_intervention": 0.5638888888888889,
+   "missing_age_stage": 0.6298342541436465,
+   "missing_sex": 0.38095238095238076,
+   "missing_environment_host": 0.23463687150837992,
+   "missing_sample_table": 0.05555555555555556,
+   "missing_paper": 0.9527777777777777
+  },
+  "GEO": {
+   "n_audited": 360,
+   "datasets": 298702,
+   "poor_rate": 0.12499999999999997,
+   "missing_tissue_cell": 0.0,
+   "missing_disease_condition": 0.8303571428571429,
+   "missing_intervention": 0.29166666666666663,
+   "missing_age_stage": 0.636103151862464,
+   "missing_sex": 0.7828947368421052,
+   "missing_environment_host": 1.0,
+   "missing_sample_table": 0.0,
+   "missing_paper": 0.21388888888888882
+  },
+  "PRIDE": {
+   "n_audited": 200,
+   "datasets": 42111,
+   "poor_rate": 0.7100000000000001,
+   "missing_tissue_cell": 0.195,
+   "missing_disease_condition": 0.6453488372093023,
+   "missing_intervention": 0.975,
+   "missing_age_stage": 0.9780219780219782,
+   "missing_sex": 0.972027972027972,
+   "missing_environment_host": 1.0,
+   "missing_sample_table": 0.8250000000000001,
+   "missing_paper": 0.125
+  },
+  "MetaboLights": {
+   "n_audited": 40,
+   "datasets": 3534,
+   "poor_rate": 0.27499999999999997,
+   "missing_tissue_cell": 0.0,
+   "missing_disease_condition": 0.7941176470588234,
+   "missing_intervention": 0.575,
+   "missing_age_stage": 0.7714285714285715,
+   "missing_sex": 0.8095238095238094,
+   "missing_environment_host": 1.0,
+   "missing_sample_table": 0.0,
+   "missing_paper": 0.4499999999999999
+  },
+  "MetabolomicsWorkbench": {
+   "n_audited": 40,
+   "datasets": 4639,
+   "poor_rate": 0.25,
+   "missing_tissue_cell": 0.024999999999999998,
+   "missing_disease_condition": 0.7894736842105261,
+   "missing_intervention": 0.525,
+   "missing_age_stage": 0.7894736842105262,
+   "missing_sex": 0.8857142857142857,
+   "missing_environment_host": 1.0,
+   "missing_sample_table": 0.0,
+   "missing_paper": 1.0
+  },
+  "ArrayExpress": {
+   "n_audited": 120,
+   "datasets": 21604,
+   "poor_rate": 0.30000000000000004,
+   "missing_tissue_cell": 0.5916666666666667,
+   "missing_disease_condition": 0.47524752475247534,
+   "missing_intervention": 0.17500000000000002,
+   "missing_age_stage": 0.5555555555555555,
+   "missing_sex": 0.7951807228915663,
+   "missing_environment_host": 1.0,
+   "missing_sample_table": 0.016666666666666666,
+   "missing_paper": 0.5083333333333333
+  }
+ },
+ "pride_sdrf": 0.18,
+ "index_only": {
+  "CELLxGENE": 2243,
+  "EGA": 16045,
+  "EVA": 1001,
+  "ExpressionAtlas": 195,
+  "LINCS": 447,
+  "MassIVE": 12719,
+  "NODE": 7865,
+  "PanoramaPublic": 476,
+  "PeptideAtlas": 2294,
+  "dbGaP": 1316,
+  "iProX": 8207,
+  "jPOST": 3179
+ },
+ "index_no_paper_by_year": {
+  "2025\u201326": 0.7366089386934148,
+  "2023\u201324": 0.6848558576399695,
+  "2020\u201322": 0.6380348398490808,
+  "2011\u201315": 0.49300810342884654,
+  "2016\u201319": 0.6356469035899851,
+  "\u22642010": 0.23745338719701678
+ },
+ "index_domain_counts": {
+  "Cancer": 107736.0,
+  "Neuroscience": 48752.0,
+  "Cardiometabolic & organ": 55272.0,
+  "Infection & immunity": 124478.0,
+  "Development & stem cells": 44691.0,
+  "Microbiome & environment": 156860.0,
+  "Other / basic biology": 149253.0,
+  "Microbial genomes": 92486.0,
+  "Plant & agriculture": 52820.0
+ }
+}

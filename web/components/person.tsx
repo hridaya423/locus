@@ -4,7 +4,9 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/logo";
+import { BackToResults } from "@/components/back-to-results";
 import { Heading, LINK, MUTED_LINK } from "@/components/page-kit";
+import { FollowPerson } from "@/components/follow-person";
 import { dataType } from "@/components/result-card";
 import { datasetPath, person, repositoryName, type Person, type PersonPaper } from "@/lib/api";
 
@@ -36,9 +38,12 @@ export function PersonPage({ name }: { name: string }) {
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 content-start gap-10">
       <nav className="flex items-center justify-between gap-4">
-        <Link href="/" aria-label="locus home" className="leading-none">
-          <Wordmark className="text-[30px]" />
-        </Link>
+        <div className="flex min-w-0 items-center gap-5">
+          <Link href="/" aria-label="locus home" className="leading-none">
+            <Wordmark className="text-[30px]" />
+          </Link>
+          <BackToResults />
+        </div>
         {rec?.search && (
           <a href={rec.search} target="_blank" rel="noreferrer" className={cn("flex shrink-0 items-center gap-1 text-[13px]", MUTED_LINK)}>
             Author search at Europe PMC
@@ -57,10 +62,11 @@ export function PersonPage({ name }: { name: string }) {
             {rec.matched! > COMMON_NAME && " A name this common belongs to several people, so these papers are not all theirs."}
           </p>
         )}
+        <FollowPerson name={name} />
       </header>
       {error ? (
         <p className="flex flex-wrap items-baseline gap-x-3 text-sm">
-          {error === "502" ? "Europe PMC did not answer." : "locus could not read this contributor."}
+          {error === "502" ? "Europe PMC did not answer." : error === "503" || error === "429" ? "locus is reading Europe PMC for many people at once. Please try again in a few seconds." : "locus could not read this contributor."}
           <button type="button" onClick={() => setAttempt((n) => n + 1)} className={LINK}>Try again</button>
         </p>
       ) : !rec ? (

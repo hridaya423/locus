@@ -1,0 +1,19 @@
+Bulk RNA-seq, Homo sapiens, 6 samples · where it can run, and what it costs for this dataset
+HERE, NOW
+A run computed earlier on this dataset, with its figures
+instant · memory none · disk none
+Show the results
+ON YOUR LAPTOP
+Subsampled reads → salmon → counts → DESeq2, five figures
+100_nm_rapamycin vs no_treatment from 'treatment', 6 samples (this machine runs it)
+about 6 min for 6 samples, plus about 7 min once for the reference · memory about 4 GB · disk about 3.3 GB
+Show the results
+Download as a zip
+uv run omics process GSE273888 --topic 'mTOR inhibitor, Torin1, rapamycin, mTORC1, mTORC2, mTOR signaling'
+copy
+ON A CLUSTER
+nf-core/rnaseq (STAR + salmon) on the full reads, as a Slurm kit
+100_nm_rapamycin vs no_treatment from 'treatment', 6 samples
+walltime 3 h (6 samples as parallel jobs; the largest has 23 M reads) · memory 32 GB per alignment job · disk about 45 GB
+not a laptop job: a human STAR index needs about 32 GB of memory
+Download the kit (zip)

@@ -1,0 +1,1318 @@
+[
+ {
+  "n": 1,
+  "question": "Matched RNA-seq and Ribo-seq before and after mTOR inhibition",
+  "wall_seconds": 220.5,
+  "timings": {
+   "plan": 0.0,
+   "gather": 6.6,
+   "triage": 58.7,
+   "prefetch": 0.0,
+   "screen": 89.4,
+   "facts": 64.7,
+   "grade": 0.4
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 26474,
+    "tokens_out": 3871,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 700.3,
+    "seconds_max": 58.68
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 13529,
+    "tokens_out": 5388,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 1013.7,
+    "seconds_max": 89.4
+   },
+   "facts": {
+    "calls": 2,
+    "tokens_in": 1844,
+    "tokens_out": 473,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 96.9,
+    "seconds_max": 64.6
+   }
+  },
+  "cost_usd": 0.0,
+  "candidates": 300,
+  "rows": [
+   [
+    "PRJEB61759",
+    "strong"
+   ],
+   [
+    "GSE241588",
+    "strong"
+   ],
+   [
+    "GSE225683",
+    "strong"
+   ],
+   [
+    "GSE132703",
+    "strong"
+   ],
+   [
+    "PRJEB46188",
+    "strong"
+   ],
+   [
+    "E-MTAB-10689",
+    "strong"
+   ],
+   [
+    "GSE263767",
+    "strong"
+   ],
+   [
+    "GSE116387",
+    "strong"
+   ],
+   [
+    "PRJNA1196484",
+    "strong"
+   ],
+   [
+    "GSE96643",
+    "strong"
+   ],
+   [
+    "PRJEB93983",
+    "strong"
+   ],
+   [
+    "GSE118422",
+    "strong"
+   ],
+   [
+    "GSE168977",
+    "strong"
+   ],
+   [
+    "E-MTAB-2940",
+    "strong"
+   ],
+   [
+    "GSE239412",
+    "partial"
+   ],
+   [
+    "GSE102246",
+    "partial"
+   ],
+   [
+    "GSE59816",
+    "partial"
+   ],
+   [
+    "GSE186779",
+    "partial"
+   ],
+   [
+    "GSE230627",
+    "partial"
+   ],
+   [
+    "GSE214652",
+    "partial"
+   ],
+   [
+    "GSE273388",
+    "partial"
+   ],
+   [
+    "GSE66927",
+    "partial"
+   ],
+   [
+    "GSE102674",
+    "partial"
+   ],
+   [
+    "GSE271325",
+    "partial"
+   ],
+   [
+    "PRJNA1307048",
+    "partial"
+   ],
+   [
+    "GSE236742",
+    "partial"
+   ],
+   [
+    "E-MTAB-8726",
+    "partial"
+   ],
+   [
+    "PRJNA491910",
+    "partial"
+   ],
+   [
+    "PRJNA721096",
+    "partial"
+   ],
+   [
+    "GSE152633",
+    "partial"
+   ],
+   [
+    "GSE134517",
+    "partial"
+   ],
+   [
+    "GSE137553",
+    "partial"
+   ],
+   [
+    "GSE304701",
+    "partial"
+   ],
+   [
+    "PRJNA830908",
+    "partial"
+   ],
+   [
+    "GSE273888",
+    "partial"
+   ],
+   [
+    "GSE178634",
+    "partial"
+   ],
+   [
+    "GSE320418",
+    "partial"
+   ],
+   [
+    "GSE35469",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "GSE36892": null,
+    "GSE35469": 38
+   },
+   "probable": {}
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 58.09,
+    "tokens_in": 2325,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.1,
+    "tokens_in": 2135,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.1,
+    "tokens_in": 2232,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.24,
+    "tokens_in": 2142,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.25,
+    "tokens_in": 2191,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.4,
+    "tokens_in": 2203,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.4,
+    "tokens_in": 2155,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.54,
+    "tokens_in": 2292,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.54,
+    "tokens_in": 2207,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.54,
+    "tokens_in": 2224,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.55,
+    "tokens_in": 2233,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 58.68,
+    "tokens_in": 2135,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 25.13,
+    "tokens_in": 730,
+    "tokens_out": 91,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 25.47,
+    "tokens_in": 1087,
+    "tokens_out": 101,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 67.2,
+    "tokens_in": 567,
+    "tokens_out": 351,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 67.65,
+    "tokens_in": 723,
+    "tokens_out": 352,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 67.83,
+    "tokens_in": 1018,
+    "tokens_out": 359,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 68.14,
+    "tokens_in": 1366,
+    "tokens_out": 360,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 68.58,
+    "tokens_in": 822,
+    "tokens_out": 360,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 71.42,
+    "tokens_in": 878,
+    "tokens_out": 381,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 72.75,
+    "tokens_in": 1269,
+    "tokens_out": 389,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 72.89,
+    "tokens_in": 1081,
+    "tokens_out": 394,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.38,
+    "tokens_in": 699,
+    "tokens_out": 419,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.06,
+    "tokens_in": 949,
+    "tokens_out": 431,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.62,
+    "tokens_in": 533,
+    "tokens_out": 434,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 83.34,
+    "tokens_in": 1050,
+    "tokens_out": 460,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 89.4,
+    "tokens_in": 757,
+    "tokens_out": 506,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 32.32,
+    "tokens_in": 835,
+    "tokens_out": 174,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 64.6,
+    "tokens_in": 1009,
+    "tokens_out": 299,
+    "max_tokens": 16000
+   }
+  ]
+ },
+ {
+  "n": 2,
+  "question": "How isoforms of one gene differ in how efficiently they are translated",
+  "wall_seconds": 179.8,
+  "timings": {
+   "done": 0.0,
+   "plan": 0.0,
+   "gather": 1.7,
+   "triage": 66.3,
+   "prefetch": 0.0,
+   "screen": 91.5,
+   "facts": 19.1,
+   "grade": 0.6
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 24531,
+    "tokens_out": 3872,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 792.4,
+    "seconds_max": 66.26
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 13535,
+    "tokens_out": 4350,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 1068.0,
+    "seconds_max": 91.49
+   },
+   "facts": {
+    "calls": 2,
+    "tokens_in": 1972,
+    "tokens_out": 192,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 34.6,
+    "seconds_max": 18.93
+   }
+  },
+  "cost_usd": 0.0,
+  "candidates": 300,
+  "rows": [
+   [
+    "PRJNA79987",
+    "strong"
+   ],
+   [
+    "E-MTAB-10452",
+    "strong"
+   ],
+   [
+    "PRJEB44747",
+    "strong"
+   ],
+   [
+    "GSE134517",
+    "strong"
+   ],
+   [
+    "PRJNA555847",
+    "strong"
+   ],
+   [
+    "GSE167223",
+    "strong"
+   ],
+   [
+    "PRJNA906650",
+    "strong"
+   ],
+   [
+    "GSE140084",
+    "strong"
+   ],
+   [
+    "E-SMDB-2546",
+    "strong"
+   ],
+   [
+    "GSE226437",
+    "strong"
+   ],
+   [
+    "GSE31539",
+    "strong"
+   ],
+   [
+    "E-MTAB-2278",
+    "strong"
+   ],
+   [
+    "PRJNA1004093",
+    "strong"
+   ],
+   [
+    "PRJEB4401",
+    "strong"
+   ],
+   [
+    "GSE263893",
+    "partial"
+   ],
+   [
+    "GSE273359",
+    "partial"
+   ],
+   [
+    "GSE239734",
+    "partial"
+   ],
+   [
+    "GSE215770",
+    "partial"
+   ],
+   [
+    "GSE46195",
+    "partial"
+   ],
+   [
+    "GSE165609",
+    "partial"
+   ],
+   [
+    "GSE69352",
+    "partial"
+   ],
+   [
+    "GSE244655",
+    "partial"
+   ],
+   [
+    "GSE45237",
+    "partial"
+   ],
+   [
+    "GSE230441",
+    "partial"
+   ],
+   [
+    "GSE198624",
+    "partial"
+   ],
+   [
+    "GSE193966",
+    "partial"
+   ],
+   [
+    "GSE180918",
+    "partial"
+   ],
+   [
+    "GSE312581",
+    "partial"
+   ],
+   [
+    "GSE128320",
+    "partial"
+   ],
+   [
+    "GSE219125",
+    "partial"
+   ],
+   [
+    "GSE180854",
+    "partial"
+   ],
+   [
+    "GSE74279",
+    "partial"
+   ],
+   [
+    "GSE207146",
+    "partial"
+   ],
+   [
+    "GSE92402",
+    "partial"
+   ],
+   [
+    "GSE126521",
+    "partial"
+   ],
+   [
+    "GSE180465",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "GSE69352": 21,
+    "GSE100007": null
+   },
+   "probable": {}
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 65.74,
+    "tokens_in": 2010,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 65.92,
+    "tokens_in": 2008,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 65.92,
+    "tokens_in": 2062,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 65.92,
+    "tokens_in": 2121,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 65.92,
+    "tokens_in": 2008,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.1,
+    "tokens_in": 1993,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.1,
+    "tokens_in": 2043,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.1,
+    "tokens_in": 2030,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.1,
+    "tokens_in": 2060,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.1,
+    "tokens_in": 2048,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.26,
+    "tokens_in": 2046,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 66.26,
+    "tokens_in": 2102,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 26.21,
+    "tokens_in": 1184,
+    "tokens_out": 93,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 31.36,
+    "tokens_in": 1188,
+    "tokens_out": 99,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 35.96,
+    "tokens_in": 700,
+    "tokens_out": 100,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 38.68,
+    "tokens_in": 1252,
+    "tokens_out": 116,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.45,
+    "tokens_in": 925,
+    "tokens_out": 318,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.78,
+    "tokens_in": 951,
+    "tokens_out": 332,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 80.51,
+    "tokens_in": 1001,
+    "tokens_out": 338,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.63,
+    "tokens_in": 1003,
+    "tokens_out": 354,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.6,
+    "tokens_in": 846,
+    "tokens_out": 346,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 84.98,
+    "tokens_in": 905,
+    "tokens_out": 357,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 87.45,
+    "tokens_in": 539,
+    "tokens_out": 368,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 87.72,
+    "tokens_in": 745,
+    "tokens_out": 371,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 89.51,
+    "tokens_in": 742,
+    "tokens_out": 380,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 91.49,
+    "tokens_in": 778,
+    "tokens_out": 388,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 91.48,
+    "tokens_in": 776,
+    "tokens_out": 390,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 15.69,
+    "tokens_in": 736,
+    "tokens_out": 86,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 18.93,
+    "tokens_in": 1236,
+    "tokens_out": 106,
+    "max_tokens": 16000
+   }
+  ]
+ },
+ {
+  "n": 3,
+  "question": "Lung fibrosis single-cell and proteomics data from patients and healthy controls",
+  "wall_seconds": 211.4,
+  "timings": {
+   "done": 0.0,
+   "plan": 0.0,
+   "gather": 1.8,
+   "triage": 89.3,
+   "prefetch": 0.0,
+   "screen": 82.4,
+   "facts": 30.4,
+   "grade": 1.6
+  },
+  "calls": {
+   "triage": {
+    "calls": 12,
+    "tokens_in": 26490,
+    "tokens_out": 3869,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 1067.6,
+    "seconds_max": 89.27
+   },
+   "screen": {
+    "calls": 15,
+    "tokens_in": 15769,
+    "tokens_out": 5562,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 1082.6,
+    "seconds_max": 82.34
+   },
+   "facts": {
+    "calls": 6,
+    "tokens_in": 5361,
+    "tokens_out": 441,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.0,
+    "seconds_sum": 78.0,
+    "seconds_max": 21.38
+   }
+  },
+  "cost_usd": 0.0,
+  "candidates": 300,
+  "rows": [
+   [
+    "PXD058805",
+    "strong"
+   ],
+   [
+    "PRJNA507827",
+    "strong"
+   ],
+   [
+    "PRJNA1369580",
+    "strong"
+   ],
+   [
+    "PXD077197",
+    "strong"
+   ],
+   [
+    "PXD036465",
+    "strong"
+   ],
+   [
+    "MSV000093129",
+    "strong"
+   ],
+   [
+    "PXD029341",
+    "strong"
+   ],
+   [
+    "MSV000094806",
+    "strong"
+   ],
+   [
+    "PXD025590",
+    "strong"
+   ],
+   [
+    "PXD008442",
+    "strong"
+   ],
+   [
+    "PXD042707",
+    "strong"
+   ],
+   [
+    "PXD017210",
+    "strong"
+   ],
+   [
+    "MSV000098032",
+    "strong"
+   ],
+   [
+    "GSE146981",
+    "partial"
+   ],
+   [
+    "GSE159354",
+    "partial"
+   ],
+   [
+    "GSE122960",
+    "partial"
+   ],
+   [
+    "GSE275264",
+    "partial"
+   ],
+   [
+    "GSE156310",
+    "partial"
+   ],
+   [
+    "GSE331144",
+    "partial"
+   ],
+   [
+    "GSE135893",
+    "partial"
+   ],
+   [
+    "GSE286182",
+    "partial"
+   ],
+   [
+    "PXD011116",
+    "partial"
+   ],
+   [
+    "GSE301982",
+    "partial"
+   ],
+   [
+    "GSE326573",
+    "partial"
+   ],
+   [
+    "GSE292589",
+    "partial"
+   ],
+   [
+    "GSE147066",
+    "partial"
+   ],
+   [
+    "PXD011129",
+    "partial"
+   ],
+   [
+    "GSE157376",
+    "partial"
+   ],
+   [
+    "GSE157996",
+    "partial"
+   ],
+   [
+    "GSE143706",
+    "partial"
+   ],
+   [
+    "PXD036638",
+    "partial"
+   ],
+   [
+    "PXD024123",
+    "partial"
+   ],
+   [
+    "PXD012322",
+    "partial"
+   ],
+   [
+    "PXD037236",
+    "partial"
+   ],
+   [
+    "GSE347725",
+    "partial"
+   ],
+   [
+    "PXD066357",
+    "partial"
+   ],
+   [
+    "GSE198153",
+    "partial"
+   ],
+   [
+    "GSE296682",
+    "partial"
+   ],
+   [
+    "GSE281482",
+    "partial"
+   ],
+   [
+    "GSE239664",
+    "partial"
+   ],
+   [
+    "PXD017145",
+    "partial"
+   ],
+   [
+    "GSE334010",
+    "partial"
+   ],
+   [
+    "PXD024113",
+    "partial"
+   ],
+   [
+    "E-MTAB-14121",
+    "partial"
+   ],
+   [
+    "GSE185492",
+    "partial"
+   ],
+   [
+    "GSE180242",
+    "partial"
+   ],
+   [
+    "GSE264233",
+    "partial"
+   ]
+  ],
+  "recall": {
+   "sure": {
+    "GSE136831": null
+   },
+   "probable": {
+    "PXD028149": null
+   }
+  },
+  "strong": {
+   "sure": [],
+   "probable": []
+  },
+  "demo_ranks": null,
+  "trace": [
+   {
+    "stage": "triage",
+    "seconds": 88.61,
+    "tokens_in": 2277,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.79,
+    "tokens_in": 2141,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.79,
+    "tokens_in": 2211,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.79,
+    "tokens_in": 2137,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.79,
+    "tokens_in": 2249,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.96,
+    "tokens_in": 2122,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.96,
+    "tokens_in": 2190,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 88.96,
+    "tokens_in": 2152,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 89.11,
+    "tokens_in": 2201,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 89.11,
+    "tokens_in": 2221,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 89.27,
+    "tokens_in": 2251,
+    "tokens_out": 323,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "triage",
+    "seconds": 89.27,
+    "tokens_in": 2338,
+    "tokens_out": 322,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 31.32,
+    "tokens_in": 1583,
+    "tokens_out": 118,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 66.84,
+    "tokens_in": 1138,
+    "tokens_out": 339,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 67.25,
+    "tokens_in": 892,
+    "tokens_out": 333,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 68.66,
+    "tokens_in": 976,
+    "tokens_out": 344,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 71.14,
+    "tokens_in": 1084,
+    "tokens_out": 365,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 75.13,
+    "tokens_in": 399,
+    "tokens_out": 391,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 75.13,
+    "tokens_in": 697,
+    "tokens_out": 386,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 75.73,
+    "tokens_in": 1244,
+    "tokens_out": 389,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 75.87,
+    "tokens_in": 1429,
+    "tokens_out": 388,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 76.52,
+    "tokens_in": 947,
+    "tokens_out": 403,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 77.9,
+    "tokens_in": 979,
+    "tokens_out": 409,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 78.87,
+    "tokens_in": 1322,
+    "tokens_out": 414,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 79.01,
+    "tokens_in": 1236,
+    "tokens_out": 416,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 81.12,
+    "tokens_in": 1087,
+    "tokens_out": 434,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "screen",
+    "seconds": 82.34,
+    "tokens_in": 756,
+    "tokens_out": 433,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 10.34,
+    "tokens_in": 645,
+    "tokens_out": 54,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 10.9,
+    "tokens_in": 953,
+    "tokens_out": 57,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 12.43,
+    "tokens_in": 858,
+    "tokens_out": 66,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 14.26,
+    "tokens_in": 648,
+    "tokens_out": 82,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 21.38,
+    "tokens_in": 1232,
+    "tokens_out": 124,
+    "max_tokens": 16000
+   },
+   {
+    "stage": "facts",
+    "seconds": 8.74,
+    "tokens_in": 1025,
+    "tokens_out": 58,
+    "max_tokens": 16000
+   }
+  ]
+ }
+]
